@@ -33,33 +33,25 @@ labels = [
 ]
 
 
-vectorizer = TfidfVectorizer(
-    lowercase=True,
-    ngram_range=(1, 2)
-)
+def train_legacy_demo(output_directory):
+    """Reproduce the 16-example demonstration only into a new separate directory."""
+    destination = Path(output_directory).resolve()
+    root = Path(__file__).resolve().parent
+    if destination == root or root in destination.parents and destination.name == "legacy_demo":
+        raise ValueError("The active legacy artifacts and metadata are protected")
+    destination.mkdir(parents=True, exist_ok=False)
+    vectorizer = TfidfVectorizer(lowercase=True, ngram_range=(1, 2))
+    model = LogisticRegression(max_iter=1000, random_state=42)
+    model.fit(vectorizer.fit_transform(texts), labels)
+    joblib.dump(vectorizer, destination / "vectorizer.joblib")
+    joblib.dump(model, destination / "phishing_model.joblib")
 
-X = vectorizer.fit_transform(texts)
 
-model = LogisticRegression(
-    max_iter=1000,
-    random_state=42
-)
-
-model.fit(X, labels)
-
-
-Path("ml").mkdir(exist_ok=True)
-
-joblib.dump(
-    vectorizer,
-    "ml/vectorizer.joblib"
-)
-
-joblib.dump(
-    model,
-    "ml/phishing_model.joblib"
-)
-
-print("SpoofZero AI model trained successfully.")
-print("Saved: ml/vectorizer.joblib")
-print("Saved: ml/phishing_model.joblib")
+if __name__ == "__main__":
+    # Support both module execution and this file's direct path, without training
+    # or writing anything merely because another module imports this one.
+    import sys
+    if not __package__:
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from ml.experiment import main
+    main()

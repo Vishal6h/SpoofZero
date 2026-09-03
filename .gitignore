@@ -93,3 +93,9 @@ Thumbs.db
 Desktop.ini
 .idea/
 .vscode/
+
+# Public ML downloads, derived text, experiment binaries, and working runs
+/ml/data/raw/
+/ml/data/processed/
+/ml/runs/
+/ml/models/**/*.joblib

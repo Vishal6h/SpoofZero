@@ -1,0 +1,22 @@
+{
+  "model_version": "legacy_demo_16",
+  "status": "active_fallback",
+  "model_type": "TF-IDF + LogisticRegression",
+  "training_examples": 16,
+  "class_counts": {
+    "0": 8,
+    "1": 8
+  },
+  "features": 185,
+  "random_seed": 42,
+  "thresholds_percent": {
+    "suspicious": 50,
+    "high": 70
+  },
+  "artifacts": {
+    "ml/vectorizer.joblib": "8eb8faebe8fb0a94989a36e37702b3bc88c1d0400860259750e8245a0d6ce30f",
+    "ml/phishing_model.joblib": "efc92ce20d0a736847148bdeef16aeee902ef91213e7392b29fffa1a96f9fabf"
+  },
+  "protected_commit": "666c31dc9deedc09a3301daaff0b791f33e1ddcd",
+  "limitations": "Demonstration fallback; no held-out evaluation or calibration at training time. Not evidence of operational reliability."
+}

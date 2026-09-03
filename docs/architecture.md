@@ -144,3 +144,32 @@ weights. The existing UI maps the two new labels to its existing amber style.
 The pipeline root schema, case storage, external enrichment, model artifacts,
 and body/IOC readiness behavior remain compatible. See
 [authentication interpretation and limitations](authentication.md) for details.
+
+
+## AI Model Readiness changes
+
+Protected reference: `666c31dc9deedc09a3301daaff0b791f33e1ddcd`.
+
+- `ml/fetch_data.py` downloads only reviewed checksum-pinned public CSVs.
+- `ml/text.py` provides deterministic readable-text normalization and bands.
+- `ml/data_pipeline.py` retains provenance, removes exact/template/near copies,
+  quarantines label conflicts and produces sealed seeded partitions.
+- `ml/experiment.py` compares four fixed models, performs training-only
+  calibration/source-transfer checks, locks validation decisions, and evaluates
+  the final holdout exactly once per lock. `ml/report.py` renders frozen metrics.
+- `ml/inference.py` gates locally trained research candidates by status,
+  normalization hash, dependency version and artifact hash. It is not called by
+  the active pipeline because the selected candidate failed source generalization.
+- `ml/train_model.py` is safe to import, provides the experiment CLI, and retains
+  the original 16 examples behind a separate-output-only demo training function.
+- `nlp_detector.py` keeps the original artifacts, scores and schema; only
+  malformed/non-text input handling changes. ML still contributes 35% of fusion.
+
+The source manifest and model/report metadata are safe aggregate artifacts. Raw
+CSV/processed text, model binaries under `ml/models`, and working runs are ignored.
+Original `ml/vectorizer.joblib` and `ml/phishing_model.joblib` remain byte-for-byte
+unchanged. No other forensic module or UI behavior is modified. The validation
+and final metrics do not establish current-inbox performance: each admitted
+source supplies one class, and held-source transfer exposes substantial bias.
+See [the model readiness methodology](ai-model-readiness.md) and
+[the frozen evaluation report](../ml/reports/AI_MODEL_READINESS.md).

@@ -158,3 +158,24 @@ Authentication findings describe parsed reports, not independently verified SPF,
 DKIM, or DMARC. Current DNS lookup context remains separate from message evidence.
 See [authentication interpretation and compatibility](docs/authentication.md)
 for reporter selection, schema additions, scoring details, and exact limitations.
+
+
+## AI Model Readiness
+
+The public-data experiment is separate from the active 16-example fallback. It
+normalizes licensed CSV text, removes duplicate templates before splitting,
+compares four lightweight linear/Naive Bayes candidates, calibrates using training
+folds, locks model choice and validation thresholds, then evaluates the final
+holdout once. Raw/processed email text and candidate binaries are ignored by Git.
+
+The selected research candidate is sigmoid-calibrated Linear SVM. It performs
+strongly on the mixed-corpus holdout but fails source-transfer checks, so it is
+**not activated**. The original model artifacts and 50/70-percent bands remain
+active; neither the UI nor forensic fusion weights changed. Missing or malformed
+NLP inputs now receive safe empty-text handling.
+
+See [the complete evaluation report](ml/reports/AI_MODEL_READINESS.md) for source
+counts, leakage controls, per-model metrics, calibration, thresholds and the
+reason promotion was blocked. [Reproduction and methodology](docs/ai-model-readiness.md)
+describes commands, artifact locations and the single-use final-test lock. The
+public benchmark's metrics must not be presented as real-inbox accuracy.

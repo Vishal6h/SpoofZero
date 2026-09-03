@@ -1,0 +1,236 @@
+{
+  "artifact_sha256": "2425a6739fae79e4532416c5f75adee06e359d88ea231e25f87cca40d6fcec86",
+  "code_sha256": {
+    "data_pipeline.py": "5b02a1f232f50f328f4c3733ef00f63e6d0675b298c5852588360728f075dba3",
+    "experiment.py": "67fd9c5d823a27c53fcf1334f65c2a3e3c13bb5fc185c332aae5a399560032ee",
+    "text.py": "2a29a731c36837de72d91049d53610da59221a742f6ba54ed4fecf8e468e62b6"
+  },
+  "dataset_id": "c6b0e37c08dff14351fa5b4c1ae118cef8e65ef1ff16374b875cbe3abd19d428",
+  "dataset_manifest_sha256": "6dc1477dbde2742f54d3502789d5b07ed0d022c845c68c88fe594b4e16bafb15",
+  "feature_settings": {
+    "max_df": 0.98,
+    "max_features": 50000,
+    "min_df": 2,
+    "ngram_range": [
+      1,
+      2
+    ],
+    "strip_accents": "unicode",
+    "sublinear_tf": true
+  },
+  "legacy_artifacts_overwritten": false,
+  "model_type": "linear_svm_sigmoid",
+  "model_version": "candidate_v1",
+  "normalization_version": "readable_masked_v1",
+  "promotion_blockers": [
+    "Each admitted original corpus supplies one class, so source and label are confounded even after metadata removal.",
+    "Historical English-centric public corpora do not validate contemporary inbox false-positive rates or BEC coverage.",
+    "Independent modern, source-balanced phishing labels are required before default activation.",
+    "Evaluation gate failed: source_generalization"
+  ],
+  "random_seed": 20260904,
+  "status": "research_candidate",
+  "test_metrics": {
+    "accuracy": 0.9967866323907455,
+    "brier_score": 0.0024250541755016443,
+    "calibration_bins": [
+      {
+        "count": 929,
+        "lower": 0.0,
+        "mean_probability": 0.002378802227321723,
+        "observed_phishing_rate": 0.001076426264800861,
+        "upper": 0.1
+      },
+      {
+        "count": 10,
+        "lower": 0.1,
+        "mean_probability": 0.14662457771532336,
+        "observed_phishing_rate": 0.0,
+        "upper": 0.2
+      },
+      {
+        "count": 1,
+        "lower": 0.2,
+        "mean_probability": 0.28073875232775675,
+        "observed_phishing_rate": 1.0,
+        "upper": 0.3
+      },
+      {
+        "count": 1,
+        "lower": 0.3,
+        "mean_probability": 0.3307620173026671,
+        "observed_phishing_rate": 0.0,
+        "upper": 0.4
+      },
+      {
+        "count": 3,
+        "lower": 0.4,
+        "mean_probability": 0.455543414887851,
+        "observed_phishing_rate": 0.3333333333333333,
+        "upper": 0.5
+      },
+      {
+        "count": 1,
+        "lower": 0.5,
+        "mean_probability": 0.5633577082440246,
+        "observed_phishing_rate": 0.0,
+        "upper": 0.6
+      },
+      {
+        "count": 1,
+        "lower": 0.6,
+        "mean_probability": 0.6401379613872822,
+        "observed_phishing_rate": 1.0,
+        "upper": 0.7
+      },
+      {
+        "count": 3,
+        "lower": 0.7,
+        "mean_probability": 0.7281011371807143,
+        "observed_phishing_rate": 0.6666666666666666,
+        "upper": 0.8
+      },
+      {
+        "count": 6,
+        "lower": 0.8,
+        "mean_probability": 0.8463546053653728,
+        "observed_phishing_rate": 1.0,
+        "upper": 0.9
+      },
+      {
+        "count": 601,
+        "lower": 0.9,
+        "mean_probability": 0.9994078764185166,
+        "observed_phishing_rate": 1.0,
+        "upper": 1.0
+      }
+    ],
+    "confusion_matrix": [
+      [
+        942,
+        1
+      ],
+      [
+        4,
+        609
+      ]
+    ],
+    "count": 1556,
+    "ece_10_equal_width": 0.00416328300427491,
+    "f1": 0.9959116925592805,
+    "f2": 0.9944480731548008,
+    "false_negatives": 4,
+    "false_positive_rate": 0.0010604453870625664,
+    "false_positives": 1,
+    "log_loss": 0.009582971808385948,
+    "pr_auc_average_precision": 0.9999169471517702,
+    "precision": 0.9983606557377049,
+    "recall": 0.9934747145187602,
+    "roc_auc": 0.9999446423288972,
+    "threshold": 0.7
+  },
+  "thresholds": {
+    "high": 0.8,
+    "suspicious": 0.7
+  },
+  "trained_at": "2026-09-03T22:29:39.361825+00:00",
+  "validated": false,
+  "validation_metrics": {
+    "accuracy": 0.9942159383033419,
+    "brier_score": 0.0040466207135780525,
+    "calibration_bins": [
+      {
+        "count": 938,
+        "lower": 0.0,
+        "mean_probability": 0.0022649627541910114,
+        "observed_phishing_rate": 0.0031982942430703624,
+        "upper": 0.1
+      },
+      {
+        "count": 3,
+        "lower": 0.1,
+        "mean_probability": 0.13442925272223064,
+        "observed_phishing_rate": 0.0,
+        "upper": 0.2
+      },
+      {
+        "count": 1,
+        "lower": 0.2,
+        "mean_probability": 0.24737593492550397,
+        "observed_phishing_rate": 1.0,
+        "upper": 0.3
+      },
+      {
+        "count": 2,
+        "lower": 0.3,
+        "mean_probability": 0.3574310267768416,
+        "observed_phishing_rate": 0.5,
+        "upper": 0.4
+      },
+      {
+        "count": 2,
+        "lower": 0.4,
+        "mean_probability": 0.44793081704739585,
+        "observed_phishing_rate": 0.5,
+        "upper": 0.5
+      },
+      {
+        "count": 1,
+        "lower": 0.5,
+        "mean_probability": 0.5625033003055999,
+        "observed_phishing_rate": 0.0,
+        "upper": 0.6
+      },
+      {
+        "count": 4,
+        "lower": 0.7,
+        "mean_probability": 0.7508645114128787,
+        "observed_phishing_rate": 0.5,
+        "upper": 0.8
+      },
+      {
+        "count": 1,
+        "lower": 0.8,
+        "mean_probability": 0.8201979655613816,
+        "observed_phishing_rate": 1.0,
+        "upper": 0.9
+      },
+      {
+        "count": 604,
+        "lower": 0.9,
+        "mean_probability": 0.9992186121356412,
+        "observed_phishing_rate": 1.0,
+        "upper": 1.0
+      }
+    ],
+    "confusion_matrix": [
+      [
+        940,
+        3
+      ],
+      [
+        6,
+        607
+      ]
+    ],
+    "count": 1556,
+    "ece_10_equal_width": 0.002980960618656797,
+    "f1": 0.9926410466067048,
+    "f2": 0.9911822338340953,
+    "false_negatives": 6,
+    "false_positive_rate": 0.003181336161187699,
+    "false_positives": 3,
+    "log_loss": 0.015376961182214703,
+    "pr_auc_average_precision": 0.9996840112187627,
+    "precision": 0.9950819672131147,
+    "recall": 0.9902120717781403,
+    "roc_auc": 0.9997820291700328,
+    "threshold": 0.5
+  },
+  "versions": {
+    "joblib": "1.6.0",
+    "numpy": "2.5.2",
+    "python": "3.14.4",
+    "scikit_learn": "1.9.0"
+  }
+}

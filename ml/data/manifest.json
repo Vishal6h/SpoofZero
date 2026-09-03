@@ -1,0 +1,193 @@
+{
+  "dataset_id": "c6b0e37c08dff14351fa5b4c1ae118cef8e65ef1ff16374b875cbe3abd19d428",
+  "deduplication": {
+    "exact_conflicting_rows_excluded": 0,
+    "exact_duplicates_removed": 55,
+    "input": 11388,
+    "near_conflicting_rows_excluded": 0,
+    "near_duplicates_removed": 694,
+    "near_edges": 1220,
+    "retained": 10372,
+    "template_conflicting_rows_excluded": 12,
+    "template_duplicates_removed": 255
+  },
+  "methodology": "Normalize; collapse exact, masked template/body, and >=0.85 trigram-Jaccard near duplicates; quarantine conflicting labels; seeded 70/15/15 source+label stratification. No model is fitted during preparation.",
+  "near_duplicate_limitations": "Cosine >=0.90 hashing prefilter plus exact word-trigram Jaccard >=0.85. Groups with fewer than eight shingles use exact/template matching only. Paraphrases and extensive quoted/edited variants may remain.",
+  "normalization_version": "readable_masked_v1",
+  "recipe": {
+    "attribution": "Champa, Rabbi and Zibran (2024), Curated datasets and feature analysis for phishing email detection with machine learning; Why phishing emails escape detection: A closer look at the failure points. DOI:10.5281/zenodo.8339691",
+    "collection": "Phishing Email Curated Datasets, Zenodo 8339691, v1",
+    "license": "CC-BY-4.0",
+    "license_source": "https://zenodo.org/api/records/8339691",
+    "promotion_limitations": [
+      "Each admitted original corpus supplies one class, so source and label are confounded even after metadata removal.",
+      "Historical English-centric public corpora do not validate contemporary inbox false-positive rates or BEC coverage.",
+      "Independent modern, source-balanced phishing labels are required before default activation."
+    ],
+    "seed": 20260904,
+    "source": "https://zenodo.org/records/8339691",
+    "sources": [
+      {
+        "checksum": "md5:eac6399dc0c7ae455aebb64423dadc8b",
+        "file": "Ling.csv",
+        "label": 0,
+        "license": "CC-BY-4.0",
+        "name": "ling",
+        "retain_original_label": 0,
+        "url": "https://zenodo.org/api/records/8339691/files/Ling.csv/content",
+        "usage_notes": "Retain legitimate/ham rows only; exclude generic spam."
+      },
+      {
+        "checksum": "md5:d921e0b2333bfaa058bd38193e6b3fbd",
+        "file": "SpamAssasin.csv",
+        "label": 0,
+        "license": "CC-BY-4.0",
+        "name": "spamassassin",
+        "retain_original_label": 0,
+        "url": "https://zenodo.org/api/records/8339691/files/SpamAssasin.csv/content",
+        "usage_notes": "Retain legitimate/ham rows only; exclude generic spam."
+      },
+      {
+        "checksum": "md5:4022d055bb7cf8602f30f768f652e91e",
+        "file": "Nazario.csv",
+        "label": 1,
+        "license": "CC-BY-4.0",
+        "name": "nazario",
+        "retain_original_label": 1,
+        "url": "https://zenodo.org/api/records/8339691/files/Nazario.csv/content",
+        "usage_notes": "Retain publisher-labeled phishing/fraud text only."
+      },
+      {
+        "checksum": "md5:65fd47ae7cb4ae762e4be42b11905d63",
+        "file": "Nigerian_Fraud.csv",
+        "label": 1,
+        "license": "CC-BY-4.0",
+        "name": "nigerian_fraud",
+        "retain_original_label": 1,
+        "url": "https://zenodo.org/api/records/8339691/files/Nigerian_Fraud.csv/content",
+        "usage_notes": "Retain publisher-labeled phishing/fraud text only."
+      }
+    ],
+    "usage_notes": "Publisher marks the collection CC BY 4.0. Attribute the collection and underlying corpora. Local research text only; raw/derived message text and learned artifacts are not redistributed in Git. Publicly released corpus text only; no private workspace emails or payloads. Spam labels in Ling/SpamAssassin are excluded rather than relabeled as phishing. Fraud emails are included in the social-engineering/phishing class, which is broader than credential theft.",
+    "version": "public_email_v1"
+  },
+  "sources": [
+    {
+      "checksum": "md5:eac6399dc0c7ae455aebb64423dadc8b",
+      "counts": {
+        "excluded_other_labels": 458,
+        "label_eligible": 2401,
+        "raw": 2859,
+        "usable_before_deduplication": 2401
+      },
+      "file": "Ling.csv",
+      "label": 0,
+      "license": "CC-BY-4.0",
+      "name": "ling",
+      "retain_original_label": 0,
+      "sha256": "9407c9e022accc6c831e54c5226b99b30ac4ae07682e63f5d483ed0ec17ff23c",
+      "url": "https://zenodo.org/api/records/8339691/files/Ling.csv/content",
+      "usage_notes": "Retain legitimate/ham rows only; exclude generic spam."
+    },
+    {
+      "checksum": "md5:d921e0b2333bfaa058bd38193e6b3fbd",
+      "counts": {
+        "excluded_other_labels": 1718,
+        "label_eligible": 4091,
+        "raw": 5809,
+        "usable_before_deduplication": 4091
+      },
+      "file": "SpamAssasin.csv",
+      "label": 0,
+      "license": "CC-BY-4.0",
+      "name": "spamassassin",
+      "retain_original_label": 0,
+      "sha256": "3bfe8f8abff89f69a98456be50413c2fcb20a476141116dd84ee1507b980c00e",
+      "url": "https://zenodo.org/api/records/8339691/files/SpamAssasin.csv/content",
+      "usage_notes": "Retain legitimate/ham rows only; exclude generic spam."
+    },
+    {
+      "checksum": "md5:4022d055bb7cf8602f30f768f652e91e",
+      "counts": {
+        "label_eligible": 1565,
+        "raw": 1565,
+        "usable_before_deduplication": 1565
+      },
+      "file": "Nazario.csv",
+      "label": 1,
+      "license": "CC-BY-4.0",
+      "name": "nazario",
+      "retain_original_label": 1,
+      "sha256": "b8fbc4158fbdfaff1ed98584c43d72e283c6352d7ade4d457d34c1d79488d184",
+      "url": "https://zenodo.org/api/records/8339691/files/Nazario.csv/content",
+      "usage_notes": "Retain publisher-labeled phishing/fraud text only."
+    },
+    {
+      "checksum": "md5:65fd47ae7cb4ae762e4be42b11905d63",
+      "counts": {
+        "empty_excluded": 1,
+        "label_eligible": 3332,
+        "raw": 3332,
+        "usable_before_deduplication": 3331
+      },
+      "file": "Nigerian_Fraud.csv",
+      "label": 1,
+      "license": "CC-BY-4.0",
+      "name": "nigerian_fraud",
+      "retain_original_label": 1,
+      "sha256": "f5d6930763cae6feeae6484131c79655a7440abbb97d6f51eab757aea4e6ab4b",
+      "url": "https://zenodo.org/api/records/8339691/files/Nigerian_Fraud.csv/content",
+      "usage_notes": "Retain publisher-labeled phishing/fraud text only."
+    }
+  ],
+  "splits": {
+    "test": {
+      "class_counts": {
+        "0": 943,
+        "1": 613
+      },
+      "count": 1556,
+      "sha256": "19cf7ab3a24d52b7f3fedf3b1acd273863202d636065d4eb413f7b9d0e93d58e",
+      "source_counts": {
+        "ling": 347,
+        "nazario": 211,
+        "nigerian_fraud": 402,
+        "spamassassin": 596
+      }
+    },
+    "train": {
+      "class_counts": {
+        "0": 4401,
+        "1": 2859
+      },
+      "count": 7260,
+      "sha256": "f176ebc8df0aec95d8272919995d94c3d0465a38b9cfc1fcc3cefaa5fd80e579",
+      "source_counts": {
+        "ling": 1618,
+        "nazario": 982,
+        "nigerian_fraud": 1877,
+        "spamassassin": 2783
+      }
+    },
+    "validation": {
+      "class_counts": {
+        "0": 943,
+        "1": 613
+      },
+      "count": 1556,
+      "sha256": "30a3749ffdeb81b9a59c77db9de379a99631b53af0a1272cf28eecdbcb91c53a",
+      "source_counts": {
+        "ling": 347,
+        "nazario": 210,
+        "nigerian_fraud": 403,
+        "spamassassin": 596
+      }
+    }
+  },
+  "usable_by_source": {
+    "ling": 2312,
+    "nazario": 1403,
+    "nigerian_fraud": 2682,
+    "spamassassin": 3975
+  }
+}

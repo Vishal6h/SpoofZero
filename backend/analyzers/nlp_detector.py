@@ -1,8 +1,10 @@
+from collections.abc import Mapping
 from pathlib import Path
 
 import joblib
 
 from .email_parser import parse_email
+from ml.text import safe_string
 
 
 MODEL_DIR = Path(__file__).resolve().parents[2] / "ml"
@@ -15,8 +17,9 @@ model = joblib.load(MODEL_PATH)
 
 
 def analyze_text(email_data):
-    subject = email_data.get("subject") or ""
-    body = email_data.get("body") or ""
+    email_data = email_data if isinstance(email_data, Mapping) else {}
+    subject = safe_string(email_data.get("subject"))
+    body = safe_string(email_data.get("body"))
 
     combined_text = f"{subject}\n{body}"
 
