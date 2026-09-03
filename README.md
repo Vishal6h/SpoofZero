@@ -1,0 +1,113 @@
+# SpoofZero
+
+SpoofZero analyzes raw EML files with sender identity checks, reported email
+authentication, local NLP classification, IOC extraction, SMTP relay analysis,
+IP geolocation, DNS/RDAP and VirusTotal intelligence, attachment hashing, and
+an evidence-fusion threat assessment. The existing Streamlit dashboard remains
+the single-email investigation interface.
+
+## Run the existing application
+
+From the repository root in WSL / Linux:
+
+```bash
+source .venv/bin/activate
+python -m streamlit run frontend/app.py
+```
+
+For a fresh environment, install `requirements.txt`. Its direct dependency
+versions match the existing working virtual environment; the correlation feature
+uses only Python's standard library and the already installed Streamlit package.
+Keep the existing `ml/vectorizer.joblib` and `ml/phishing_model.joblib` files.
+Run from the repository root because the current NLP loader uses relative paths.
+
+Set `VT_API_KEY` in the environment or the existing `.env` for VirusTotal lookups.
+If no key is configured, other analyzers still run and VT reports unavailable.
+Do not commit `.env` or investigation databases.
+
+The existing CLI also remains available:
+
+```bash
+python -m backend.analyze data/samples/test.eml
+```
+
+## Campaign / Case Correlation
+
+1. Open **Campaign / Case Correlation** below the original EML upload area.
+2. Create a named case, or select an existing one.
+3. Analyze one email with the original **Analyze** button and choose **Add current
+   result to case**, or select several EML files and choose **Analyze batch**.
+4. Open **Campaign / Cases** in the evidence tabs to inspect candidate groups,
+   direct relationships, and the exact shared indicators and their sources.
+5. Use **Open email in dashboard** to review any saved analysis in the original
+   tabs. **Export case evidence (JSON)** downloads snapshots and correlation data.
+
+Saved cases can also be inspected before opening any single-email result.
+A batch accepts up to 25 emails, 10 MiB each; each case supports 200 unique emails.
+Identical raw EML bytes are counted once per case, even after renaming the file.
+A duplicate skips repeated external lookups. Failures are reported per file and
+successful files stay saved. External enrichment still runs sequentially and may
+be slow or rate limited; correlation itself makes no network requests.
+
+For a demonstration, batch-upload these three files from `data/samples/campaign`:
+
+- `related_1.eml`
+- `related_2.eml`
+- `unrelated.eml`
+
+The first two share a normalized URL and sender domain. The third shares only
+receiving infrastructure and should remain outside the candidate group at the
+default threshold. The fixtures use reserved domains and documentation IPs.
+
+## Storage and interpretation
+
+SQLite stores cases and full analysis snapshots at
+`data/cases/spoofzero.sqlite3`. Set `SPOOFZERO_CASE_DB` to change the location.
+Snapshots contain email metadata, relay headers, indicators, and intelligence
+results, but no raw EML file, message-body field, or attachment payload. Batch
+payload files are temporary and are removed after analysis. Case snapshots persist
+across Streamlit/browser restarts. This is local, unencrypted storage shared by
+sessions using the same database; no multi-user access controls are introduced.
+
+The link score is an explainable heuristic, separate from the existing threat
+score. Its maximum is 100 and the default candidate-group threshold is 50.
+Only the strongest shared signal in each evidence family contributes:
+
+| Family | Signals and maximum strengths |
+| --- | --- |
+| Attachment | Non-empty SHA-256: 60 |
+| Content | Exact normalized URL: 50; known shared-provider URL: 10 |
+| Identity | Exact sender mailbox: 30; exact domain: 10 |
+| Infrastructure | Public IP: 10–20; relay/MX/nameserver host: 3; network: 2; ASN: 1 |
+
+Common provider domains, non-public IPs, and empty attachment hashes are visible
+as context but contribute zero. Infrastructure alone cannot form a candidate
+group. The provider list is a conservative starting point, not an exhaustive
+allowlist. Sender mailbox comparisons ignore display names and letter case.
+Domains are lowercased, IDNA-normalized, and matched exactly (no guessed
+registrable-domain grouping). URL scheme/host casing and default ports normalize;
+path case, query order, and fragment are preserved. Invalid IPs, URLs, domains,
+and SHA-256 strings are excluded by the correlation layer.
+
+Candidate groups are connected components: A can connect to C through B without
+A and C sharing evidence directly. Group IDs are deterministic for their member
+set and change if membership changes. Shared evidence, including weak links,
+remains inspectable. Correlation does not prove maliciousness or a common actor,
+and cannot recover indicators the original parser/extractor missed. DNS, RDAP,
+and network intelligence reflect stored lookup snapshots, not a historical
+infrastructure verification or a fresh lookup at correlation time.
+
+## Validation
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Tests run offline with temporary databases and cover matching/normalization,
+context-only evidence, transitive groups, duplicate raw emails, case isolation,
+persistence, temporary-file cleanup, batch failures, original analysis output,
+and Streamlit single-email and case workflows. Live intelligence-service
+availability and browser pixel layout are not validated by these tests.
+
+See [the repository architecture review](docs/architecture.md) for the original
+module map, findings, and the integration boundaries.

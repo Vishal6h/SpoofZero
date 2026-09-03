@@ -1,0 +1,12 @@
+From: Team Coordinator <coordinator@team-calendar.test>
+To: victim@example.com
+Subject: Next week's planning meeting
+Date: Thu, 03 Sep 2026 12:00:00 +0530
+Message-ID: <unrelated-demo@team-calendar.test>
+Received: from mail.team-calendar.test (198.51.100.50) by inbox.example.com
+Authentication-Results: inbox.example.com; spf=pass; dkim=pass; dmarc=pass
+Content-Type: text/plain; charset="UTF-8"
+
+The team meeting is scheduled for next Monday.
+Agenda: https://team-calendar.test/meetings/next-week
+This unrelated demo shares only receiving infrastructure with the other samples.

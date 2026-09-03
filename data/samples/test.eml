@@ -1,0 +1,21 @@
+From: "PayPal Support" <support@example.com>
+To: victim@example.com
+Reply-To: payments@example.net
+Return-Path: <mailer@example.org>
+Subject: Urgent: Verify Your Account
+Date: Thu, 3 Sep 2026 10:00:00 +0530
+Message-ID: <123456@example.com>
+Received: from mail-gateway.example.com (203.0.113.30) by inbox.example.com
+Received: from relay.example.net (198.51.100.20) by mail-gateway.example.com
+Received: from suspicious-server.example.net (192.0.2.10) by relay.example.net
+Authentication-Results: mail.example.com; spf=fail; dkim=none; dmarc=fail
+Content-Type: text/plain; charset="UTF-8"
+
+Your account requires verification.
+
+Please review your account immediately:
+
+https://example-phishing.test/login
+
+If you have questions contact:
+security@example-phishing.test

@@ -1,0 +1,12 @@
+From: Account Notices <notice@account-alert.test>
+To: victim@example.com
+Reply-To: help@account-alert.test
+Subject: Please review your account
+Date: Thu, 03 Sep 2026 10:00:00 +0530
+Message-ID: <campaign-demo-1@account-alert.test>
+Received: from dispatch.account-alert.test (192.0.2.10) by inbox.example.com
+Authentication-Results: inbox.example.com; spf=fail; dkim=none; dmarc=fail
+Content-Type: text/plain; charset="UTF-8"
+
+This is a harmless SpoofZero campaign demo.
+Please verify your account at https://account-review.test/verify?id=demo

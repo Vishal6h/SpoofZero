@@ -1,0 +1,23 @@
+From: billing@example.com
+To: victim@example.com
+Subject: Invoice Document
+Date: Thu, 03 Sep 2026 10:00:00 +0530
+Message-ID: <attachment-demo@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============3751281397528238240=="
+
+--===============3751281397528238240==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Please review the attached demo invoice.
+
+--===============3751281397528238240==
+Content-Type: text/plain
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="invoice-demo.txt"
+MIME-Version: 1.0
+
+VGhpcyBpcyBhIGhhcm1sZXNzIFNwb29mWmVybyBkZW1vIGF0dGFjaG1lbnQu
+
+--===============3751281397528238240==--

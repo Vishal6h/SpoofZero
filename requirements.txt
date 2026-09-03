@@ -1,0 +1,9 @@
+# Direct runtime dependencies verified against SpoofZero source imports.
+# Keep the installed/tested versions, including compatibility with saved ML models.
+streamlit==1.63.0        # Frontend and streamlit.testing.v1 UI tests
+scikit-learn==1.9.0     # TF-IDF / logistic-regression training and model inference
+joblib==1.6.0           # Saved model and vectorizer loading
+dnspython==2.8.0       # dns.resolver lookups
+python-dotenv==1.2.3    # Local environment configuration
+
+# SQLite, HTTP requests, MIME parsing, hashing, and unittest use the Python standard library.
