@@ -19,7 +19,10 @@ For a fresh environment, install `requirements.txt`. Its direct dependency
 versions match the existing working virtual environment; the correlation feature
 uses only Python's standard library and the already installed Streamlit package.
 Keep the existing `ml/vectorizer.joblib` and `ml/phishing_model.joblib` files.
-Run from the repository root because the current NLP loader uses relative paths.
+Model paths resolve from the code location, independent of the working directory.
+The commands above still use the repository root for Python module discovery and
+relative input paths; from another directory, make the repository importable
+(for example with `PYTHONPATH`) and supply absolute input paths.
 
 Set `VT_API_KEY` in the environment or the existing `.env` for VirusTotal lookups.
 If no key is configured, other analyzers still run and VT reports unavailable.
@@ -108,6 +111,32 @@ context-only evidence, transitive groups, duplicate raw emails, case isolation,
 persistence, temporary-file cleanup, batch failures, original analysis output,
 and Streamlit single-email and case workflows. Live intelligence-service
 availability and browser pixel layout are not validated by these tests.
+
+## Real Email Readiness
+
+The parser now reads plain text and HTML, merges distinct body text without
+repeating equivalent alternatives, and retains HTML references for IOC extraction.
+Scripts, styles and markup are not treated as readable body text or executed.
+Text attachments, named inline files, and attached emails remain separate from
+this message's body. Malformed encodings use replacement decoding where possible;
+unrecoverable multipart boundaries leave the body empty rather than guessing
+that an opaque payload is readable text.
+
+IOCs retain the existing four-list schema. IPv4 and IPv6 are validated and
+normalized, URL and mailbox hosts are normalized, and common filename noise is
+filtered in prose. HTML link/resource/form targets, literal URLs in CSS/scripts,
+refresh targets, and srcset values are inspected without fetching anything.
+Relative references resolve only against an explicit absolute HTML base; without
+one, scheme-relative references contribute a host only. URL path case, query
+order and fragments remain meaningful. Scoped IPv6 interface identifiers are
+excluded, and dynamic JavaScript/CSS/browser rendering is not performed.
+
+Fresh analyses can legitimately have different IOCs or NLP probabilities because
+HTML evidence is now available and attachment text is no longer mixed into the
+body. Model artifacts, the scoring formula, authentication interpretation,
+VirusTotal logic and the case-correlation policy are unchanged. Existing saved
+snapshots are not migrated; batch deduplication still skips an email already in
+that case. Analyze into a new case to retain a refreshed snapshot.
 
 See [the repository architecture review](docs/architecture.md) for the original
 module map, findings, and the integration boundaries.

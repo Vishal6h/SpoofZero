@@ -1,10 +1,13 @@
+from pathlib import Path
+
 import joblib
 
 from .email_parser import parse_email
 
 
-VECTOR_PATH = "ml/vectorizer.joblib"
-MODEL_PATH = "ml/phishing_model.joblib"
+MODEL_DIR = Path(__file__).resolve().parents[2] / "ml"
+VECTOR_PATH = MODEL_DIR / "vectorizer.joblib"
+MODEL_PATH = MODEL_DIR / "phishing_model.joblib"
 
 
 vectorizer = joblib.load(VECTOR_PATH)

@@ -66,8 +66,9 @@ completed without exceptions.
   `use_container_width` argument, although the original UI still runs.
 
 Persistent cases, correlation-specific normalization, batch error handling,
-documentation, and regression tests are addressed in this feature. The existing
-analyzer limitations above remain follow-up work; their behavior is preserved.
+documentation, and regression tests were addressed at the campaign-correlation
+baseline. The analyzer limitations listed above describe that original baseline;
+the Real Email Readiness changes below record the subsequent corrections.
 
 ## Additive campaign / case integration
 
@@ -96,3 +97,35 @@ snapshots and direct evidence make candidate groups reviewable, including
 indirect membership. Common-provider domains and non-public IPs remain visible
 as context. Correlation quality is bounded by the original extraction and
 trusted-evidence limitations; a shared indicator is not proof of a common actor.
+
+
+## Real Email Readiness changes
+
+Protected reference: `d83e88d80a6bf8b39760e6d8ed543ca88663b8e2`.
+
+- `email_parser.py` now separates main-body MIME parts from attachments and
+  related resources, decodes plain/HTML content with safe fallbacks, and merges
+  equivalent alternatives. Distinct HTML text is retained to avoid hiding a
+  phishing HTML alternative behind benign plain text. `html_parts` is additive
+  transient parser evidence used by the IOC extractor; it is not added to saved
+  analysis snapshots or rendered by the UI.
+- `ioc_extractor.py` validates IPv4/IPv6 and host syntax, canonicalizes duplicates,
+  removes obvious prose/filename noise, and inspects inert HTML reference values
+  and literal web URLs. It preserves the existing `urls`, `ips`, `emails`, and
+  `domains` lists. Mailbox matching ignores local-part case, consistent with the
+  existing correlation policy; this is an investigation convention, not a claim
+  about every mail server's delivery rules.
+- `nlp_detector.py` resolves the two existing joblib files relative to its source
+  file. No training or artifact replacement occurs.
+- New parser, IOC, subprocess model-path, and end-to-end compatibility tests
+  complement the original suite. External lookups are mocked in integration tests.
+
+Compatibility: corrected body content and normalized/new indicators can change a
+fresh email assessment or its correlation matches without changing the model,
+fusion weights, or correlation algorithm. The original plain-text sample still
+has NLP probability 58.05% and risk 69/100. Attachment hashes remain unchanged.
+Saved snapshots stay untouched. Authentication remains a reported-header
+heuristic, and relay reconstruction/origin selection still uses its original
+IPv4 extraction; the IPv6 improvement here applies to IOC extraction. Readable
+HTML extraction is not a full browser/CSS layout engine, and literal URL scanning
+does not evaluate dynamically constructed JavaScript destinations.
