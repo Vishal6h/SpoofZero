@@ -140,3 +140,21 @@ that case. Analyze into a new case to retain a refreshed snapshot.
 
 See [the repository architecture review](docs/architecture.md) for the original
 module map, findings, and the integration boundaries.
+
+
+## Email Authentication Readiness
+
+Authentication analysis now preserves individual reports, status values,
+identities, source confidence, and offline organizational alignment evidence.
+Unknown, malformed, and conflicting results are explicit. PASS does not suppress
+suspicious behavior; the current dashboard shows a warning when reported PASS
+coexists with sender, AI, reputation, attachment, or relay concerns. Numeric
+fusion weights remain unchanged. Low-score uncertain results can now display
+INCONCLUSIVE or REVIEW REQUIRED using the existing amber style.
+
+Install the updated `requirements.txt` to include `tldextract==5.3.2`. Its bundled
+public-suffix snapshot is used offline, without a network refresh or local cache.
+Authentication findings describe parsed reports, not independently verified SPF,
+DKIM, or DMARC. Current DNS lookup context remains separate from message evidence.
+See [authentication interpretation and compatibility](docs/authentication.md)
+for reporter selection, schema additions, scoring details, and exact limitations.

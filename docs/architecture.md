@@ -129,3 +129,18 @@ heuristic, and relay reconstruction/origin selection still uses its original
 IPv4 extraction; the IPv6 improvement here applies to IOC extraction. Readable
 HTML extraction is not a full browser/CSS layout engine, and literal URL scanning
 does not evaluate dynamically constructed JavaScript destinations.
+
+
+## Email Authentication Readiness changes
+
+Protected reference: `1ad4d20982e0dccde442a55ac77f4726e44607da`.
+
+`auth_results.py` now parses separate reported checks and identities;
+`auth_analyzer.py` selects reporter evidence and exposes confidence/alignment;
+`domain_alignment.py` supplies offline public-suffix comparisons shared with the
+sender analyzer. The parser retains duplicate From and DKIM-Signature evidence.
+Fusion adds behavioral context and uncertainty labels while retaining numeric
+weights. The existing UI maps the two new labels to its existing amber style.
+The pipeline root schema, case storage, external enrichment, model artifacts,
+and body/IOC readiness behavior remain compatible. See
+[authentication interpretation and limitations](authentication.md) for details.

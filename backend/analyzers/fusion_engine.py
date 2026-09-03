@@ -165,6 +165,41 @@ def calculate_final_risk(
             "Suspicious relay-chain mismatch detected"
         )
 
+    # Authentication is a domain-authentication signal, never a safety credit.
+    # Keep the existing score weights and expose contradictory behavioral evidence.
+    passed_methods = [method for method in ("spf", "dkim", "dmarc")
+                      if authentication.get(method) == "pass"]
+    behavioral_signals = []
+    if sender_score > 0:
+        behavioral_signals.append("sender_identity")
+    if ai_score >= 50:
+        behavioral_signals.append("ai_phishing_language")
+    if reputation_score > 0:
+        behavioral_signals.append("domain_or_ip_reputation")
+    if attachment_score > 0:
+        behavioral_signals.append("attachment_reputation")
+    if mismatches:
+        behavioral_signals.append("relay_chain")
+    behavioral_finding = None
+    if passed_methods and behavioral_signals:
+        message = (
+            "Authentication passed, but behavioral evidence remains suspicious."
+            if len(passed_methods) == 3 or "dmarc" in passed_methods else
+            "Some authentication checks passed, but behavioral evidence remains suspicious."
+        )
+        behavioral_finding = {
+            "type": "AUTH_PASS_SUSPICIOUS_BEHAVIOR", "severity": "MEDIUM",
+            "message": message + " These are reported results; this does not prove account compromise.",
+        }
+        reasons.append(behavioral_finding["message"])
+    if authentication.get("evidence_state") == "inconclusive":
+        reasons.append("Authentication evidence is incomplete or inconclusive; missing or unknown results do not establish safety.")
+    if authentication.get("evidence_confidence", {}).get("source") == "untrusted":
+        reasons.append("Authentication claims come from a reporter whose receiving-infrastructure association is unverified.")
+    if any(f.get("type") in ("FROM_SPF_MISMATCH", "FROM_DKIM_MISMATCH", "DMARC_FROM_MISMATCH", "DMARC_ALIGNMENT_UNSUPPORTED")
+           for f in authentication.get("findings", [])):
+        reasons.append("Reported authentication identities contain alignment differences; inspect the per-identity evidence.")
+
     final_score = min(
         round(final_score),
         100
@@ -178,6 +213,10 @@ def calculate_final_risk(
         verdict = "SUSPICIOUS"
     elif final_score >= 20:
         verdict = "LOW RISK"
+    elif behavioral_finding:
+        verdict = "REVIEW REQUIRED"
+    elif authentication.get("evidence_state") == "inconclusive":
+        verdict = "INCONCLUSIVE"
     else:
         verdict = "LIKELY SAFE"
 
@@ -197,5 +236,11 @@ def calculate_final_risk(
         "attachment_bonus": attachment_bonus,
         "relay_bonus": relay_bonus,
 
-        "reasons": reasons
+        "reasons": reasons,
+        "authentication_context": {
+            "reported_pass_methods": passed_methods,
+            "behavioral_signals": behavioral_signals,
+            "finding": behavioral_finding,
+            "account_compromise_proven": False,
+        }
     }

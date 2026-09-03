@@ -5,5 +5,6 @@ scikit-learn==1.9.0     # TF-IDF / logistic-regression training and model infere
 joblib==1.6.0           # Saved model and vectorizer loading
 dnspython==2.8.0       # dns.resolver lookups
 python-dotenv==1.2.3    # Local environment configuration
+tldextract==5.3.2       # Offline bundled PSL for authentication alignment
 
 # SQLite, HTTP requests, MIME parsing, hashing, and unittest use the Python standard library.

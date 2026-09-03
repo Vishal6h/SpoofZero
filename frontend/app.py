@@ -281,7 +281,7 @@ def verdict_class(verdict):
     if verdict == "HIGH RISK":
         return "verdict-high"
 
-    if verdict == "SUSPICIOUS":
+    if verdict in ("SUSPICIOUS", "REVIEW REQUIRED", "INCONCLUSIVE"):
         return "verdict-suspicious"
 
     return "verdict-safe"

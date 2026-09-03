@@ -183,6 +183,8 @@ def parse_email(file_path):
         "date": msg.get("Date"),
         "received": msg.get_all("Received", []),
         "authentication_results": msg.get_all("Authentication-Results", []),
+        "dkim_signatures": msg.get_all("DKIM-Signature", []),
+        "from_headers": msg.get_all("From", []),
         "body": "",
         # Transient parser evidence for IOC extraction, never rendered in the UI.
         "html_parts": [],
