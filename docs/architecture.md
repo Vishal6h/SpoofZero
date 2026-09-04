@@ -309,3 +309,25 @@ analysis contract or the protected fusion calculation. The Streamlit boundaries
 reject oversized uploads before reading them and show controlled errors without
 exception details. See [the hardening threat model, limits, benchmark method, and
 deployment checklist](security-privacy-performance-hardening.md).
+
+## v1.0 release-candidate runtime
+
+SpoofZero v1.0.0-rc1 retains the existing Streamlit, analyzer, case, correlation,
+report, and deterministic fusion boundaries. backend/runtime_config.py
+centralizes validated environment switches, request timeouts, and cache
+lifetimes while preserving prior defaults. The main pipeline accepts an additive
+offline-enrichment switch; local forensic analyzers always run, while disabled
+external services return structured UNAVAILABLE/UNKNOWN evidence.
+
+backend/demo.py exposes only an allowlist of maintained samples under
+data/samples and forces external enrichment off. backend/readiness.py checks the
+Python runtime, pinned legacy-model loadability, case-storage connectivity, and
+configured service state without live calls, paths, credentials, or private
+evidence. run_spoofzero.py provides shell-free cross-platform startup and binds
+to localhost unless an operator explicitly supplies another IP.
+
+The Dockerfile is a reproducible private-deployment option, not a claim of public
+deployment readiness. It runs as an unprivileged user and expects persistent
+case storage at /data. Unrestricted public exposure remains blocked because the
+application does not provide built-in identity, authorization, tenant isolation,
+encrypted storage, or production abuse controls.

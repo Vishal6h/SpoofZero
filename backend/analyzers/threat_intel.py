@@ -11,6 +11,7 @@ from backend.external_services import (
 )
 from backend.observability import log_event
 from backend.input_safety import normalized_domain
+from backend.runtime_config import get_runtime_config
 
 RESERVED_DEMO_DOMAINS = ("example.com", "example.net", "example.org")
 DNS_TYPES = ("A", "AAAA", "MX", "NS", "TXT")
@@ -28,6 +29,13 @@ def is_reserved_demo_domain(domain):
         for reserved in RESERVED_DEMO_DOMAINS)
 
 def dns_lookup(domain):
+    config = get_runtime_config()
+    if not config.dns_enabled:
+        return {
+            **{kind: [] for kind in DNS_TYPES},
+            **service_result(UNAVAILABLE, "DNS intelligence is disabled."),
+            "cache_hit": False, "partial": False,
+        }
     key = ("dns", str(domain).lower().rstrip("."))
     cached = DNS_CACHE.get(key)
     if cached is not None:
@@ -37,7 +45,7 @@ def dns_lookup(domain):
     failures, found_authoritative_absence = [], False
     for record_type in DNS_TYPES:
         try:
-            answers = dns.resolver.resolve(domain, record_type, lifetime=3)
+            answers = dns.resolver.resolve(domain, record_type, lifetime=config.dns_timeout_seconds)
             results[record_type].extend(str(answer).strip('"') for answer in answers)
         except dns.resolver.NXDOMAIN:
             found_authoritative_absence = True
@@ -59,7 +67,9 @@ def dns_lookup(domain):
     results.update(service_status=status, status="success" if status == SUCCESS else
                    "not_found" if status == NOT_FOUND else "error",
                    cache_hit=False, partial=bool(failures and status == SUCCESS))
-    DNS_CACHE.set(key, results, DNS_TTL_SECONDS if status in {SUCCESS, NOT_FOUND} else FAILURE_TTL_SECONDS)
+    ttl = (config.dns_cache_ttl_seconds if status in {SUCCESS, NOT_FOUND}
+           else config.failure_cache_ttl_seconds)
+    DNS_CACHE.set(key, results, ttl)
     log_event("external_request", analyzer="dns", service_status=status, cache_hit=False)
     return results
 
@@ -67,11 +77,15 @@ def dns_lookup(domain):
 LifetimeTimeout = getattr(dns.resolver, "LifetimeTimeout", dns.exception.Timeout)
 
 def rdap_lookup(domain):
+    config = get_runtime_config()
+    if not config.rdap_enabled:
+        return service_result(UNAVAILABLE, "RDAP intelligence is disabled.")
     response = request_json(
         "rdap", "https://rdap.org/domain/" + urllib.parse.quote(str(domain), safe=""),
-        headers={"User-Agent": "SpoofZero/1.0"}, timeout=8,
+        headers={"User-Agent": "SpoofZero/1.0"}, timeout=config.rdap_timeout_seconds,
         cache=RDAP_CACHE, cache_key=str(domain).lower().rstrip("."),
-        ttl_seconds=RDAP_TTL_SECONDS, failure_ttl_seconds=FAILURE_TTL_SECONDS,
+        ttl_seconds=config.rdap_cache_ttl_seconds,
+        failure_ttl_seconds=config.failure_cache_ttl_seconds,
     )
     if response.get("service_status") != SUCCESS:
         return response

@@ -13,6 +13,7 @@ from backend.case_reporting import (
 from backend.case_store import CaseStore, CaseStorageError
 from backend.fusion_policy import snapshot_policy_version
 from backend.input_safety import safe_display_text
+from backend.runtime_config import get_runtime_config
 
 
 STORE_ERRORS = (OSError, sqlite3.Error, ValueError, CaseStorageError)
@@ -141,7 +142,7 @@ def render_case_workspace():
 
             privacy_safe = st.checkbox(
                 "Privacy-safe case storage (minimize personal message metadata)",
-                value=False, key=f"sz_privacy_safe_{case_id}",
+                value=get_runtime_config().privacy_safe_default, key=f"sz_privacy_safe_{case_id}",
                 help=(
                     "Always excludes bodies, payloads, API secrets, and credentials. "
                     "This option also removes personal headers, mailbox IOCs, and attachment names "

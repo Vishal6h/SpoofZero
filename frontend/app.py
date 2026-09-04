@@ -7,12 +7,18 @@ from uuid import uuid4
 import streamlit as st
 
 from backend.analyze import analyze_email, analysis_health
+from backend.demo import demo_choices, demo_filename, run_demo_analysis
 from backend.input_safety import DEFAULT_EMAIL_LIMITS, EmailInputError, safe_evidence_filename
 from backend.observability import log_event
+from backend.runtime_config import get_runtime_config
+from backend.version import VERSION_LABEL
 from frontend.case_ui import render_case_workspace, render_case_report
 from frontend.ai_ui import (
     ai_evidence_label, render_ai_card, render_ai_details, score_breakdown_rows,
 )
+
+
+RUNTIME_CONFIG = get_runtime_config()
 
 
 # ============================================================
@@ -99,6 +105,43 @@ st.markdown("""
         color: #74dca5;
         font-size: 0.82rem;
         font-weight: 600;
+    }
+
+    .workflow-strip {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.45rem;
+        padding: 0.75rem 1rem;
+        margin: -0.35rem 0 1.1rem;
+        border: 1px solid rgba(120, 170, 210, 0.12);
+        border-radius: 12px;
+        color: #aab9c4;
+        background: rgba(10, 23, 34, 0.55);
+        font-size: 0.82rem;
+    }
+
+    .workflow-step {
+        white-space: nowrap;
+    }
+
+    .workflow-arrow {
+        color: #4db8ff;
+    }
+
+    @media (max-width: 700px) {
+        .brand-wrapper {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .block-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        .workflow-strip {
+            justify-content: flex-start;
+        }
     }
 
     /* Upload panel */
@@ -318,16 +361,38 @@ def auth_badge(value):
 # ============================================================
 
 render_html(
-    """
+    f"""
     <div class="brand-wrapper">
         <div>
             <div class="brand-name">Spoof<span class="brand-zero">Zero</span></div>
-            <div class="brand-tagline">AI Email Threat Detection &amp; Forensic Intelligence</div>
+            <div class="brand-tagline">AI Email Threat Detection &amp; Forensic Intelligence · {escape(VERSION_LABEL)}</div>
         </div>
-        <div class="engine-status">● ANALYSIS ENGINE ONLINE</div>
+        <div class="engine-status">● LOCAL ANALYSIS READY</div>
+    </div>
+    <div class="workflow-strip" aria-label="Investigation workflow">
+        <span class="workflow-step">Upload Email</span><span class="workflow-arrow">→</span>
+        <span class="workflow-step">Analyze</span><span class="workflow-arrow">→</span>
+        <span class="workflow-step">Review Evidence</span><span class="workflow-arrow">→</span>
+        <span class="workflow-step">Save to Case</span><span class="workflow-arrow">→</span>
+        <span class="workflow-step">Compare / Correlate</span><span class="workflow-arrow">→</span>
+        <span class="workflow-step">Export Report</span>
     </div>
     """
 )
+
+
+if RUNTIME_CONFIG.mode == "demo":
+    st.info(
+        "Demo runtime mode is active. Uploaded and built-in evidence will be analyzed "
+        "without live DNS, RDAP, VirusTotal, or geolocation requests."
+    )
+elif not RUNTIME_CONFIG.external_services_enabled:
+    st.info("Live external intelligence is disabled by local configuration.")
+if RUNTIME_CONFIG.warnings:
+    st.warning(
+        "One or more runtime settings were invalid and safe defaults were applied. "
+        "Run the readiness check for configuration details."
+    )
 
 
 # ============================================================
@@ -358,10 +423,39 @@ with st.expander("Privacy and session controls", expanded=False):
     if st.button("Clear current session evidence", key="sz_clear_session"):
         for key in (
             "spoofzero_result", "spoofzero_filename", "spoofzero_analysis_id",
-            "spoofzero_analyzed_at", "spoofzero_result_source",
+            "spoofzero_analyzed_at", "spoofzero_result_source", "spoofzero_demo_mode",
         ):
             st.session_state.pop(key, None)
         st.success("Current session evidence was cleared. Saved case history was not changed.")
+
+
+with st.expander("Explore with safe built-in evidence", expanded=False):
+    st.caption(
+        "Built-in examples use repository-safe .EML files. Live DNS, RDAP, VirusTotal, "
+        "and geolocation checks are disabled; unavailable intelligence is labeled UNKNOWN."
+    )
+    choices = demo_choices()
+    demo_key = st.selectbox(
+        "Demo scenario",
+        options=list(choices),
+        format_func=choices.get,
+        key="sz_demo_scenario",
+    )
+    if st.button("Run offline demo", key="sz_run_demo", type="secondary"):
+        analysis_id = uuid4().hex
+        try:
+            with st.spinner("SpoofZero is analyzing built-in evidence offline..."):
+                result = run_demo_analysis(demo_key, analysis_id=analysis_id)
+            st.session_state["spoofzero_result"] = result
+            st.session_state["spoofzero_filename"] = demo_filename(demo_key)
+            st.session_state["spoofzero_analysis_id"] = analysis_id
+            st.session_state["spoofzero_analyzed_at"] = datetime.now(timezone.utc).isoformat()
+            st.session_state["spoofzero_result_source"] = "built_in_demo"
+            st.session_state["spoofzero_demo_mode"] = True
+        except Exception:
+            log_event("analysis_failure", analyzer="streamlit_demo", analysis_id=analysis_id,
+                      service_status="ERROR")
+            st.error("The built-in demo could not be completed. Run the readiness check for details.")
 
 
 if uploaded_file is not None:
@@ -379,7 +473,7 @@ if uploaded_file is not None:
     with button_col:
         analyze_clicked = st.button(
             "Analyze",
-            use_container_width=True,
+            width="stretch",
             type="primary"
         )
 
@@ -409,6 +503,7 @@ if uploaded_file is not None:
             st.session_state["spoofzero_analysis_id"] = analysis_id
             st.session_state["spoofzero_analyzed_at"] = datetime.now(timezone.utc).isoformat()
             st.session_state["spoofzero_result_source"] = "fresh_analysis"
+            st.session_state["spoofzero_demo_mode"] = False
         except EmailInputError as error:
             st.error(str(error))
         except Exception:
@@ -439,6 +534,12 @@ result = st.session_state.get(
 )
 
 if result:
+
+    if st.session_state.get("spoofzero_demo_mode"):
+        st.info(
+            "Offline demo evidence is loaded. External intelligence was not contacted, "
+            "and no live reputation or geolocation success is implied."
+        )
 
     current_health = analysis_health(result)
     if current_health["status"] == "PARTIAL":
@@ -745,7 +846,7 @@ if result:
         st.dataframe(
             sender_table,
             hide_index=True,
-            use_container_width=True
+            width="stretch"
         )
 
 
@@ -789,7 +890,7 @@ if result:
                             "Indicator": values
                         },
                         hide_index=True,
-                        use_container_width=True
+                        width="stretch"
                     )
 
                 else:
@@ -877,13 +978,18 @@ if result:
                     st.dataframe(
                         hop["ips"],
                         hide_index=True,
-                        use_container_width=True
+                        width="stretch"
                     )
 
 
         st.markdown(
             '<div class="section-title">Origin Geo Intelligence</div>',
             unsafe_allow_html=True
+        )
+
+        st.caption(
+            "IP geolocation estimates infrastructure location. It does not identify "
+            "a sender's or person's physical location."
         )
 
         if geo.get(
@@ -1041,7 +1147,7 @@ if result:
                         },
 
                         hide_index=True,
-                        use_container_width=True
+                        width="stretch"
                     )
 
                 elif status == "skipped":
@@ -1138,7 +1244,7 @@ if result:
                         },
 
                         hide_index=True,
-                        use_container_width=True
+                        width="stretch"
                     )
 
                 else:

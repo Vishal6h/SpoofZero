@@ -4,7 +4,8 @@ import json
 import math
 import sys
 import urllib.parse
-from backend.external_services import ERROR, SKIPPED, SUCCESS, TTLCache, request_json, service_result
+from backend.external_services import ERROR, SKIPPED, SUCCESS, UNAVAILABLE, TTLCache, request_json, service_result
+from backend.runtime_config import get_runtime_config
 
 GEO_CACHE = TTLCache(256)
 GEO_TTL_SECONDS, GEO_FAILURE_TTL_SECONDS = 900, 20
@@ -18,6 +19,9 @@ def geolocate_ip(ip_string):
     except ValueError:
         return {"ip": str(ip_string), **service_result(ERROR, "Invalid IP address.")}
     value = str(ip)
+    config = get_runtime_config()
+    if not config.geolocation_enabled:
+        return {"ip": value, **service_result(UNAVAILABLE, "Geolocation is disabled.")}
     if not ip.is_global:
         return {
             "status": "not_public", "service_status": SKIPPED, "ip": value,
@@ -25,9 +29,10 @@ def geolocate_ip(ip_string):
         }
     response = request_json(
         "geolocation", "https://ipwho.is/" + urllib.parse.quote(value, safe=""),
-        headers={"User-Agent": "SpoofZero/1.0"}, timeout=10,
+        headers={"User-Agent": "SpoofZero/1.0"}, timeout=config.geolocation_timeout_seconds,
         cache=GEO_CACHE, cache_key=value,
-        ttl_seconds=GEO_TTL_SECONDS, failure_ttl_seconds=GEO_FAILURE_TTL_SECONDS,
+        ttl_seconds=config.geolocation_cache_ttl_seconds,
+        failure_ttl_seconds=config.failure_cache_ttl_seconds,
     )
     if response.get("service_status") != SUCCESS:
         return {"ip": value, **response}

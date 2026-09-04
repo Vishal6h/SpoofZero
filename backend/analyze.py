@@ -16,10 +16,11 @@ from .analyzers.threat_intel import analyze_domains
 from .analyzers.reputation_analyzer import analyze_reputation, analyze_attachment_reputation
 from .analyzers.attachment_analyzer import analyze_attachments
 from .analyzers.fusion_engine import calculate_final_risk
-from .external_services import ERROR, FAILURE_STATUSES, SKIPPED, service_result
+from .external_services import ERROR, FAILURE_STATUSES, SKIPPED, UNAVAILABLE, service_result
 from .fusion_policy import CURRENT_FUSION_POLICY
 from .input_safety import DEFAULT_EMAIL_LIMITS
 from .observability import log_event
+from .runtime_config import get_runtime_config
 
 EXTERNAL_CONCURRENCY = 4
 
@@ -82,7 +83,8 @@ def analysis_health(result):
     }
 
 
-def analyze_email(file_path, *, analysis_id=None, limits=None):
+def analyze_email(
+        file_path, *, analysis_id=None, limits=None, external_services_enabled=None):
     started = perf_counter()
     analysis_id = analysis_id or uuid4().hex
     limits = limits or DEFAULT_EMAIL_LIMITS
@@ -95,6 +97,8 @@ def analyze_email(file_path, *, analysis_id=None, limits=None):
     attachments = _timed(
         "attachment_analyzer", lambda: analyze_attachments(file_path, limits=limits), analysis_id)
     candidate_ip = relay_trace.get("candidate_origin_ip")
+    if external_services_enabled is None:
+        external_services_enabled = get_runtime_config().external_services_enabled
 
     domain_failure = lambda: [
         {"domain": domain, **service_result(ERROR, "Domain intelligence could not be completed."),
@@ -119,27 +123,65 @@ def analyze_email(file_path, *, analysis_id=None, limits=None):
          **service_result(ERROR, "Attachment hash reputation could not be completed.")}
         for item in attachments.get("attachments", [])
     ]
-    tasks = {
-        "threat_intelligence": (
-            lambda: analyze_domains(iocs.get("domains", [])), domain_failure),
-        "reputation": (
-            lambda: analyze_reputation(iocs, candidate_ip), reputation_failure),
-        "attachment_reputation": (
-            lambda: analyze_attachment_reputation(attachments), attachment_failure),
-    }
-    if candidate_ip:
-        tasks["geolocation"] = (
-            lambda: geolocate_ip(candidate_ip),
-            lambda: {"ip": candidate_ip, **service_result(
-                ERROR, "Geolocation could not be completed.")},
-        )
-    with ThreadPoolExecutor(max_workers=EXTERNAL_CONCURRENCY,
-                            thread_name_prefix="spoofzero-enrichment") as executor:
-        future_map = {
-            name: executor.submit(_safe_external, name, function, fallback, analysis_id)
-            for name, (function, fallback) in tasks.items()
+    if external_services_enabled:
+        tasks = {
+            "threat_intelligence": (
+                lambda: analyze_domains(iocs.get("domains", [])), domain_failure),
+            "reputation": (
+                lambda: analyze_reputation(iocs, candidate_ip), reputation_failure),
+            "attachment_reputation": (
+                lambda: analyze_attachment_reputation(attachments), attachment_failure),
         }
-        enrichment = {name: future.result() for name, future in future_map.items()}
+        if candidate_ip:
+            tasks["geolocation"] = (
+                lambda: geolocate_ip(candidate_ip),
+                lambda: {"ip": candidate_ip, **service_result(
+                    ERROR, "Geolocation could not be completed.")},
+            )
+        with ThreadPoolExecutor(max_workers=EXTERNAL_CONCURRENCY,
+                                thread_name_prefix="spoofzero-enrichment") as executor:
+            future_map = {
+                name: executor.submit(_safe_external, name, function, fallback, analysis_id)
+                for name, (function, fallback) in tasks.items()
+            }
+            enrichment = {name: future.result() for name, future in future_map.items()}
+    else:
+        disabled = "External intelligence is disabled for this analysis."
+        enrichment = {
+            "threat_intelligence": [
+                {
+                    "domain": domain, **service_result(UNAVAILABLE, disabled),
+                    "risk_score": None,
+                    "indicators": ["External intelligence disabled; no safety conclusion was made."],
+                }
+                for domain in iocs.get("domains", [])[:8]
+            ],
+            "reputation": {
+                "domains": [
+                    {"type": "domain", "value": domain,
+                     **service_result(UNAVAILABLE, disabled)}
+                    for domain in iocs.get("domains", [])[:5]
+                ],
+                "ips": [
+                    {"type": "ip", "value": ip, **service_result(UNAVAILABLE, disabled)}
+                    for ip in list(dict.fromkeys(
+                        ([candidate_ip] if candidate_ip else []) + iocs.get("ips", [])
+                    ))[:5]
+                ],
+            },
+            "attachment_reputation": [
+                {
+                    "type": "file_hash", "value": item.get("sha256"),
+                    "filename": item.get("filename"), "lookup_method": "sha256_only",
+                    **service_result(UNAVAILABLE, disabled),
+                }
+                for item in attachments.get("attachments", [])
+            ],
+        }
+        if candidate_ip:
+            enrichment["geolocation"] = {
+                "ip": candidate_ip, **service_result(UNAVAILABLE, disabled)
+            }
     if candidate_ip:
         geo_analysis = enrichment["geolocation"]
     else:

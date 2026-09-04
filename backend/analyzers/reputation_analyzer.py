@@ -10,6 +10,7 @@ from backend.external_services import (
 )
 from .threat_intel import is_reserved_demo_domain
 from backend.input_safety import normalized_domain
+from backend.runtime_config import get_runtime_config
 
 load_dotenv()
 VT_API_KEY = os.getenv("VT_API_KEY")
@@ -25,6 +26,9 @@ def clear_reputation_cache():
     VT_COOLDOWN.clear()
 
 def vt_request(endpoint):
+    config = get_runtime_config()
+    if not config.virus_total_enabled:
+        return service_result(UNAVAILABLE, "VirusTotal lookups are disabled.")
     if not VT_API_KEY:
         return service_result(UNAVAILABLE, "VirusTotal API key is not configured.")
     cooldown = VT_COOLDOWN.get("rate_limit")
@@ -33,9 +37,9 @@ def vt_request(endpoint):
     result = request_json(
         "virustotal", VT_BASE_URL + endpoint,
         headers={"x-apikey": VT_API_KEY, "User-Agent": "SpoofZero/1.0"},
-        timeout=15, cache=VT_CACHE, cache_key=endpoint,
-        ttl_seconds=VT_SUCCESS_TTL_SECONDS,
-        failure_ttl_seconds=VT_FAILURE_TTL_SECONDS,
+        timeout=config.vt_timeout_seconds, cache=VT_CACHE, cache_key=endpoint,
+        ttl_seconds=config.vt_cache_ttl_seconds,
+        failure_ttl_seconds=config.failure_cache_ttl_seconds,
     )
     if result.get("service_status") == RATE_LIMITED:
         VT_COOLDOWN.set("rate_limit", result, 60)
