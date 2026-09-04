@@ -260,14 +260,20 @@ class CandidateInferenceTests(unittest.TestCase):
 
     def test_runtime_fallback_retains_original_score_and_schema(self):
         result = analyze_text(parse_email(ROOT / "data/samples/test.eml"))
-        self.assertEqual(result, {"phishing_probability": 58.05, "verdict": "SUSPICIOUS"})
+        self.assertEqual(
+            {key: result[key] for key in ("phishing_probability", "verdict")},
+            {"phishing_probability": 58.05, "verdict": "SUSPICIOUS"},
+        )
+        self.assertEqual(result["model_status"], "EXPERIMENTAL")
+        self.assertEqual(result["validation_status"], "NOT VALIDATED")
 
     def test_runtime_fallback_handles_malformed_inputs_without_switching_models(self):
         for data in (None, [], "bad", {"body": {}}, {"subject": 10}, {"body": b"hello \xff"}):
             with self.subTest(data=data):
                 result = analyze_text(data)
                 self.assertTrue(0 <= result["phishing_probability"] <= 100)
-                self.assertEqual(set(result), {"phishing_probability", "verdict"})
+                self.assertTrue({"phishing_probability", "verdict"}.issubset(result))
+                self.assertEqual(result["evidence_role"], "supporting_evidence_only")
 
     def test_candidate_loading_is_gated_and_checks_bytes(self):
         with TemporaryDirectory() as directory:

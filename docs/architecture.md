@@ -203,3 +203,26 @@ single-use marker precede final evaluation. Candidate metadata never sets active
 to true. No production module imports this namespace. Original model artifacts,
 active inference, fusion, forensic modules and UI are unchanged.
 See [the protocol](real-world-validation-corpus.md).
+## AI Honesty & Production Safety
+
+Protected reference: `8cbe862af712e83fbab6c5db2fe089c6e838f9b6`.
+
+`ml/model_policy.py` is the shared trust boundary for active legacy loading,
+controlled UI labels, and candidate eligibility. `nlp_detector.py` preserves its
+score and verdict fields while adding version, experimental status, validation
+status, evidence role and a concise limitation. `frontend/ai_ui.py` displays the
+controlled labels and supplies safe unknown defaults for old saved snapshots;
+case storage does not migrate or rewrite those snapshots.
+
+The v1 and v2 research loaders now require exact validated states, Boolean
+validation and eligibility flags, empty blockers, and complete internally
+consistent deployment-gate evidence before a model can be considered eligible.
+Eligibility never activates a model. The legacy fallback remains an explicit
+byte-pinned compatibility exception and is not eligible as a validated
+replacement. All research candidates remain unvalidated and inactive.
+
+`fusion_engine.py` keeps the original 30/35/35 base weights and all numeric
+thresholds. Its additive `ai_context` describes the 35% AI weight, exact weighted
+points, supporting role, and lack of calibration. Details and the future
+weighting recommendation are in
+[AI honesty and production safety](ai-honesty-and-production-safety.md).

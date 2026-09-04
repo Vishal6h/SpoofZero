@@ -56,9 +56,12 @@ print(json.dumps(analyze_text(parse_email(sys.argv[1]))))
                 text=True, timeout=30,
             )
         self.assertEqual(process.returncode, 0, process.stderr)
-        self.assertEqual(json.loads(process.stdout), {
-            "phishing_probability": 58.05, "verdict": "SUSPICIOUS",
-        })
+        output = json.loads(process.stdout)
+        self.assertEqual(
+            {key: output[key] for key in ("phishing_probability", "verdict")},
+            {"phishing_probability": 58.05, "verdict": "SUSPICIOUS"},
+        )
+        self.assertEqual(output["validation_status"], "NOT VALIDATED")
 
 
 class EmailReadinessIntegrationTests(unittest.TestCase):

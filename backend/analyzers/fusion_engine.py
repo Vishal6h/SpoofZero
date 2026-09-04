@@ -1,3 +1,6 @@
+from ml.model_policy import describe_ai_output, FUSION_NOTE
+
+
 def calculate_reputation_score(reputation):
     item_scores = []
 
@@ -105,7 +108,7 @@ def calculate_final_risk(
 
     if ai_score >= 50:
         reasons.append(
-            "AI detected suspicious phishing language"
+            "AI model signal suggests phishing-like language"
         )
 
     # Domain/IP reputation bonus
@@ -237,6 +240,15 @@ def calculate_final_risk(
         "relay_bonus": relay_bonus,
 
         "reasons": reasons,
+        "ai_context": {
+            "calculation_version": "legacy_fusion_v1",
+            "base_weight": 0.35,
+            "maximum_base_points": 35,
+            "weighted_points_before_rounding": ai_score * 0.35,
+            "validation_status": describe_ai_output(ai_analysis)["validation_status"],
+            "evidence_role": "supporting_evidence_only",
+            "limitation": FUSION_NOTE,
+        },
         "authentication_context": {
             "reported_pass_methods": passed_methods,
             "behavioral_signals": behavioral_signals,

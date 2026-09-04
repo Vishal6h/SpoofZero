@@ -6,6 +6,7 @@ import joblib
 import sklearn
 
 from ml.data_pipeline import ROOT, digest
+from ml.model_policy import require_activation_eligible
 from ml.experiment import CANDIDATES
 from ml.text import verdict_for_probability
 from .text import VERSION, feature_text
@@ -21,12 +22,8 @@ def load_candidate(name, *, research=False):
     status = metadata.get("validation_status")
     if status not in {"RESEARCH", "UNVALIDATED", "VALIDATED"}:
         raise ValueError("Unknown model validation state")
-    eligible = (status == "VALIDATED" and metadata.get("validated") is True and
-                metadata.get("activation_eligible") is True and not metadata.get("blockers") and
-                metadata.get("development_gates", {}).get("passed_all") is True and
-                metadata.get("final_confirmation_gates", {}).get("passed_all") is True)
-    if not research and not eligible:
-        raise ValueError("Candidate is not validated; explicit research use is required")
+    if not research:
+        require_activation_eligible(metadata)
     if metadata.get("normalization_version") != VERSION or metadata["versions"]["scikit_learn"] != sklearn.__version__:
         raise ValueError("Research preprocessing/runtime mismatch")
     for path in ("text.py", "generalization/text.py"):

@@ -18,5 +18,13 @@
     "ml/phishing_model.joblib": "efc92ce20d0a736847148bdeef16aeee902ef91213e7392b29fffa1a96f9fabf"
   },
   "protected_commit": "666c31dc9deedc09a3301daaff0b791f33e1ddcd",
-  "limitations": "Demonstration fallback; no held-out evaluation or calibration at training time. Not evidence of operational reliability."
+  "limitations": "Demonstration fallback; no held-out evaluation or calibration at training time. Not evidence of operational reliability.",
+  "model_status": "EXPERIMENTAL",
+  "validation_status": "NOT VALIDATED",
+  "evidence_role": "supporting_evidence_only",
+  "validation_note": "Experimental classifier trained on 16 examples; not validated for real-world use. This score is a model signal, not a confirmed probability that the email is phishing.",
+  "active": true,
+  "validated": false,
+  "activation_eligible": false,
+  "compatibility_exception": true
 }

@@ -5,6 +5,7 @@ import streamlit as st
 
 from backend.analyze import analyze_email
 from frontend.case_ui import render_case_workspace, render_case_report
+from frontend.ai_ui import render_ai_card, render_ai_details
 
 
 # ============================================================
@@ -478,14 +479,7 @@ if result:
         )
 
     with c3:
-        card(
-            "AI Probability",
-            f'{ai.get("phishing_probability", 0)}%',
-            ai.get(
-                "verdict",
-                "No AI verdict"
-            )
-        )
+        render_ai_card(ai)
 
     with c4:
         card(
@@ -535,6 +529,8 @@ if result:
     # ========================================================
 
     with overview_tab:
+
+        render_ai_details(ai, assessment)
 
         st.markdown(
             '<div class="section-title">Why SpoofZero flagged this email</div>',
@@ -626,7 +622,7 @@ if result:
                     "Evidence": [
                         "Sender Identity",
                         "Authentication",
-                        "AI / NLP",
+                        "AI model signal",
                         "Threat Reputation",
                         "Attachment Reputation"
                     ],

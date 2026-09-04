@@ -6,6 +6,7 @@ import joblib
 import sklearn
 
 from .data_pipeline import digest
+from .model_policy import require_activation_eligible
 from .text import VERSION, feature_text, verdict_for_probability
 
 MODEL_ROOT = Path(__file__).resolve().parent / "models"
@@ -18,8 +19,8 @@ def load_candidate(version="candidate_v1", *, research=False):
         raise ValueError("Expected a local model version name")
     directory = MODEL_ROOT / version
     metadata = json.loads((directory / "metadata.json").read_text())
-    if not metadata.get("validated") and not research:
-        raise ValueError("Candidate is not validated for activation; research use must be explicit")
+    if not research:
+        require_activation_eligible(metadata)
     if metadata.get("normalization_version") != VERSION or metadata["versions"]["scikit_learn"] != sklearn.__version__:
         raise ValueError("Candidate preprocessing/runtime does not match this installation")
     expected_code = metadata.get("code_sha256", {}).get("text.py")

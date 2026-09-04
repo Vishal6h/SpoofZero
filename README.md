@@ -197,3 +197,16 @@ evidence gates. Only real older emails fit this experiment; synthetic data is
 separate post-lock stress evidence. The legacy model remains active and unchanged.
 See [methodology and reproduction](docs/real-world-validation-corpus.md) and
 [measured results](ml/reports/REAL_WORLD_VALIDATION_CORPUS.md).
+## AI Honesty & Production Safety
+
+The active 16-example classifier is now labeled **EXPERIMENTAL** and **NOT
+VALIDATED** in every new NLP result. The dashboard presents its percentage as
+an AI phishing score and supporting model signal, not as a confirmed real-world
+probability. Historical cases remain unchanged on disk; missing model metadata
+displays as `UNKNOWN / LEGACY SNAPSHOT`.
+
+A shared fail-closed policy now guards research-model eligibility. All research
+candidates remain inactive, and the protected legacy artifact hashes are checked
+before loading. Fusion weights and historical scores are unchanged; the UI now
+discloses the legacy AI signal's 35% base weight and lack of validation. See
+[AI honesty, compatibility, and future fusion guidance](docs/ai-honesty-and-production-safety.md).

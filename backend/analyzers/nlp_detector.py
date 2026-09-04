@@ -1,10 +1,9 @@
 from collections.abc import Mapping
 from pathlib import Path
 
-import joblib
-
 from .email_parser import parse_email
 from ml.text import safe_string
+from ml.model_policy import legacy_output_metadata, load_legacy_compatibility_model
 
 
 MODEL_DIR = Path(__file__).resolve().parents[2] / "ml"
@@ -12,8 +11,7 @@ VECTOR_PATH = MODEL_DIR / "vectorizer.joblib"
 MODEL_PATH = MODEL_DIR / "phishing_model.joblib"
 
 
-vectorizer = joblib.load(VECTOR_PATH)
-model = joblib.load(MODEL_PATH)
+vectorizer, model = load_legacy_compatibility_model()
 
 
 def analyze_text(email_data):
@@ -38,7 +36,8 @@ def analyze_text(email_data):
 
     return {
         "phishing_probability": phishing_probability,
-        "verdict": verdict
+        "verdict": verdict,
+        **legacy_output_metadata(),
     }
 
 

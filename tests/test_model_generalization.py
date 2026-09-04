@@ -459,7 +459,9 @@ class V2InferenceTests(unittest.TestCase):
         import backend.analyzers.nlp_detector as active
         self.assertEqual(active.MODEL_PATH, ROOT / "phishing_model.joblib")
         self.assertEqual(active.VECTOR_PATH, ROOT / "vectorizer.joblib")
-        self.assertEqual(set(analyze_text({"body": "hello"})), {"phishing_probability", "verdict"})
+        output = analyze_text({"body": "hello"})
+        self.assertTrue({"phishing_probability", "verdict"}.issubset(output))
+        self.assertEqual(output["model_version"], "legacy_demo_16")
 
     def test_v1_remains_unvalidated(self):
         self.assertFalse(json.loads((ROOT / "models/candidate_v1/metadata.json").read_text())["validated"])
