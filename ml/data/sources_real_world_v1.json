@@ -1,0 +1,451 @@
+{
+  "version": "real_world_v1",
+  "protected_commit": "bfa6d958631cdafa3c893d2ca439931f4cc22f71",
+  "seed": 20260904,
+  "sources": [
+    {
+      "name": "ling",
+      "publisher": "Champa, Rabbi and Zibran (2024), Curated datasets and feature analysis for phishing email detection with machine learning; Why phishing emails escape detection: A closer look at the failure points. DOI:10.5281/zenodo.8339691",
+      "source": "https://zenodo.org/records/8339691",
+      "license": "CC-BY-4.0",
+      "period": "Publisher compilation spans 1995-2022; conservative 2022 upper bound, not individual timestamps",
+      "raw_count": 2859,
+      "input_kind": "Previously deduplicated v2 representatives",
+      "nature": "REAL",
+      "classes": [
+        0
+      ],
+      "decision": "DEVELOPMENT_ONLY",
+      "class_overlap_quality": "SINGLE_CLASS",
+      "usage_notes": "Reuse local pinned v2 text only. No new raw download. Synthetic rows never fit a model or tune thresholds in this run; previously exposed real test families are quarantined."
+    },
+    {
+      "name": "spamassassin",
+      "publisher": "Champa, Rabbi and Zibran (2024), Curated datasets and feature analysis for phishing email detection with machine learning; Why phishing emails escape detection: A closer look at the failure points. DOI:10.5281/zenodo.8339691",
+      "source": "https://zenodo.org/records/8339691",
+      "license": "CC-BY-4.0",
+      "period": "Publisher compilation spans 1995-2022; conservative 2022 upper bound, not individual timestamps",
+      "raw_count": 5809,
+      "input_kind": "Previously deduplicated v2 representatives",
+      "nature": "REAL",
+      "classes": [
+        0
+      ],
+      "decision": "DEVELOPMENT_ONLY",
+      "class_overlap_quality": "SINGLE_CLASS",
+      "usage_notes": "Reuse local pinned v2 text only. No new raw download. Synthetic rows never fit a model or tune thresholds in this run; previously exposed real test families are quarantined."
+    },
+    {
+      "name": "nazario",
+      "publisher": "Champa, Rabbi and Zibran (2024), Curated datasets and feature analysis for phishing email detection with machine learning; Why phishing emails escape detection: A closer look at the failure points. DOI:10.5281/zenodo.8339691",
+      "source": "https://zenodo.org/records/8339691",
+      "license": "CC-BY-4.0",
+      "period": "Publisher compilation spans 1995-2022; conservative 2022 upper bound, not individual timestamps",
+      "raw_count": 1565,
+      "input_kind": "Previously deduplicated v2 representatives",
+      "nature": "REAL",
+      "classes": [
+        1
+      ],
+      "decision": "DEVELOPMENT_ONLY",
+      "class_overlap_quality": "SINGLE_CLASS",
+      "usage_notes": "Reuse local pinned v2 text only. No new raw download. Synthetic rows never fit a model or tune thresholds in this run; previously exposed real test families are quarantined."
+    },
+    {
+      "name": "nigerian_fraud",
+      "publisher": "Champa, Rabbi and Zibran (2024), Curated datasets and feature analysis for phishing email detection with machine learning; Why phishing emails escape detection: A closer look at the failure points. DOI:10.5281/zenodo.8339691",
+      "source": "https://zenodo.org/records/8339691",
+      "license": "CC-BY-4.0",
+      "period": "Publisher compilation spans 1995-2022; conservative 2022 upper bound, not individual timestamps",
+      "raw_count": 3332,
+      "input_kind": "Previously deduplicated v2 representatives",
+      "nature": "REAL",
+      "classes": [
+        1
+      ],
+      "decision": "DEVELOPMENT_ONLY",
+      "class_overlap_quality": "SINGLE_CLASS",
+      "usage_notes": "Reuse local pinned v2 text only. No new raw download. Synthetic rows never fit a model or tune thresholds in this run; previously exposed real test families are quarantined."
+    },
+    {
+      "name": "trec06_ham",
+      "publisher": "Arifa Islam Champa and Md Fazle Rabbi; original TREC 2006 spam track",
+      "source": "https://figshare.com/articles/dataset/25432108",
+      "license": "CC-BY-4.0",
+      "period": "TREC 2006 collection; row Date headers are unverified and not reliable chronology",
+      "raw_count": 16463,
+      "input_kind": "Previously deduplicated v2 representatives",
+      "nature": "REAL",
+      "classes": [
+        0
+      ],
+      "decision": "DEVELOPMENT_ONLY",
+      "class_overlap_quality": "SINGLE_CLASS",
+      "usage_notes": "Reuse local pinned v2 text only. No new raw download. Synthetic rows never fit a model or tune thresholds in this run; previously exposed real test families are quarantined."
+    },
+    {
+      "name": "adjei_bec",
+      "publisher": "Yaw Osei Adjei",
+      "source": "https://www.kaggle.com/datasets/yoadjei/adversarial-bec-email-dataset",
+      "license": "CC-BY-SA-4.0",
+      "period": "Published November 2025; generated examples, no real sent timestamps",
+      "raw_count": 4211,
+      "input_kind": "Previously deduplicated v2 representatives",
+      "nature": "SYNTHETIC",
+      "classes": [
+        1
+      ],
+      "decision": "DIAGNOSTIC_ONLY",
+      "class_overlap_quality": "SINGLE_CLASS",
+      "usage_notes": "Reuse local pinned v2 text only. No new raw download. Synthetic rows never fit a model or tune thresholds in this run; previously exposed real test families are quarantined."
+    },
+    {
+      "name": "kuladeep_synthetic",
+      "publisher": "Kuladeep P",
+      "source": "https://www.kaggle.com/datasets/kuladeep19/phishing-and-legitimate-emails-dataset",
+      "license": "CC-BY-SA-4.0",
+      "period": "Version 1 released September 2025 despite 2026 title; synthetic, no real sent timestamps",
+      "raw_count": 10000,
+      "input_kind": "Previously deduplicated v2 representatives",
+      "nature": "SYNTHETIC",
+      "classes": [
+        0,
+        1
+      ],
+      "decision": "DIAGNOSTIC_ONLY",
+      "class_overlap_quality": "BOTH_CLASSES_SYNTHETIC",
+      "usage_notes": "Reuse local pinned v2 text only. No new raw download. Synthetic rows never fit a model or tune thresholds in this run; previously exposed real test families are quarantined."
+    },
+    {
+      "name": "spaphish",
+      "publisher": "Lazaro Bustio-Martinez et al.",
+      "source": "https://data.mendeley.com/datasets/hz2d6gz7pc/5",
+      "license": "CC-BY-4.0",
+      "period": "2014-07 through 2025-10; DD/MM/YYYY per publisher schema, 24 missing dates",
+      "nature": "REAL",
+      "classes": [
+        0,
+        1
+      ],
+      "raw_count": 1395,
+      "decision": "ADMITTED_TEMPORAL_EMAIL",
+      "class_overlap_quality": "BOTH_CLASSES_REAL",
+      "usage_notes": "Authors voluntarily published manually anonymized personal/institutional messages. Majority expert labels. Plain CSV subject/body only; annotations, attachment metadata, hashes, dates and labels are never model text. One collection, not one independent source per author."
+    },
+    {
+      "name": "smishx",
+      "publisher": "Yizhu Wang, Haoyu Zhai, Chenkai Wang, Qingying Hao, Nick A. Cohen, Roopa Foulger, Jonathan A. Handler, Gang Wang",
+      "source": "https://github.com/yizhu-joy/SmishX",
+      "paper": "https://www.usenix.org/system/files/soups2025-wang.pdf",
+      "license": "MIT, publisher repository LICENSE",
+      "period": "Published SOUPS 2025; reuses older public SMS and 22 author-contributed messages; no row dates",
+      "nature": "REAL",
+      "classes": [
+        "legitimate",
+        "smishing",
+        "spam"
+      ],
+      "raw_count": 1200,
+      "decision": "ADMITTED_EXTERNAL_SMS",
+      "class_overlap_quality": "BOTH_CLASSES_REAL_MULTIPLE_ORIGINS",
+      "usage_notes": "Researcher relabeling of public real SMS. Admit legitimate and smishing, exclude generic spam. Underlying sources vary by class and are not mapped per row; not an independent real-email environment. Never follow URLs or execute companion crawler/LLM code."
+    }
+  ],
+  "considered": [
+    {
+      "name": "DataPhish / Constructing and Benchmarking (2025)",
+      "source": "https://arxiv.org/abs/2511.21448",
+      "publisher": "Rebeka Toth, Tamas Bisztray, Richard A. Dubniczky",
+      "license": "Paper CC-BY-4.0; downloadable corpus license not verified",
+      "reported_count": "Paper describes originals and rephrases; no verified accessible raw count",
+      "period": "2025 publication",
+      "decision": "REJECTED_UNAVAILABLE",
+      "reason": "Published GitHub DataPhish/PhishingSpamDataSet and API returned 404 on 2026-09-04. No data downloaded; paper license does not establish permission for unavailable corpus.",
+      "admitted_count": 0,
+      "review": "Inherited v2 decision, retained for provenance; not downloaded again",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "MeAJOR v2",
+      "source": "https://zenodo.org/records/18471483",
+      "publisher": "Cardoso, Vitorino, Mendes, Maia, Praca",
+      "license": "CC-BY-4.0",
+      "reported_count": 108685,
+      "period": "Historical TREC 2005-2007, Nazario and Nigerian Fraud; 2026 release",
+      "decision": "REJECTED",
+      "reason": "Repackages overlapping corpora; merged positive label includes spam sources. Not new independent phishing ground truth; anonymization also changes text. No raw download.",
+      "admitted_count": 0,
+      "review": "Inherited v2 decision, retained for provenance; not downloaded again",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "Phishing-Email-Detection-Dataset (2025)",
+      "source": "https://zenodo.org/records/17314806",
+      "publisher": "Alhuzali, Alloqmani, Aljabri, Alharbi",
+      "license": "CC-BY-4.0",
+      "reported_count": null,
+      "period": "2025 release, older merged corpora",
+      "decision": "REJECTED",
+      "reason": "Merged/downsampled public corpora; no verified new independent collection or spam/phishing separation. No raw download.",
+      "admitted_count": 0,
+      "review": "Inherited v2 decision, retained for provenance; not downloaded again",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "Seven Phishing Email Datasets: other files",
+      "source": "https://figshare.com/articles/dataset/25432108",
+      "publisher": "Champa and Rabbi",
+      "license": "CC-BY-4.0",
+      "reported_count": null,
+      "period": "Historical through 2008; released 2024",
+      "decision": "PARTIAL",
+      "reason": "TREC-06 ham admitted. Assassin/Ling copies duplicate existing bytes; TREC-05/-07 and CEAS generic spam positives not admitted as phishing; Enron and pre-vectorized files not used. TREC-06 suffices as one extra historical legitimate source in this fixed run.",
+      "admitted_count": 0,
+      "review": "Inherited v2 decision, retained for provenance; not downloaded again",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "Human-LLM generated phishing-legitimate emails",
+      "source": "https://www.kaggle.com/datasets/francescogreco97/human-llm-generated-phishing-legitimate-emails",
+      "publisher": "Francesco Greco et al.",
+      "license": "CC-BY-NC-SA-4.0",
+      "reported_count": 4000,
+      "period": "2024 release; mixed historical and generated",
+      "decision": "REJECTED",
+      "reason": "Label column denotes human versus LLM, not phishing; human source description ambiguously attributes legitimate mail to Nazario/Nigerian Fraud. Do not guess a class mapping. No raw download.",
+      "admitted_count": 0,
+      "review": "Inherited v2 decision, retained for provenance; not downloaded again",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "PhishNChips v5.2",
+      "source": "https://huggingface.co/datasets/AreLit/PhishNChips",
+      "publisher": "PhishNChips / AreLit",
+      "license": "MIT synthetic content plus mixed third-party/academic permissions; not a blanket MIT corpus license",
+      "reported_count": "2000 core synthetic emails plus overlapping Nazario subsets",
+      "period": "2026 synthetic release; historical real phishing",
+      "decision": "REJECTED",
+      "reason": "Additional synthetic source with mixed source-specific permissions, not fresh independent real email ground truth. Core URL-derived labels have source/label confounding. Prefer clearly licensed CSVs for this run.",
+      "admitted_count": 0,
+      "review": "Inherited v2 decision, retained for provenance; not downloaded again",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "IWSPA-AP v2",
+      "source": "https://www2.cs.uh.edu/~rmverma/book.html",
+      "publisher": "Rakesh M. Verma / University of Houston",
+      "license": "Restricted academic request, institutional identity and NDA",
+      "reported_count": null,
+      "period": "2018/2019",
+      "decision": "REJECTED_RESTRICTED",
+      "reason": "Not openly downloadable under current authorization; no request, NDA, identity transfer or third-party mirror use.",
+      "admitted_count": 0,
+      "review": "Inherited v2 decision, retained for provenance; not downloaded again",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "AVN Phishing Email Classification Dataset",
+      "source": "https://www.kaggle.com/datasets/avnbluefox/avn-phishing-email-classification-dataset",
+      "publisher": "AVN BlueFox",
+      "license": "CC-BY-4.0",
+      "reported_count": "60000 Basic rows advertised; clean corpus count not verified",
+      "period": "2025 release; original message period unknown",
+      "decision": "REJECTED",
+      "reason": "Adds deliberate noise/garbage labels; independent original collection and inherited class provenance not sufficiently documented. No raw download.",
+      "admitted_count": 0,
+      "review": "Inherited v2 decision, retained for provenance; not downloaded again",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "Turkish Phishing Email Dataset",
+      "source": "https://www.kaggle.com/datasets/osmancancet/turkish-phishing-email-dataset",
+      "publisher": "Osman Can Cetlenbik",
+      "license": "Card text CC-BY-4.0 conflicts with platform CC-BY-NC-SA-4.0",
+      "reported_count": "7500+ advertised",
+      "period": "2025 release; message dates unknown",
+      "decision": "REJECTED",
+      "reason": "Conflicting usage declarations and unclear generation/collection provenance; language transfer is outside this fixed English-centric research comparison. No raw download.",
+      "admitted_count": 0,
+      "review": "Inherited v2 decision, retained for provenance; not downloaded again",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "Phishing Codebook",
+      "source": "https://arxiv.org/abs/2408.08967",
+      "publisher": "Saka, Jain, Vaniea, Kokciyan",
+      "license": "Open paper; separately licensed downloadable email-text corpus not verified",
+      "reported_count": 503,
+      "period": "2015-2021 emails; 2024 paper",
+      "decision": "REJECTED_UNVERIFIED",
+      "reason": "The primary paper identifies the annotated corpus as Nazario 2015-2021, not an independent collection. No licensed independent text asset; not downloaded.",
+      "admitted_count": 0,
+      "review": "Rechecked primary paper 2026-09-04",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "Impact of email category on phishing detection",
+      "source": "https://figshare.com/articles/dataset/28953446",
+      "publisher": "Arifa Islam Champa",
+      "license": "CC-BY-4.0",
+      "reported_count": 20,
+      "period": "2025 study",
+      "decision": "REJECTED",
+      "reason": "Small user-study package with questionnaire, response spreadsheet and 20 stimuli; insufficient source-generalization support. No participant data downloaded.",
+      "admitted_count": 0,
+      "review": "Inherited v2 decision, retained for provenance; not downloaded again",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "Spam E-mail and Phishing Detection",
+      "source": "https://data.mendeley.com/datasets/shj94nrczy/1",
+      "publisher": "Ahmed Sedik and Moustafa M. Nasralla",
+      "license": "CC-BY-4.0",
+      "reported_count": null,
+      "period": "2025 release",
+      "decision": "REJECTED",
+      "reason": "RAR notebook bundle with unclear phishing/ham text label provenance; no reviewed standalone email CSV. No archive downloaded.",
+      "admitted_count": 0,
+      "review": "Inherited v2 decision, retained for provenance; not downloaded again",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "Balanced Dataset for Spam and Smishing Detection",
+      "source": "https://data.mendeley.com/datasets/vmg875v4xs/1",
+      "publisher": "Miriam Munoz and Muhammad Islam",
+      "license": "CC-BY-4.0",
+      "reported_count": 10191,
+      "period": "2025 generated release",
+      "decision": "REJECTED",
+      "reason": "Synthetic SMS/smishing, not email text; no download.",
+      "admitted_count": 0,
+      "review": "Inherited v2 decision, retained for provenance; not downloaded again",
+      "nature": "UNKNOWN",
+      "classes": "See publisher; unverified unless specified"
+    },
+    {
+      "name": "Phishing Pot",
+      "publisher": "rf-peixoto and contributors",
+      "source": "https://github.com/rf-peixoto/phishing_pot",
+      "license": "CC-BY-NC-4.0",
+      "period": "Modern honeypot collection; public snapshot dates do not establish each message date",
+      "nature": "REAL",
+      "classes": [
+        1
+      ],
+      "reported_count": "10,362 including private samples advertised; public text-only usable count unverified",
+      "admitted_count": 0,
+      "decision": "REJECTED_PAYLOAD_SCOPE",
+      "reason": "Raw MIME collection can contain weaponized attachments. No reviewed attachment-free text release verified. No EML or archive downloaded."
+    },
+    {
+      "name": "realprogrammersusevim/email-dataset",
+      "publisher": "Jonathan Milligan; inherited zrz1996, SpamAssassin contributors, Rachael Tatman",
+      "source": "https://github.com/realprogrammersusevim/email-dataset",
+      "license": "MIT notices plus CC-BY-SA-4.0 Fraudulent E-mail Corpus notice",
+      "period": "Historical; exact message range not documented in card",
+      "nature": "UNKNOWN",
+      "classes": [
+        "ham",
+        "spam"
+      ],
+      "reported_count": 19528,
+      "admitted_count": 0,
+      "decision": "REJECTED_PROVENANCE",
+      "reason": "Not a verified independent modern collection; inherited SpamAssassin/Fraudulent Email content and no per-record original source map. Generic spam is not phishing. No messages downloaded."
+    },
+    {
+      "name": "Sting9",
+      "publisher": "Sting9 Research Initiative",
+      "source": "https://sting9.org/dataset",
+      "license": "Page conflicts: CC0 access description versus ODC-BY-NC footer",
+      "period": "2025 onward advertised; not verified",
+      "nature": "UNKNOWN",
+      "classes": [
+        "phishing",
+        "BEC",
+        "smishing",
+        "scam"
+      ],
+      "reported_count": null,
+      "admitted_count": 0,
+      "decision": "REJECTED_UNVERIFIED",
+      "reason": "Conflicting public license statements; no clearly versioned text-only corpus verified. No database dump downloaded."
+    },
+    {
+      "name": "BanglaPhish-2026",
+      "publisher": "Xrenes",
+      "source": "https://github.com/Xrenes/BanglaPhish-2026",
+      "license": "CC-BY-NC-4.0",
+      "period": "2026 synthetic release",
+      "nature": "SYNTHETIC",
+      "classes": [
+        0,
+        1
+      ],
+      "reported_count": 6000,
+      "admitted_count": 0,
+      "decision": "REJECTED_SCOPE",
+      "reason": "Explicitly synthetic Bengali benchmark; does not add captured real-email evidence. No download."
+    }
+  ],
+  "assets": [
+    {
+      "filename": "spaphish.csv",
+      "url": "https://data.mendeley.com/public-files/datasets/hz2d6gz7pc/files/f796c8e2-3768-4c2d-8b73-48f0d7771de5/file_downloaded",
+      "sha256": "656b2245d58da72d640680e5c2a168673a130b38607f2a427c773bbb167e995e",
+      "bytes": 5098917
+    },
+    {
+      "filename": "spaphish_schema.json",
+      "url": "https://data.mendeley.com/public-files/datasets/hz2d6gz7pc/files/eb378c47-8c13-44d2-afef-328cb1a03a43/file_downloaded",
+      "sha256": "51d501037e05f2dd117f8d46c4131d08971fa1f21b220bcc401670741605cdba",
+      "bytes": 17798
+    },
+    {
+      "filename": "smishx.csv",
+      "url": "https://raw.githubusercontent.com/yizhu-joy/SmishX/116a8c827741e0572563f678d25ed04306b1e3ff/data/dataset.csv",
+      "sha256": "8d65e373b17477c34e8f1c619e6f59d249e8fca21276cabdd03a55d11a469285",
+      "bytes": 163840
+    }
+  ],
+  "protocol": {
+    "training": "REAL only: existing v2 train representatives and SpaPhish dated through 2022; cap 1500 per source/class. Synthetic data only post-lock diagnostics.",
+    "validation": "Thresholds use SpaPhish 2023 only. Mixed-source diagnostics and ranking include previously exposed historical v2 validation plus 2023 SpaPhish. The historical slice is not called a temporal holdout.",
+    "final": "SpaPhish 2024-2025 (within-source, forward-time), plus fully external SmishX SMS and unknown-date/SYNTHETIC diagnostics. All opened once after all model, threshold, code, data and policy hashes are locked.",
+    "external": "SmishX sources never enter fitting, threshold selection, model selection or source-identity diagnostics. Data preparation only mechanically normalizes/deduplicates it and reports counts before sealing; evaluation text is read only after lock.",
+    "chronology": "Documented historical collection bound through 2022, SpaPhish documented message dates. No invented dates from filenames, release dates or IDs. Sender dates not independently verified. Cross-period duplicate families fully quarantined.",
+    "selection": "Preserve v2 fixed four candidates, source-aware ranking and all gate values. Add temporal and external/evidence gates. Test cannot select model or change thresholds.",
+    "activation": "Never activate. Even all-gate pass only VALIDATED - eligible for activation review. Original model and production paths remain unchanged."
+  },
+  "evidence": {
+    "independent_real_both_class_sources": 1,
+    "representative_external_holdout": false,
+    "reason": "SpaPhish is one modern real-email collection with both labels. SmishX is SMS from multiple underlying sources, not a second email collection or representative email external test."
+  },
+  "transfer_pairs": [
+    [
+      "ling",
+      "nazario"
+    ],
+    [
+      "spamassassin",
+      "nigerian_fraud"
+    ],
+    [
+      "trec06_ham",
+      "spaphish"
+    ]
+  ]
+}

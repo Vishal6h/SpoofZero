@@ -188,3 +188,12 @@ mandatory generalization gates. New synthetic evidence is labeled explicitly.
 The protected legacy model remains active; research candidates are not activated.
 See [v2 methodology](docs/ai-dataset-generalization-v2.md) and
 [measured results](ml/reports/AI_DATASET_GENERALIZATION_V2.md).
+
+## Real-World Validation Corpus
+
+The isolated research path now supports explicit REAL/SYNTHETIC/UNKNOWN provenance,
+forward-time email evaluation, a sealed external SMS holdout, and additional
+evidence gates. Only real older emails fit this experiment; synthetic data is
+separate post-lock stress evidence. The legacy model remains active and unchanged.
+See [methodology and reproduction](docs/real-world-validation-corpus.md) and
+[measured results](ml/reports/REAL_WORLD_VALIDATION_CORPUS.md).

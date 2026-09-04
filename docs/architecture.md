@@ -189,3 +189,17 @@ only. Synthetic corpora do not satisfy modern real-mail deployment evidence.
 Versioned v2 inference is separate from the application loader. The active legacy
 artifacts, v1 frozen code/reports, UI, fusion weights and forensic modules are
 unchanged. See [v2 methodology](ai-dataset-generalization-v2.md).
+
+## Real-World Validation Corpus
+
+Protected reference: bfa6d958631cdafa3c893d2ca439931f4cc22f71.
+
+`ml/validation_corpus/` reuses the frozen normalization/deduplication primitives,
+model factory, calibration, metrics and source-transfer evaluators. It adds
+explicit provenance tags, cross-role family quarantine, publisher-date temporal
+partitions, separate real/synthetic cohorts and mandatory external evidence
+gates. Selection cannot read final or external partitions; a hash-bound lock and
+single-use marker precede final evaluation. Candidate metadata never sets active
+to true. No production module imports this namespace. Original model artifacts,
+active inference, fusion, forensic modules and UI are unchanged.
+See [the protocol](real-world-validation-corpus.md).
