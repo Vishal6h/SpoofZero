@@ -1,220 +1,149 @@
+"""DNS and RDAP intelligence with bounded, expiring local caches."""
 import json
 import sys
-import urllib.request
-
+import socket
+import urllib.parse
+from copy import deepcopy
+import dns.exception
 import dns.resolver
-
-
-RESERVED_DEMO_DOMAINS = (
-    "example.com",
-    "example.net",
-    "example.org",
+from backend.external_services import (
+    ERROR, NOT_FOUND, SUCCESS, TIMEOUT, UNAVAILABLE, TTLCache, request_json, service_result,
 )
+from backend.observability import log_event
+from backend.input_safety import normalized_domain
 
+RESERVED_DEMO_DOMAINS = ("example.com", "example.net", "example.org")
+DNS_TYPES = ("A", "AAAA", "MX", "NS", "TXT")
+DNS_CACHE, RDAP_CACHE = TTLCache(256), TTLCache(256)
+DNS_TTL_SECONDS, FAILURE_TTL_SECONDS, RDAP_TTL_SECONDS = 300, 20, 900
+
+def clear_threat_intel_cache():
+    DNS_CACHE.clear()
+    RDAP_CACHE.clear()
 
 def is_reserved_demo_domain(domain):
-    domain = domain.lower().rstrip(".")
-
-    if domain.endswith((".test", ".invalid", ".localhost")):
-        return True
-
-    for reserved in RESERVED_DEMO_DOMAINS:
-        if domain == reserved or domain.endswith("." + reserved):
-            return True
-
-    return False
-
+    domain = str(domain or "").lower().rstrip(".")
+    return domain.endswith((".test", ".invalid", ".localhost")) or any(
+        domain == reserved or domain.endswith("." + reserved)
+        for reserved in RESERVED_DEMO_DOMAINS)
 
 def dns_lookup(domain):
-    results = {
-        "A": [],
-        "AAAA": [],
-        "MX": [],
-        "NS": [],
-        "TXT": []
-    }
-
-    for record_type in results:
+    key = ("dns", str(domain).lower().rstrip("."))
+    cached = DNS_CACHE.get(key)
+    if cached is not None:
+        cached["cache_hit"] = True
+        return cached
+    results = {kind: [] for kind in DNS_TYPES}
+    failures, found_authoritative_absence = [], False
+    for record_type in DNS_TYPES:
         try:
-            answers = dns.resolver.resolve(
-                domain,
-                record_type,
-                lifetime=3
-            )
-
-            for answer in answers:
-                results[record_type].append(
-                    str(answer).strip('"')
-                )
-
+            answers = dns.resolver.resolve(domain, record_type, lifetime=3)
+            results[record_type].extend(str(answer).strip('"') for answer in answers)
+        except dns.resolver.NXDOMAIN:
+            found_authoritative_absence = True
+            break
+        except dns.resolver.NoAnswer:
+            continue
+        except (dns.exception.Timeout, LifetimeTimeout, socket.timeout):
+            failures.append(TIMEOUT)
+        except dns.resolver.NoNameservers:
+            failures.append(UNAVAILABLE)
         except Exception:
-            pass
-
+            failures.append(ERROR)
+    if found_authoritative_absence:
+        status = NOT_FOUND
+    elif failures and len(failures) == len(DNS_TYPES):
+        status = TIMEOUT if all(x == TIMEOUT for x in failures) else UNAVAILABLE
+    else:
+        status = SUCCESS
+    results.update(service_status=status, status="success" if status == SUCCESS else
+                   "not_found" if status == NOT_FOUND else "error",
+                   cache_hit=False, partial=bool(failures and status == SUCCESS))
+    DNS_CACHE.set(key, results, DNS_TTL_SECONDS if status in {SUCCESS, NOT_FOUND} else FAILURE_TTL_SECONDS)
+    log_event("external_request", analyzer="dns", service_status=status, cache_hit=False)
     return results
 
+# dnspython exposes this under resolver on supported versions.
+LifetimeTimeout = getattr(dns.resolver, "LifetimeTimeout", dns.exception.Timeout)
 
 def rdap_lookup(domain):
-    url = f"https://rdap.org/domain/{domain}"
-
-    request = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent": "SpoofZero/1.0"
-        }
+    response = request_json(
+        "rdap", "https://rdap.org/domain/" + urllib.parse.quote(str(domain), safe=""),
+        headers={"User-Agent": "SpoofZero/1.0"}, timeout=8,
+        cache=RDAP_CACHE, cache_key=str(domain).lower().rstrip("."),
+        ttl_seconds=RDAP_TTL_SECONDS, failure_ttl_seconds=FAILURE_TTL_SECONDS,
     )
-
-    try:
-        with urllib.request.urlopen(
-            request,
-            timeout=8
-        ) as response:
-
-            data = json.loads(
-                response.read().decode("utf-8")
-            )
-
-    except Exception as error:
-        return {
-            "status": "unavailable",
-            "message": str(error)
-        }
-
-    events = {}
-
-    for event in data.get("events", []):
-        action = event.get("eventAction")
-        date = event.get("eventDate")
-
-        if action:
-            events[action] = date
-
-    nameservers = []
-
-    for ns in data.get("nameservers", []):
-        name = ns.get("ldhName")
-
-        if name:
-            nameservers.append(name)
-
+    if response.get("service_status") != SUCCESS:
+        return response
+    data = response.get("data")
+    if not isinstance(data, dict):
+        return service_result(ERROR, "RDAP returned an incomplete record.",
+                              error_type="MALFORMED_RESPONSE")
+    event_items = data.get("events") or []
+    ns_items = data.get("nameservers") or []
+    if not isinstance(event_items, list) or not isinstance(ns_items, list):
+        return service_result(ERROR, "RDAP returned malformed record fields.",
+                              error_type="MALFORMED_RESPONSE")
+    events = {event.get("eventAction"): event.get("eventDate")
+              for event in event_items if isinstance(event, dict) and event.get("eventAction")}
+    nameservers = [item.get("ldhName") for item in ns_items
+                   if isinstance(item, dict) and item.get("ldhName")]
     return {
-        "status": "success",
-        "handle": data.get("handle"),
-        "registration_date": events.get("registration"),
-        "expiration_date": events.get("expiration"),
-        "last_changed": events.get("last changed"),
-        "nameservers": nameservers
+        "status": "success", "service_status": SUCCESS, "handle": data.get("handle"),
+        "registration_date": events.get("registration"), "expiration_date": events.get("expiration"),
+        "last_changed": events.get("last changed"), "nameservers": nameservers,
+        "cache_hit": response.get("cache_hit", False), "attempts": response.get("attempts", 1),
     }
-
 
 def analyze_domain(domain):
-    domain = domain.lower().strip().rstrip(".")
-
-    # Prevent demo/test domains from being treated as real threats
+    domain = normalized_domain(domain)
+    if domain is None:
+        return {"domain": "INVALID", **service_result(ERROR, "Invalid domain."),
+                "risk_score": None, "indicators": ["Invalid domain was not queried."]}
     if is_reserved_demo_domain(domain):
-        return {
-            "domain": domain,
-            "status": "reserved_demo",
-            "risk_score": 0,
-            "dns": {},
-            "rdap": {},
-            "indicators": [
-                "Reserved demo/test domain — real reputation lookup skipped"
-            ]
-        }
-
-    dns_data = dns_lookup(domain)
-    rdap_data = rdap_lookup(domain)
-
-    indicators = []
-    risk_score = 0
-
-    total_records = sum(
-        len(records)
-        for records in dns_data.values()
-    )
-
-    if total_records == 0:
-        indicators.append(
-            "No DNS records found"
-        )
-        risk_score += 20
-
-    if not dns_data["NS"]:
-        indicators.append(
-            "No authoritative nameserver record found"
-        )
-        risk_score += 10
-
-    mx_records = dns_data["MX"]
-
-    if mx_records == ["0 ."]:
-        indicators.append(
-            "Null MX detected — domain intentionally does not receive email"
-        )
-
-    elif not mx_records:
-        indicators.append(
-            "No MX mail-server record found"
-        )
-
-    if rdap_data.get("status") != "success":
-        indicators.append(
-            "Domain registration information unavailable"
-        )
-
-    risk_score = min(risk_score, 100)
-
-    return {
-        "domain": domain,
-        "status": "analyzed",
-        "risk_score": risk_score,
-        "dns": dns_data,
-        "rdap": rdap_data,
-        "indicators": indicators
-    }
-
+        return {"domain": domain, "status": "reserved_demo", "service_status": "SKIPPED",
+                "risk_score": 0, "dns": {}, "rdap": {},
+                "indicators": ["Reserved demo/test domain — real reputation lookup skipped"]}
+    dns_data, rdap_data = dns_lookup(domain), rdap_lookup(domain)
+    indicators, risk_score = [], 0
+    dns_status = dns_data.get("service_status")
+    if dns_status in {TIMEOUT, UNAVAILABLE, ERROR}:
+        risk_score = None
+        indicators.append("DNS evidence unavailable; no safety conclusion was made.")
+    else:
+        total = sum(len(dns_data[kind]) for kind in DNS_TYPES)
+        if total == 0:
+            indicators.append("No DNS records found")
+            risk_score += 20
+        if not dns_data["NS"]:
+            indicators.append("No authoritative nameserver record found")
+            risk_score += 10
+        if dns_data["MX"] == ["0 ."]:
+            indicators.append("Null MX detected — domain intentionally does not receive email")
+        elif not dns_data["MX"]:
+            indicators.append("No MX mail-server record found")
+    if rdap_data.get("service_status") != SUCCESS:
+        indicators.append("Domain registration information unavailable; no safety conclusion was made.")
+    partial = bool(dns_data.get("partial")) or dns_status in {TIMEOUT, UNAVAILABLE, ERROR} or rdap_data.get("service_status") != SUCCESS
+    return {"domain": domain, "status": "analyzed", "service_status": SUCCESS,
+            "evidence_status": "PARTIAL" if partial else "COMPLETE",
+            "risk_score": min(risk_score, 100) if risk_score is not None else None,
+            "dns": dns_data, "rdap": rdap_data, "indicators": indicators}
 
 def analyze_domains(domains, limit=8):
+    unique = sorted(set(str(d).lower().strip().rstrip(".") for d in domains if d))
     results = []
-
-    unique_domains = sorted(
-        set(
-            d.lower().strip().rstrip(".")
-            for d in domains
-            if d
-        )
-    )
-
-    for domain in unique_domains[:limit]:
+    for domain in unique[:limit]:
         try:
-            results.append(
-                analyze_domain(domain)
-            )
-
-        except Exception as error:
-            results.append({
-                "domain": domain,
-                "status": "error",
-                "risk_score": 0,
-                "indicators": [
-                    f"Lookup failed: {error}"
-                ]
-            })
-
+            results.append(analyze_domain(domain))
+        except Exception:
+            results.append({"domain": domain, **service_result(
+                ERROR, "Domain intelligence could not be completed."),
+                "risk_score": None, "indicators": ["Lookup failed; no safety conclusion was made."]})
     return results
-
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print(
-            "Usage: python -m "
-            "backend.analyzers.threat_intel <domain>"
-        )
+        print("Usage: python -m backend.analyzers.threat_intel <domain>")
         sys.exit(1)
-
-    print(
-        json.dumps(
-            analyze_domain(sys.argv[1]),
-            indent=4
-        )
-    )
+    print(json.dumps(analyze_domain(sys.argv[1]), indent=4))

@@ -3,7 +3,7 @@
 The original case_emails rows remain an immutable compatibility record. Runtime
 analysis does not retain EML bodies or attachment payloads.
 """
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from datetime import date, datetime, timezone
 from hashlib import sha256
 import json
@@ -12,6 +12,9 @@ import os
 from pathlib import Path
 import re
 import sqlite3
+
+from .input_safety import safe_display_text, safe_evidence_filename
+from .storage_privacy import prepare_analysis_for_storage
 from uuid import uuid4
 
 DB_SCHEMA_VERSION = 1
@@ -24,10 +27,14 @@ def utc_now():
     return datetime.now(timezone.utc).isoformat()
 
 
+class CaseStorageError(RuntimeError):
+    pass
+
+
 def _text(value, label, maximum, required=False):
     if not isinstance(value, str):
         raise ValueError(f"{label} must be text")
-    value = value.strip()
+    value = safe_display_text(value, maximum) or ""
     if (required and not value) or len(value) > maximum:
         raise ValueError(f"{label} must contain {'1' if required else '0'} to {maximum} characters")
     return value
@@ -35,10 +42,33 @@ def _text(value, label, maximum, required=False):
 
 class CaseStore:
     def __init__(self, db_path=None):
-        self.path = Path(db_path or os.getenv("SPOOFZERO_CASE_DB") or DEFAULT_DB_PATH)
-        self.path.parent.mkdir(parents=True, exist_ok=True)
+        configured = str(db_path or os.getenv("SPOOFZERO_CASE_DB") or DEFAULT_DB_PATH)
+        if "\x00" in configured:
+            raise CaseStorageError("Case database location is invalid.")
+        candidate = Path(configured).expanduser()
+        if not candidate.is_absolute():
+            candidate = DEFAULT_DB_PATH.parents[2] / candidate
+        if candidate.exists() and candidate.is_symlink():
+            raise CaseStorageError("Case database symlinks are not accepted.")
+        self.path = candidate.resolve(strict=False)
+        if self.path.exists() and not self.path.is_file():
+            raise CaseStorageError("Case database location is not a regular file.")
+        created_parent = not self.path.parent.exists()
+        self.path.parent.mkdir(parents=True, mode=0o700, exist_ok=True)
+        if os.name == "posix" and created_parent:
+            self.path.parent.chmod(0o700)
+        if not self.path.exists():
+            descriptor = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+            os.close(descriptor)
         self.migration_backup = None
-        self._initialize()
+        try:
+            self._initialize()
+            if os.name == "posix":
+                self.path.chmod(0o600)
+        except sqlite3.DatabaseError as error:
+            raise CaseStorageError(
+                "Case database is unreadable or corrupted; stored evidence was not rewritten."
+            ) from error
 
     @contextmanager
     def connection(self):
@@ -56,13 +86,17 @@ class CaseStore:
         # The migration connection holds BEGIN IMMEDIATE, preventing concurrent
         # writes. A separate read connection snapshots committed legacy data.
         try:
-            with sqlite3.connect(self.path) as source, sqlite3.connect(backup) as target:
+            with closing(sqlite3.connect(self.path)) as source, closing(
+                    sqlite3.connect(backup)) as target:
                 source.backup(target)
                 if target.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
                     raise ValueError("Case backup failed its integrity check")
+                target.commit()
         except Exception:
             # Keep any partial backup for inspection; never remove user evidence.
             raise
+        if os.name == "posix":
+            backup.chmod(0o600)
         self.migration_backup = backup
 
     def _initialize(self):
@@ -267,7 +301,11 @@ class CaseStore:
         return next((r for r in records if r["is_latest"]), None)
 
     def add_analysis(self, case_id, filename, analysis, *, allow_reanalysis=False,
-                     analysis_id=None, analyzed_at=None):
+                     analysis_id=None, analyzed_at=None, privacy_safe=False):
+        if not isinstance(analysis, dict):
+            raise ValueError("Analysis snapshot must be a mapping")
+        analysis = prepare_analysis_for_storage(analysis, privacy_safe=privacy_safe)
+        filename = safe_evidence_filename(filename or "email.eml")
         email_id = (analysis.get("email") or {}).get("sha256") or ""
         if not re.fullmatch(r"[a-f0-9]{64}", email_id):
             raise ValueError("Analyze the email again to obtain its raw EML SHA-256")

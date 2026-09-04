@@ -260,3 +260,17 @@ requires explicit input and is not stored.
 
 Existing unversioned case databases migrate transactionally to schema v1 after a
 verified local backup. See [case management and forensic reporting](docs/case-management-and-reports.md).
+
+## Security, Privacy, Performance & Failure Hardening
+
+Untrusted EML, MIME, body, header, and attachment data now pass through shared,
+documented resource limits. External intelligence calls use bounded concurrency,
+short-lived in-memory caches, conservative retries, and explicit availability
+states so failed checks are never presented as safe evidence. Case persistence
+filters raw content and secrets, offers an opt-in privacy-safe snapshot, and uses
+restrictive local SQLite permissions where the operating system supports them.
+
+The dashboard gives controlled partial-evidence and failure messages without raw
+tracebacks, and lets an investigator clear current session evidence. These changes
+preserve the protected fusion policy, historical snapshots, and inactive research
+models. See [security, privacy, performance, and failure hardening](docs/security-privacy-performance-hardening.md).

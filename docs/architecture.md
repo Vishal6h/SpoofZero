@@ -289,3 +289,23 @@ ID and UTC timestamp for later persistence.
 These changes do not alter analysis output, fusion, correlation weights, model
 state, or existing snapshot JSON. See
 [reports and case management](case-management-and-reports.md).
+
+## Security, Privacy, Performance & Failure Hardening
+
+Protected reference: `1bff7273a95e1edb5a271d1b70f9cdc6dcb23d75`.
+
+`backend/input_safety.py` owns bounded inert EML loading, MIME depth and part
+validation, decoded-content limits, and display-safe filenames. Attachment
+payloads are decoded only for bounded metadata and SHA-256 analysis; they are not
+executed, opened, uploaded, or persisted. `backend/storage_privacy.py` removes raw
+message content, payloads, and secret-like material before a new case snapshot is
+written, with an additional investigator-selected minimization mode.
+
+`backend/external_services.py` centralizes classified service outcomes, response
+limits, conservative retries, bounded concurrency, hashed-key TTL caches, and
+allowlisted operational events. `backend/analyze.py` runs independent enrichments
+concurrently and reports partial evidence additively without changing the public
+analysis contract or the protected fusion calculation. The Streamlit boundaries
+reject oversized uploads before reading them and show controlled errors without
+exception details. See [the hardening threat model, limits, benchmark method, and
+deployment checklist](security-privacy-performance-hardening.md).

@@ -6,13 +6,16 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from .case_store import MAX_CASE_EMAILS
+from .input_safety import DEFAULT_EMAIL_LIMITS, EmailInputError, safe_evidence_filename
+from .observability import log_event
 
 
 MAX_BATCH_FILES = 25
-MAX_EMAIL_BYTES = 10 * 1024 * 1024
+MAX_EMAIL_BYTES = DEFAULT_EMAIL_LIMITS.max_eml_bytes
 
 
-def analyze_batch(files, case_id, store, analysis_fn=None, *, allow_reanalysis=False):
+def analyze_batch(files, case_id, store, analysis_fn=None, *,
+                  allow_reanalysis=False, privacy_safe=False):
     """Yield per-file outcomes while isolating failures and removing payload files.
 
     By default an existing raw EML hash skips analysis and returns its latest
@@ -28,6 +31,7 @@ def analyze_batch(files, case_id, store, analysis_fn=None, *, allow_reanalysis=F
 
     seen_batch = set()
     for filename, content in files:
+        filename = safe_evidence_filename(filename or "email.eml")
         try:
             content = content() if callable(content) else content
             if not isinstance(content, bytes) or not content:
@@ -55,7 +59,8 @@ def analyze_batch(files, case_id, store, analysis_fn=None, *, allow_reanalysis=F
                 analysis = deepcopy(analysis_fn(str(path)))
                 analysis.setdefault("email", {})["sha256"] = digest
             inserted = store.add_analysis(
-                case_id, filename, analysis, allow_reanalysis=bool(existing)
+                case_id, filename, analysis, allow_reanalysis=bool(existing),
+                privacy_safe=privacy_safe,
             )
             if not inserted:
                 saved = store.get_analysis(case_id, digest)
@@ -70,5 +75,12 @@ def analyze_batch(files, case_id, store, analysis_fn=None, *, allow_reanalysis=F
                 "analysis_id": saved["analysis_id"] if saved else None,
                 "analysis": analysis,
             }
-        except Exception as error:
+        except EmailInputError as error:
             yield {"filename": filename, "status": "error", "message": str(error)}
+        except Exception:
+            log_event("analysis_failure", analyzer="batch", case_id=case_id,
+                      service_status="ERROR")
+            yield {
+                "filename": filename, "status": "error",
+                "message": "Analysis could not be completed safely for this file.",
+            }

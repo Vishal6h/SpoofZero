@@ -1,9 +1,10 @@
-from email import policy
-from email.parser import BytesParser
 from email.utils import collapse_rfc2231_value
 from html.parser import HTMLParser
-from pathlib import Path
 import re
+
+from backend.input_safety import (
+    DEFAULT_EMAIL_LIMITS, load_email_message, safe_display_text, truncate_utf8,
+)
 
 
 class _EmailHTMLParser(HTMLParser):
@@ -168,10 +169,9 @@ def _merge_body_texts(texts):
     return "\n\n".join(text.strip() for text in accepted)
 
 
-def parse_email(file_path):
-    file_path = Path(file_path)
-    with open(file_path, "rb") as f:
-        msg = BytesParser(policy=policy.default).parse(f)
+def parse_email(file_path, *, limits=None):
+    limits = limits or DEFAULT_EMAIL_LIMITS
+    msg, processing = load_email_message(file_path, limits)
 
     email_data = {
         "subject": msg.get("Subject"),
@@ -189,15 +189,36 @@ def parse_email(file_path):
         # Transient parser evidence for IOC extraction, never rendered in the UI.
         "html_parts": [],
     }
+    for field in ("subject", "from", "to", "reply_to", "return_path", "message_id", "date"):
+        email_data[field] = safe_display_text(email_data[field], limits.max_header_chars)
+    for field in ("received", "authentication_results", "dkim_signatures", "from_headers"):
+        email_data[field] = [
+            safe_display_text(value, limits.max_header_chars) for value in email_data[field]
+        ]
     texts = []
+    remaining = limits.max_body_text_bytes
+    truncated = False
     for part in _body_parts(msg):
-        text = _decode_text(part)
+        if remaining <= 0:
+            truncated = True
+            break
+        text, was_truncated = truncate_utf8(_decode_text(part), remaining)
+        remaining -= len(text.encode("utf-8", errors="replace"))
+        truncated = truncated or was_truncated
         if part.get_content_type() == "text/html":
             if text not in email_data["html_parts"]:
                 email_data["html_parts"].append(text)
             text = extract_html_content(text)["text"]
         texts.append(text)
-    email_data["body"] = _merge_body_texts(texts)
+    email_data["body"], merged_truncated = truncate_utf8(
+        _merge_body_texts(texts), limits.max_body_text_bytes)
+    truncated = truncated or merged_truncated
+    processing["status"] = "PARTIAL" if truncated else "COMPLETE"
+    processing["warnings"] = (
+        ["Body/HTML extraction reached its byte limit; indicators beyond the retained text were not checked."]
+        if truncated else []
+    )
+    email_data["processing"] = processing
     return email_data
 
 

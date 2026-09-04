@@ -1,11 +1,14 @@
 import os
 import tempfile
 import textwrap
+from html import escape
 from datetime import datetime, timezone
 from uuid import uuid4
 import streamlit as st
 
-from backend.analyze import analyze_email
+from backend.analyze import analyze_email, analysis_health
+from backend.input_safety import DEFAULT_EMAIL_LIMITS, EmailInputError, safe_evidence_filename
+from backend.observability import log_event
 from frontend.case_ui import render_case_workspace, render_case_report
 from frontend.ai_ui import (
     ai_evidence_label, render_ai_card, render_ai_details, score_breakdown_rows,
@@ -266,12 +269,15 @@ def render_html(content):
 
 
 def card(label, value, note="", value_class=""):
+    css = value_class if value_class in {
+        "", "verdict-critical", "verdict-high", "verdict-suspicious", "verdict-safe"
+    } else ""
     render_html(
         f"""
         <div class="sz-card">
-            <div class="sz-label">{label}</div>
-            <div class="sz-value {value_class}">{value}</div>
-            <div class="sz-small">{note}</div>
+            <div class="sz-label">{escape(str(label))}</div>
+            <div class="sz-value {css}">{escape(str(value))}</div>
+            <div class="sz-small">{escape(str(note))}</div>
         </div>
         """
     )
@@ -304,7 +310,7 @@ def auth_badge(value):
     else:
         css = "auth-unknown"
 
-    return f'<span class="{css}">{value}</span>'
+    return f'<span class="{css}">{escape(value)}</span>'
 
 
 # ============================================================
@@ -344,6 +350,19 @@ uploaded_file = st.file_uploader(
     label_visibility="collapsed"
 )
 
+with st.expander("Privacy and session controls", expanded=False):
+    st.caption(
+        "Analysis results remain in this browser session until cleared. Case snapshots "
+        "exclude raw bodies and attachment payloads."
+    )
+    if st.button("Clear current session evidence", key="sz_clear_session"):
+        for key in (
+            "spoofzero_result", "spoofzero_filename", "spoofzero_analysis_id",
+            "spoofzero_analyzed_at", "spoofzero_result_source",
+        ):
+            st.session_state.pop(key, None)
+        st.success("Current session evidence was cleared. Saved case history was not changed.")
+
 
 if uploaded_file is not None:
 
@@ -354,7 +373,7 @@ if uploaded_file is not None:
 
     with file_col:
         st.success(
-            f"Loaded: {uploaded_file.name}"
+            f"Loaded: {safe_evidence_filename(uploaded_file.name)}"
         )
 
     with button_col:
@@ -365,45 +384,47 @@ if uploaded_file is not None:
         )
 
     if analyze_clicked:
-
         temp_path = None
-
+        analysis_id = uuid4().hex
         try:
-
-            with tempfile.NamedTemporaryFile(
-                delete=False,
-                suffix=".eml"
-            ) as temp_file:
-
-                temp_file.write(
-                    uploaded_file.getvalue()
+            reported_size = getattr(uploaded_file, "size", None)
+            if isinstance(reported_size, int) and reported_size > DEFAULT_EMAIL_LIMITS.max_eml_bytes:
+                raise EmailInputError(
+                    f"Email exceeds the {DEFAULT_EMAIL_LIMITS.max_eml_bytes // (1024 * 1024)} MiB upload limit."
                 )
-
+            upload_payload = uploaded_file.getvalue()
+            if not isinstance(upload_payload, bytes) or not upload_payload:
+                raise EmailInputError("The EML file is empty or unreadable.")
+            if len(upload_payload) > DEFAULT_EMAIL_LIMITS.max_eml_bytes:
+                raise EmailInputError(
+                    f"Email exceeds the {DEFAULT_EMAIL_LIMITS.max_eml_bytes // (1024 * 1024)} MiB upload limit."
+                )
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".eml") as temp_file:
+                temp_file.write(upload_payload)
                 temp_path = temp_file.name
-
-            with st.spinner(
-                "SpoofZero is correlating forensic evidence..."
-            ):
-
-                result = analyze_email(
-                    temp_path
-                )
-
+            with st.spinner("SpoofZero is correlating forensic evidence..."):
+                result = analyze_email(temp_path, analysis_id=analysis_id)
             st.session_state["spoofzero_result"] = result
-            st.session_state["spoofzero_filename"] = uploaded_file.name
-            st.session_state["spoofzero_analysis_id"] = uuid4().hex
+            st.session_state["spoofzero_filename"] = safe_evidence_filename(uploaded_file.name)
+            st.session_state["spoofzero_analysis_id"] = analysis_id
             st.session_state["spoofzero_analyzed_at"] = datetime.now(timezone.utc).isoformat()
             st.session_state["spoofzero_result_source"] = "fresh_analysis"
-
+        except EmailInputError as error:
+            st.error(str(error))
+        except Exception:
+            log_event("analysis_failure", analyzer="streamlit", analysis_id=analysis_id,
+                      service_status="ERROR")
+            st.error(
+                "Analysis could not be completed safely. The email was not saved; "
+                "review the file and try again."
+            )
         finally:
-
-            if (
-                temp_path
-                and os.path.exists(temp_path)
-            ):
-                os.unlink(
-                    temp_path
-                )
+            if temp_path and os.path.exists(temp_path):
+                try:
+                    os.unlink(temp_path)
+                except OSError:
+                    log_event("temporary_file_cleanup_failure", analyzer="streamlit",
+                              analysis_id=analysis_id, service_status="ERROR")
 
 
 case_workspace = render_case_workspace()
@@ -418,6 +439,13 @@ result = st.session_state.get(
 )
 
 if result:
+
+    current_health = analysis_health(result)
+    if current_health["status"] == "PARTIAL":
+        st.warning(
+            "Some evidence could not be checked. The analysis completed with partial "
+            "results, and unavailable evidence was not treated as safe."
+        )
 
     assessment = result.get(
         "final_assessment",
@@ -554,7 +582,7 @@ if result:
             for reason in reasons:
 
                 st.markdown(
-                    f'<div class="reason-box">{reason}</div>',
+                    f'<div class="reason-box">{escape(str(reason))}</div>',
                     unsafe_allow_html=True
                 )
 

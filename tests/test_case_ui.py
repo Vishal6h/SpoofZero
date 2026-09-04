@@ -18,6 +18,16 @@ class Upload:
         return self.content
 
 
+class SizedUpload:
+    def __init__(self, name, size, content_error=None):
+        self.name, self.size, self.content_error = name, size, content_error
+
+    def getvalue(self):
+        if self.content_error:
+            raise self.content_error
+        return b""
+
+
 class CaseUITests(unittest.TestCase):
     def setUp(self):
         self.temp = TemporaryDirectory()
@@ -194,6 +204,53 @@ class CaseUITests(unittest.TestCase):
         self.assert_clean(app)
         self.assertTrue(any("Case storage is unavailable" in item.value for item in app.warning))
         self.assertEqual(len(app.get("file_uploader")), 1)
+
+
+    def test_oversized_upload_is_rejected_before_payload_read_or_analysis(self):
+        from backend.input_safety import DEFAULT_EMAIL_LIMITS
+
+        upload = SizedUpload(
+            "oversized.eml", DEFAULT_EMAIL_LIMITS.max_eml_bytes + 1,
+            AssertionError("oversized payload must not be read"),
+        )
+        with patch("streamlit.file_uploader", return_value=upload), patch(
+                "backend.analyze.analyze_email") as analyzer:
+            app = AppTest.from_file(str(
+                Path(__file__).resolve().parents[1] / "frontend" / "app.py")).run()
+            next(button for button in app.button if button.label == "Analyze").click().run()
+        self.assert_clean(app)
+        self.assertEqual(analyzer.call_count, 0)
+        self.assertTrue(any("10 MiB upload limit" in item.value for item in app.error))
+
+    def test_partial_evidence_and_unexpected_failures_have_safe_ui_messages(self):
+        from copy import deepcopy
+
+        partial = deepcopy(analysis())
+        partial["threat_intelligence"] = [{
+            "domain": "example.dev", "service_status": "TIMEOUT",
+            "status": "error", "verdict": "UNKNOWN", "risk_score": None,
+        }]
+        upload = Upload("partial.eml", b"Subject: partial\r\n\r\nbody")
+        with patch("streamlit.file_uploader", return_value=upload), patch(
+                "backend.analyze.analyze_email", return_value=partial):
+            app = AppTest.from_file(str(
+                Path(__file__).resolve().parents[1] / "frontend" / "app.py")).run()
+            next(button for button in app.button if button.label == "Analyze").click().run()
+        self.assert_clean(app)
+        warning_text = "\n".join(item.value for item in app.warning)
+        self.assertIn("partial results", warning_text)
+        self.assertIn("not treated as safe", warning_text)
+
+        with patch("streamlit.file_uploader", return_value=upload), patch(
+                "backend.analyze.analyze_email",
+                side_effect=RuntimeError("private path /home/investigator/evidence.eml")):
+            failed = AppTest.from_file(str(
+                Path(__file__).resolve().parents[1] / "frontend" / "app.py")).run()
+            next(button for button in failed.button if button.label == "Analyze").click().run()
+        self.assert_clean(failed)
+        error_text = "\n".join(item.value for item in failed.error)
+        self.assertIn("could not be completed safely", error_text)
+        self.assertNotIn("/home/investigator", error_text)
 
 
 if __name__ == "__main__":

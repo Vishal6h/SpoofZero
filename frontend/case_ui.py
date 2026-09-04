@@ -10,11 +10,21 @@ from backend.case_reporting import (
     build_forensic_report, compare_analyses, report_html, report_json,
     sanitize_export_filename,
 )
-from backend.case_store import CaseStore
+from backend.case_store import CaseStore, CaseStorageError
 from backend.fusion_policy import snapshot_policy_version
+from backend.input_safety import safe_display_text
 
 
-STORE_ERRORS = (OSError, sqlite3.Error, ValueError)
+STORE_ERRORS = (OSError, sqlite3.Error, ValueError, CaseStorageError)
+
+
+def _storage_error(error):
+    if isinstance(error, ValueError):
+        return safe_display_text(str(error), 400)
+    return (
+        "Case storage is unavailable. Check local access permissions or database "
+        "integrity; stored evidence was not changed."
+    )
 
 
 def _record_label(record):
@@ -129,6 +139,20 @@ def render_case_workspace():
                     st.info("Case restored." if archived else
                             "Case archived. Its evidence was not deleted.")
 
+            privacy_safe = st.checkbox(
+                "Privacy-safe case storage (minimize personal message metadata)",
+                value=False, key=f"sz_privacy_safe_{case_id}",
+                help=(
+                    "Always excludes bodies, payloads, API secrets, and credentials. "
+                    "This option also removes personal headers, mailbox IOCs, and attachment names "
+                    "while retaining hashes, domains, authentication, infrastructure, and scores."
+                ),
+            )
+            st.caption(
+                "Case snapshots never retain raw EML bodies or attachment payloads. "
+                + ("Personal metadata minimization is enabled." if privacy_safe else
+                   "Standard forensic metadata retention is enabled.")
+            )
             current = st.session_state.get("spoofzero_result")
             if current and not case.get("archived"):
                 filename = st.session_state.get("spoofzero_filename", "email.eml")
@@ -147,6 +171,7 @@ def render_case_workspace():
                             allow_reanalysis=save_version,
                             analysis_id=st.session_state.get("spoofzero_analysis_id"),
                             analyzed_at=st.session_state.get("spoofzero_analyzed_at"),
+                            privacy_safe=privacy_safe,
                         )
                         if inserted and previous:
                             st.success("Re-analysis appended as a new immutable version.")
@@ -160,7 +185,7 @@ def render_case_workspace():
                         else:
                             st.info("This analysis is already saved in the case.")
                     except STORE_ERRORS as error:
-                        st.warning(str(error))
+                        st.warning(_storage_error(error))
 
             files = st.file_uploader(
                 "Add multiple EML files to this case", type=["eml"],
@@ -181,7 +206,8 @@ def render_case_workspace():
                     progress = st.progress(0.0, text="Analyzing emails...")
                     batch = [(item.name, item.getvalue) for item in files]
                     for index, outcome in enumerate(analyze_batch(
-                            batch, case_id, store, allow_reanalysis=batch_reanalysis)):
+                            batch, case_id, store, allow_reanalysis=batch_reanalysis,
+                            privacy_safe=privacy_safe)):
                         outcomes.append({
                             "File": outcome["filename"], "Status": outcome["status"],
                             "Details": outcome.get("message", ""),
@@ -233,7 +259,7 @@ def render_case_workspace():
                     st.session_state["spoofzero_result_source"] = "saved_snapshot"
             return {"case": case, "records": records, "history": history}
         except STORE_ERRORS as error:
-            st.warning(f"Case storage is unavailable: {error}")
+            st.warning(_storage_error(error))
             return None
 
 
