@@ -1,6 +1,8 @@
 import os
 import tempfile
 import textwrap
+from datetime import datetime, timezone
+from uuid import uuid4
 import streamlit as st
 
 from backend.analyze import analyze_email
@@ -389,6 +391,8 @@ if uploaded_file is not None:
 
             st.session_state["spoofzero_result"] = result
             st.session_state["spoofzero_filename"] = uploaded_file.name
+            st.session_state["spoofzero_analysis_id"] = uuid4().hex
+            st.session_state["spoofzero_analyzed_at"] = datetime.now(timezone.utc).isoformat()
             st.session_state["spoofzero_result_source"] = "fresh_analysis"
 
         finally:

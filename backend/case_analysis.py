@@ -12,12 +12,12 @@ MAX_BATCH_FILES = 25
 MAX_EMAIL_BYTES = 10 * 1024 * 1024
 
 
-def analyze_batch(files, case_id, store, analysis_fn=None):
-    """Yield per-file outcomes; duplicates skip analysis and failures stay isolated.
+def analyze_batch(files, case_id, store, analysis_fn=None, *, allow_reanalysis=False):
+    """Yield per-file outcomes while isolating failures and removing payload files.
 
-    files is a sequence of (display filename, raw EML bytes) pairs. It may also
-    contain lazy byte readers, so the UI need not copy the whole batch into RAM.
-    Temporary payloads are always removed, including after parser failures.
+    By default an existing raw EML hash skips analysis and returns its latest
+    snapshot. allow_reanalysis=True is an explicit request to run the forensic
+    pipeline again and append another immutable version.
     """
     if len(files) > MAX_BATCH_FILES:
         raise ValueError(f"Analyze at most {MAX_BATCH_FILES} emails per batch")
@@ -26,6 +26,7 @@ def analyze_batch(files, case_id, store, analysis_fn=None):
         from .analyze import analyze_email
         analysis_fn = analyze_email
 
+    seen_batch = set()
     for filename, content in files:
         try:
             content = content() if callable(content) else content
@@ -35,24 +36,39 @@ def analyze_batch(files, case_id, store, analysis_fn=None):
                 raise ValueError("Batch emails must be 10 MiB or smaller")
             digest = sha256(content).hexdigest()
             existing = store.get_analysis(case_id, digest)
-            if existing:
-                yield {"filename": filename, "status": "duplicate", "email_id": digest,
-                       "analysis": existing["analysis"]}
+            # Even explicit reanalysis runs at most once for identical payload
+            # bytes within one batch operation.
+            if digest in seen_batch or (existing and not allow_reanalysis):
+                yield {
+                    "filename": filename, "status": "duplicate", "email_id": digest,
+                    "analysis_id": existing["analysis_id"] if existing else None,
+                    "analysis": existing["analysis"] if existing else None,
+                }
                 continue
-            if existing_count >= MAX_CASE_EMAILS:
+            if not existing and existing_count >= MAX_CASE_EMAILS:
                 raise ValueError(f"Each case supports up to {MAX_CASE_EMAILS} unique emails")
+            seen_batch.add(digest)
 
             with TemporaryDirectory(prefix="spoofzero-case-") as directory:
-                # Uploaded filenames are labels, never filesystem paths.
                 path = Path(directory) / "email.eml"
                 path.write_bytes(content)
                 analysis = deepcopy(analysis_fn(str(path)))
                 analysis.setdefault("email", {})["sha256"] = digest
-            inserted = store.add_analysis(case_id, filename, analysis)
-            existing_count += int(inserted)
+            inserted = store.add_analysis(
+                case_id, filename, analysis, allow_reanalysis=bool(existing)
+            )
             if not inserted:
-                analysis = store.get_analysis(case_id, digest)["analysis"]
-            yield {"filename": filename, "status": "saved" if inserted else "duplicate",
-                   "email_id": digest, "analysis": analysis}
+                saved = store.get_analysis(case_id, digest)
+                analysis = saved["analysis"]
+            else:
+                saved = store.get_analysis(case_id, digest)
+                existing_count += int(existing is None)
+            yield {
+                "filename": filename,
+                "status": "reanalyzed" if existing and inserted else "saved" if inserted else "duplicate",
+                "email_id": digest,
+                "analysis_id": saved["analysis_id"] if saved else None,
+                "analysis": analysis,
+            }
         except Exception as error:
             yield {"filename": filename, "status": "error", "message": str(error)}

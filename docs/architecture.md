@@ -242,8 +242,9 @@ metadata.
 `frontend/ai_ui.py` distinguishes current v2, explicit v1 and metadata-free
 legacy snapshots without recalculating them. The case inventory shows the stored
 policy, and duplicate raw emails cannot overwrite an earlier case row. Uploading
-an EML through the main analyzer produces a fresh v2 result; storing both versions
-requires separate cases under the unchanged raw-SHA-256 case key. Campaign
+an EML through the main analyzer produces a fresh v2 result. At the AI Fusion
+Safety milestone, storing both versions required separate cases; the later
+Reports + Case Management milestone below adds explicit history in one case. Campaign
 correlation remains based on indicators and infrastructure, independent of the
 risk score. See [AI fusion safety](ai-fusion-safety.md).
 
@@ -264,3 +265,27 @@ existing v2 arithmetic. `frontend/ai_ui.py` prepares display-safe rows whose
 components plus explicit rounding/cap adjustment equal the stored final score;
 snapshots without contribution metadata are not recalculated. The existing raw
 evidence table remains available. See [risk score calibration](risk-score-calibration.md).
+
+
+## Reports + Case Management Polish
+
+Protected reference: `917f8d002879037949d8770f0965a1dc33df14cf`.
+
+The prior unversioned case schema is preserved under a version-1 additive
+migration. `case_emails` remains the immutable raw-email identity/original
+snapshot table; `analysis_versions` stores append-only history. A verified
+pre-migration SQLite backup is created before recognized legacy data changes.
+Unknown schemas fail closed. Latest-only records preserve the correlation API,
+while full history serves timelines, comparison, and reporting.
+
+`backend/case_reporting.py` is a pure offline projection layer. It builds
+structured comparisons, allowlisted and redacted schema-v2 reports, canonical
+content hashes, sanitized filenames, and standalone printable HTML.
+`frontend/case_ui.py` adds metadata editing, archive/restore, search/filter/sort,
+timeline, explicit re-analysis, comparison, and dual report downloads in the
+existing case areas. `frontend/app.py` gives each fresh run a transient analysis
+ID and UTC timestamp for later persistence.
+
+These changes do not alter analysis output, fusion, correlation weights, model
+state, or existing snapshot JSON. See
+[reports and case management](case-management-and-reports.md).

@@ -123,6 +123,36 @@ class CaseUITests(unittest.TestCase):
             after = connection.execute("SELECT analysis_json FROM case_emails").fetchone()[0]
         self.assertEqual(before, after)
 
+    def test_explicit_reanalysis_appends_history_in_same_case(self):
+        from backend.analyze import analyze_email
+        with patch("backend.analyzers.reputation_analyzer.VT_API_KEY", None), \
+             patch("urllib.request.urlopen", side_effect=AssertionError("No network")):
+            original = analyze_email("data/samples/test.eml")
+        upload = Upload("test.eml", Path("data/samples/test.eml").read_bytes())
+
+        def uploader(*args, **kwargs):
+            return [] if kwargs.get("key") == "sz_batch_files" else upload
+
+        with patch("streamlit.file_uploader", side_effect=uploader), \
+             patch("backend.analyze.analyze_email", return_value=original):
+            app = AppTest.from_file(str(
+                Path(__file__).resolve().parents[1] / "frontend" / "app.py")).run()
+            self.create_case(app, "Version history")
+            next(button for button in app.button if button.label == "Analyze").click().run()
+            app.button(key="sz_save_current").click().run()
+            store = CaseStore(self.db)
+            case_id = store.list_cases()[0]["case_id"]
+            first = store.list_analysis_history(case_id)[0]
+            next(button for button in app.button if button.label == "Analyze").click().run()
+            app.checkbox(key=f"sz_save_version_{case_id}").check().run()
+            app.button(key="sz_save_current").click().run()
+            self.assert_clean(app)
+            history = store.list_analysis_history(case_id)
+            self.assertEqual([item["version"] for item in history], [1, 2])
+            self.assertEqual([item["is_latest"] for item in history], [False, True])
+            self.assertEqual(history[0]["analysis_id"], first["analysis_id"])
+            self.assertEqual(history[0]["analysis"], first["analysis"])
+
     def test_batch_upload_failure_duplicate_and_report_controls(self):
         uploads = [Upload("one.eml", b"one"), Upload("two.eml", b"two"),
                    Upload("renamed.eml", b"one"), Upload("bad.eml", b"bad")]
@@ -140,19 +170,19 @@ class CaseUITests(unittest.TestCase):
             app.button(key="sz_analyze_batch").click().run(timeout=15)
             self.assert_clean(app)
             self.assertEqual(mock_analyze.call_count, 3)
-            self.assertEqual(app.metric[0].value, "2")
-            self.assertEqual(app.metric[1].value, "1")
-            self.assertEqual(len(app.get("download_button")), 1)
+            self.assertEqual(next(x.value for x in app.metric if x.label == "Case emails"), "2")
+            self.assertEqual(next(x.value for x in app.metric if x.label == "Candidate groups"), "1")
+            self.assertEqual(len(app.get("download_button")), 2)
             self.assertEqual(CaseStore(self.db).list_cases()[0]["email_count"], 2)
             # Threshold and relationship filtering must not leave stale pair widgets.
             app.slider(key="sz_minimum_link_score").set_value(90).run()
             self.assert_clean(app)
             app.checkbox(key="sz_show_weak").uncheck().run()
             self.assert_clean(app)
-            self.assertEqual(app.metric[1].value, "0")
+            self.assertEqual(next(x.value for x in app.metric if x.label == "Candidate groups"), "0")
             app.slider(key="sz_minimum_link_score").set_value(50).run()
             self.assert_clean(app)
-            self.assertEqual(app.metric[1].value, "1")
+            self.assertEqual(next(x.value for x in app.metric if x.label == "Candidate groups"), "1")
             app.button(key="sz_open_email").click().run()
             self.assert_clean(app)
             self.create_case(app, "Isolated second case")

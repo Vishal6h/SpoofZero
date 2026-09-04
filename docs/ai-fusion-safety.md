@@ -118,12 +118,12 @@ inventory includes the stored fusion-policy label and warns that scores from
 different policies should not be compared without their evidence.
 
 Opening a saved case preserves its historical score. Uploading the original EML
-and choosing **Analyze** creates a fresh in-memory v2 result. Saving the same raw
-email back into the same case cannot replace the existing row because the case
-schema intentionally keys it by raw EML SHA-256. The UI explains that the
-historical snapshot was retained and that a separate case is needed to retain
-both stored versions. Batch duplicate handling continues to reuse the saved
-snapshot instead of silently re-analyzing it.
+and choosing **Analyze** creates a fresh in-memory v2 result. The later Reports +
+Case Management milestone adds explicit append-only re-analysis versions within
+the same case. The original raw-email row and snapshot remain immutable. Default
+duplicate handling still reuses the latest saved snapshot without extra lookups;
+an investigator must explicitly request re-analysis to append another version.
+See [the case history workflow](case-management-and-reports.md).
 
 Campaign correlation remains independent of fusion policy and threat score. It
 continues to correlate stored indicators and infrastructure.

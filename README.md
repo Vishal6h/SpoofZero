@@ -42,14 +42,16 @@ python -m backend.analyze data/samples/test.eml
    result to case**, or select several EML files and choose **Analyze batch**.
 4. Open **Campaign / Cases** in the evidence tabs to inspect candidate groups,
    direct relationships, and the exact shared indicators and their sources.
-5. Use **Open email in dashboard** to review any saved analysis in the original
-   tabs. **Export case evidence (JSON)** downloads snapshots and correlation data.
+5. Use **Open analysis in dashboard** to review any historical or latest version
+   in the original tabs. The report controls download forensic JSON or printable
+   HTML, including case history and correlation evidence.
 
 Saved cases can also be inspected before opening any single-email result.
 A batch accepts up to 25 emails, 10 MiB each; each case supports 200 unique emails.
 Identical raw EML bytes are counted once per case, even after renaming the file.
-A duplicate skips repeated external lookups. Failures are reported per file and
-successful files stay saved. External enrichment still runs sequentially and may
+A duplicate skips repeated external lookups by default. Explicit re-analysis
+appends an immutable version; it never overwrites the original. Failures are
+reported per file and successful files stay saved. External enrichment still runs sequentially and may
 be slow or rate limited; correlation itself makes no network requests.
 
 For a demonstration, batch-upload these three files from `data/samples/campaign`:
@@ -238,3 +240,23 @@ without recalculation. Experimental AI continues contributing 0 points.
 See [the complete calibration report](docs/risk-score-calibration.md). The
 reported scenario matches and misses describe controlled engineering targets,
 not statistical accuracy or phishing probability.
+
+
+## Reports + Case Management
+
+Cases now support descriptions, timestamps, rename/archive controls,
+search/filter/sort, and append-only analysis history. Duplicate raw EML files
+still skip lookups by default; explicitly re-running analysis can append another
+version of the same evidence without replacing the earlier snapshot. Correlation
+uses each email's latest version, while timeline, comparison, and reports preserve
+the full history.
+
+The Campaign / Cases area compares saved analyses and exports schema-versioned
+JSON or standalone printable HTML. Reports include a canonical-record SHA-256,
+contribution ledger, forensic evidence, AI validation disclosure, correlation
+context, and explicit limitations. The checksum is not a legal digital
+signature. Reports summarize content by default; optional readable body text
+requires explicit input and is not stored.
+
+Existing unversioned case databases migrate transactionally to schema v1 after a
+verified local backup. See [case management and forensic reporting](docs/case-management-and-reports.md).
