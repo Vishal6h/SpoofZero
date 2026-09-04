@@ -173,3 +173,19 @@ and final metrics do not establish current-inbox performance: each admitted
 source supplies one class, and held-source transfer exposes substantial bias.
 See [the model readiness methodology](ai-model-readiness.md) and
 [the frozen evaluation report](../ml/reports/AI_MODEL_READINESS.md).
+
+## AI Dataset Generalization v2
+
+`ml/generalization/` layers versioned metadata scrubbing and source-aware data
+preparation over the preserved v1 normalizer, hashing/Jaccard duplicate detector,
+model factory, calibration and metric functions. It adds leave-one-source-out and
+paired-source transfer with fitting-source-only threshold selection, macro and
+worst-source statistics, explicit deployment gates and sealed final evaluation.
+Raw/derived text and all fitted research binaries stay in ignored paths.
+
+V1 validation/test families are quarantined; any remaining old-source component
+is development-only. Fresh final test coverage therefore concerns new sources
+only. Synthetic corpora do not satisfy modern real-mail deployment evidence.
+Versioned v2 inference is separate from the application loader. The active legacy
+artifacts, v1 frozen code/reports, UI, fusion weights and forensic modules are
+unchanged. See [v2 methodology](ai-dataset-generalization-v2.md).

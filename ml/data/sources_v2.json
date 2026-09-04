@@ -1,0 +1,242 @@
+{
+  "version": "public_email_generalization_v2",
+  "seed": 20260904,
+  "protected_commit": "a56e87675657cbfbde3f70be7c440db203bed76a",
+  "legacy_recipe": "ml/data/sources.json",
+  "legacy_partitions": "ml/data/processed/public_email_v1",
+  "usage_notes": "Local defensive research using publicly released CSV text. Attribute publishers. CC-BY-SA material and all learned artifacts stay local/ignored; no dataset or model redistribution is part of this milestone. Only subject/body enter features. Generic spam, malformed labels, and empty text are excluded. Publication date is not an email timestamp.",
+  "additional_sources": [
+    {
+      "name": "trec06_ham",
+      "dataset": "Seven Phishing Email Datasets: TREC-06",
+      "publisher": "Arifa Islam Champa and Md Fazle Rabbi; original TREC 2006 spam track",
+      "source": "https://figshare.com/articles/dataset/25432108",
+      "license": "CC-BY-4.0",
+      "license_source": "https://api.figshare.com/v2/articles/25432108",
+      "file": "TREC-06.csv",
+      "url": "https://ndownloader.figshare.com/files/45117808",
+      "sha256": "8ca6b1249f30f0a74790b8a34d4dbe248d526cfb0b13227b41970a1ebd638be5",
+      "label_map": {
+        "0": 0
+      },
+      "body_field": "body",
+      "subject_field": "subject",
+      "synthetic": false,
+      "period": "TREC 2006 collection; row Date headers are unverified and not reliable chronology",
+      "usage_notes": "Retain explicitly labeled ham only; exclude label 1 generic spam and null/invalid labels. New corpus source, not independent evidence for both classes.",
+      "raw_rows_observed": 16463
+    },
+    {
+      "name": "adjei_bec",
+      "dataset": "Adversarial BEC Email Dataset, version 2, clean original text",
+      "publisher": "Yaw Osei Adjei",
+      "source": "https://www.kaggle.com/datasets/yoadjei/adversarial-bec-email-dataset",
+      "license": "CC-BY-SA-4.0",
+      "license_source": "https://www.kaggle.com/api/v1/datasets/view/yoadjei/adversarial-bec-email-dataset",
+      "file": "synthetic_emails.csv",
+      "url": "https://www.kaggle.com/api/v1/datasets/download/yoadjei/adversarial-bec-email-dataset/synthetic_emails.csv?datasetVersionNumber=2",
+      "sha256": "c6151b4fca463a48f5141303a911f7fb177af2c7b6314344fd52498603dd932e",
+      "label_map": {
+        "1": 1
+      },
+      "body_field": "body",
+      "subject_field": "subject",
+      "synthetic": true,
+      "period": "Published November 2025; generated examples, no real sent timestamps",
+      "usage_notes": "Gemini 2.5 Flash synthetic BEC/fraud. Only clean CSV; the paired obfuscated version is excluded to avoid splitting paraphrase families and is not downloaded. Actual filename differs from the card. Blank labels excluded rather than inferred.",
+      "raw_rows_observed": 4211
+    },
+    {
+      "name": "kuladeep_synthetic",
+      "dataset": "Phishing and Legitimate Emails Dataset for ML 2026, version 1",
+      "publisher": "Kuladeep P",
+      "source": "https://www.kaggle.com/datasets/kuladeep19/phishing-and-legitimate-emails-dataset",
+      "license": "CC-BY-SA-4.0",
+      "license_source": "https://www.kaggle.com/api/v1/datasets/view/kuladeep19/phishing-and-legitimate-emails-dataset",
+      "file": "phishing_legit_dataset_KD_10000.csv",
+      "url": "https://www.kaggle.com/api/v1/datasets/download/kuladeep19/phishing-and-legitimate-emails-dataset/phishing_legit_dataset_KD_10000.csv?datasetVersionNumber=1",
+      "sha256": "fb65d38e33e9fe070cc842abf3a6f7ed679da5ae0fd823cec31db46ede5f1aa7",
+      "label_map": {
+        "0": 0,
+        "1": 1
+      },
+      "body_field": "text",
+      "subject_field": null,
+      "synthetic": true,
+      "period": "Version 1 released September 2025 despite 2026 title; synthetic, no real sent timestamps",
+      "usage_notes": "Both classes within one collection. Explicit separate prompts make legitimate text deliberately non-suspicious; template/topic bias is expected. Ignore phishing_type, severity and confidence entirely.",
+      "raw_rows_observed": 10000
+    }
+  ],
+  "additional_considered": [
+    {
+      "name": "DataPhish / Constructing and Benchmarking (2025)",
+      "source": "https://arxiv.org/abs/2511.21448",
+      "publisher": "Rebeka Toth, Tamas Bisztray, Richard A. Dubniczky",
+      "license": "Paper CC-BY-4.0; downloadable corpus license not verified",
+      "reported_count": "Paper describes originals and rephrases; no verified accessible raw count",
+      "period": "2025 publication",
+      "decision": "REJECTED_UNAVAILABLE",
+      "reason": "Published GitHub DataPhish/PhishingSpamDataSet and API returned 404 on 2026-09-04. No data downloaded; paper license does not establish permission for unavailable corpus."
+    },
+    {
+      "name": "MeAJOR v2",
+      "source": "https://zenodo.org/records/18471483",
+      "publisher": "Cardoso, Vitorino, Mendes, Maia, Praca",
+      "license": "CC-BY-4.0",
+      "reported_count": 108685,
+      "period": "Historical TREC 2005-2007, Nazario and Nigerian Fraud; 2026 release",
+      "decision": "REJECTED",
+      "reason": "Repackages overlapping corpora; merged positive label includes spam sources. Not new independent phishing ground truth; anonymization also changes text. No raw download."
+    },
+    {
+      "name": "Phishing-Email-Detection-Dataset (2025)",
+      "source": "https://zenodo.org/records/17314806",
+      "publisher": "Alhuzali, Alloqmani, Aljabri, Alharbi",
+      "license": "CC-BY-4.0",
+      "reported_count": null,
+      "period": "2025 release, older merged corpora",
+      "decision": "REJECTED",
+      "reason": "Merged/downsampled public corpora; no verified new independent collection or spam/phishing separation. No raw download."
+    },
+    {
+      "name": "Seven Phishing Email Datasets: other files",
+      "source": "https://figshare.com/articles/dataset/25432108",
+      "publisher": "Champa and Rabbi",
+      "license": "CC-BY-4.0",
+      "reported_count": null,
+      "period": "Historical through 2008; released 2024",
+      "decision": "PARTIAL",
+      "reason": "TREC-06 ham admitted. Assassin/Ling copies duplicate existing bytes; TREC-05/-07 and CEAS generic spam positives not admitted as phishing; Enron and pre-vectorized files not used. TREC-06 suffices as one extra historical legitimate source in this fixed run."
+    },
+    {
+      "name": "Human-LLM generated phishing-legitimate emails",
+      "source": "https://www.kaggle.com/datasets/francescogreco97/human-llm-generated-phishing-legitimate-emails",
+      "publisher": "Francesco Greco et al.",
+      "license": "CC-BY-NC-SA-4.0",
+      "reported_count": 4000,
+      "period": "2024 release; mixed historical and generated",
+      "decision": "REJECTED",
+      "reason": "Label column denotes human versus LLM, not phishing; human source description ambiguously attributes legitimate mail to Nazario/Nigerian Fraud. Do not guess a class mapping. No raw download."
+    },
+    {
+      "name": "PhishNChips v5.2",
+      "source": "https://huggingface.co/datasets/AreLit/PhishNChips",
+      "publisher": "PhishNChips / AreLit",
+      "license": "MIT synthetic content plus mixed third-party/academic permissions; not a blanket MIT corpus license",
+      "reported_count": "2000 core synthetic emails plus overlapping Nazario subsets",
+      "period": "2026 synthetic release; historical real phishing",
+      "decision": "REJECTED",
+      "reason": "Additional synthetic source with mixed source-specific permissions, not fresh independent real email ground truth. Core URL-derived labels have source/label confounding. Prefer clearly licensed CSVs for this run."
+    },
+    {
+      "name": "IWSPA-AP v2",
+      "source": "https://www2.cs.uh.edu/~rmverma/book.html",
+      "publisher": "Rakesh M. Verma / University of Houston",
+      "license": "Restricted academic request, institutional identity and NDA",
+      "reported_count": null,
+      "period": "2018/2019",
+      "decision": "REJECTED_RESTRICTED",
+      "reason": "Not openly downloadable under current authorization; no request, NDA, identity transfer or third-party mirror use."
+    },
+    {
+      "name": "AVN Phishing Email Classification Dataset",
+      "source": "https://www.kaggle.com/datasets/avnbluefox/avn-phishing-email-classification-dataset",
+      "publisher": "AVN BlueFox",
+      "license": "CC-BY-4.0",
+      "reported_count": "60000 Basic rows advertised; clean corpus count not verified",
+      "period": "2025 release; original message period unknown",
+      "decision": "REJECTED",
+      "reason": "Adds deliberate noise/garbage labels; independent original collection and inherited class provenance not sufficiently documented. No raw download."
+    },
+    {
+      "name": "Turkish Phishing Email Dataset",
+      "source": "https://www.kaggle.com/datasets/osmancancet/turkish-phishing-email-dataset",
+      "publisher": "Osman Can Cetlenbik",
+      "license": "Card text CC-BY-4.0 conflicts with platform CC-BY-NC-SA-4.0",
+      "reported_count": "7500+ advertised",
+      "period": "2025 release; message dates unknown",
+      "decision": "REJECTED",
+      "reason": "Conflicting usage declarations and unclear generation/collection provenance; language transfer is outside this fixed English-centric research comparison. No raw download."
+    },
+    {
+      "name": "Phishing Codebook",
+      "source": "https://arxiv.org/abs/2408.08967",
+      "publisher": "Saka, Jain, Vaniea, Kokciyan",
+      "license": "Open paper; separately licensed downloadable email-text corpus not verified",
+      "reported_count": 503,
+      "period": "2015-2021 emails; 2024 paper",
+      "decision": "REJECTED_UNVERIFIED",
+      "reason": "Useful independent phishing study, but no verified licensed text asset located in this review. No data downloaded."
+    },
+    {
+      "name": "Impact of email category on phishing detection",
+      "source": "https://figshare.com/articles/dataset/28953446",
+      "publisher": "Arifa Islam Champa",
+      "license": "CC-BY-4.0",
+      "reported_count": 20,
+      "period": "2025 study",
+      "decision": "REJECTED",
+      "reason": "Small user-study package with questionnaire, response spreadsheet and 20 stimuli; insufficient source-generalization support. No participant data downloaded."
+    },
+    {
+      "name": "Spam E-mail and Phishing Detection",
+      "source": "https://data.mendeley.com/datasets/shj94nrczy/1",
+      "publisher": "Ahmed Sedik and Moustafa M. Nasralla",
+      "license": "CC-BY-4.0",
+      "reported_count": null,
+      "period": "2025 release",
+      "decision": "REJECTED",
+      "reason": "RAR notebook bundle with unclear phishing/ham text label provenance; no reviewed standalone email CSV. No archive downloaded."
+    },
+    {
+      "name": "Balanced Dataset for Spam and Smishing Detection",
+      "source": "https://data.mendeley.com/datasets/vmg875v4xs/1",
+      "publisher": "Miriam Munoz and Muhammad Islam",
+      "license": "CC-BY-4.0",
+      "reported_count": 10191,
+      "period": "2025 generated release",
+      "decision": "REJECTED",
+      "reason": "Synthetic SMS/smishing, not email text; no download."
+    },
+    {
+      "name": "AVN/other search results policy",
+      "source": null,
+      "publisher": null,
+      "license": null,
+      "reported_count": null,
+      "period": null,
+      "decision": "SCOPE",
+      "reason": "Search-engine suggestions alone were not treated as reviewed/admitted datasets. This catalog records datasets whose provenance, format or suitability was actually assessed."
+    }
+  ],
+  "evidence": {
+    "independent_real_both_class_sources": 0,
+    "representative_external_holdout": false,
+    "reliable_temporal_evaluation": false,
+    "reason": "Only the synthetic Kuladeep source supplies both labels. No independently labeled modern real-email collection with both classes and reliable chronology was verified. Synthetic or historical results cannot satisfy that deployment evidence requirement."
+  },
+  "transfer_pairs": [
+    [
+      "ling",
+      "nazario"
+    ],
+    [
+      "spamassassin",
+      "nigerian_fraud"
+    ],
+    [
+      "trec06_ham",
+      "adjei_bec"
+    ]
+  ],
+  "protocol": {
+    "pre_exposed_policy": "All v1 validation/test representatives and their detected exact/template/near families are quarantined globally. Any representative with old-source provenance is development-only. Final v2 test contains only new-source representatives, sealed before fitting.",
+    "mixed_split": "Source+label strata: fresh new sources 70/15/15; old-source development-only representatives 85/15/0. Strata under 8 rows are training-only and explicitly counted. No source gets fake test support.",
+    "training_balance": "After splitting, deterministic training cap of 1500 unique representatives per source/class stratum. No validation/test rebalancing or oversampling.",
+    "thresholds": "Use preserved v1 select_thresholds on mixed validation only for each of four fixed candidates. LOSO/source-transfer models choose their own bands using only fitting-source internal validation; held-out source labels never tune a threshold.",
+    "selection": "Prefer any candidate passing all development gates, then maximize 0.50*(1-worst source error)+0.25*transfer macro recall+0.15*validation F1+0.10*(1-source macro Brier). Ties favor simpler/faster model. No final-test input.",
+    "temporal": "No reliable message chronology, so no fabricated temporal split. New synthetic release dates are not sent dates. Source transfer is reported, not called temporal validation.",
+    "final": "One post-lock diagnostic final evaluation with fixed artifacts/bands. No model switch or threshold revision after test. No automatic activation, even if eligible."
+  }
+}

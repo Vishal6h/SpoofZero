@@ -1,0 +1,376 @@
+{
+  "activation_eligible": false,
+  "active": false,
+  "artifact_sha256": "bfb6e497329be85938cd991e945d838e2c09fc2b4f251f9dbdcbe0e6eeb332fd",
+  "blockers": [
+    "final_confirmation:independent_real_both_class_sources",
+    "final_confirmation:loso_macro_brier_score",
+    "final_confirmation:loso_macro_ece_10_equal_width",
+    "final_confirmation:loso_macro_false_positive_rate",
+    "final_confirmation:loso_macro_recall",
+    "final_confirmation:loso_worst_brier",
+    "final_confirmation:loso_worst_source_error",
+    "final_confirmation:representative_external_holdout",
+    "final_confirmation:transfer_min_f1",
+    "final_confirmation:transfer_min_recall",
+    "independent_real_both_class_sources",
+    "loso_macro_brier_score",
+    "loso_macro_ece_10_equal_width",
+    "loso_macro_false_positive_rate",
+    "loso_macro_recall",
+    "loso_worst_brier",
+    "loso_worst_source_error",
+    "representative_external_holdout",
+    "transfer_min_f1",
+    "transfer_min_recall"
+  ],
+  "code_sha256": {
+    "data_pipeline.py": "5b02a1f232f50f328f4c3733ef00f63e6d0675b298c5852588360728f075dba3",
+    "experiment.py": "67fd9c5d823a27c53fcf1334f65c2a3e3c13bb5fc185c332aae5a399560032ee",
+    "generalization/data.py": "0f1a474acd2ad57a697ca12d182d426573f3af6e2238cce4534ead152f218eb9",
+    "generalization/evaluate.py": "fda5dc12ffdd77335c8fbbf16588b5a052e3ecd56a96669fc972843f7856a5a5",
+    "generalization/fetch.py": "87637ac4d9799f76b957fbfc0f63d65b193f4b738c7391fff02c13b79d3bbb84",
+    "generalization/inference.py": "9b818a7d352bc7bc6c43ada7bfc07f9c53f9b67d60bd540240a3fdcf56a97f69",
+    "generalization/text.py": "ce8ac7b69921b55106f65c55785e78151097ea0fdfc4baaf78e91ad40a5b9205",
+    "text.py": "2a29a731c36837de72d91049d53610da59221a742f6ba54ed4fecf8e468e62b6"
+  },
+  "dataset_id": "d9e57517dac7859483c07517b2fbd4620624f79b19e66163b59ee035c10aca4e",
+  "dataset_manifest_sha256": "6ca257a5cd8f154cb70f9ca8f042dcfdea9ab169a1c1d9502b943600a7379f52",
+  "development_gates": {
+    "failed": [
+      "loso_worst_source_error",
+      "loso_macro_recall",
+      "loso_macro_false_positive_rate",
+      "loso_macro_brier_score",
+      "loso_macro_ece_10_equal_width",
+      "loso_worst_brier",
+      "transfer_min_recall",
+      "transfer_min_f1",
+      "independent_real_both_class_sources",
+      "representative_external_holdout"
+    ],
+    "gates": {
+      "all_source_folds_evaluated": {
+        "actual": true,
+        "limit": true,
+        "operator": "is",
+        "passed": true
+      },
+      "independent_real_both_class_sources": {
+        "actual": 0,
+        "limit": 2,
+        "operator": ">=",
+        "passed": false
+      },
+      "inference_p95_ms": {
+        "actual": 2.0136267499310634,
+        "limit": 25,
+        "operator": "<=",
+        "passed": true
+      },
+      "loso_macro_brier_score": {
+        "actual": 0.11708547654770177,
+        "limit": 0.1,
+        "operator": "<=",
+        "passed": false
+      },
+      "loso_macro_ece_10_equal_width": {
+        "actual": 0.16677472698974813,
+        "limit": 0.1,
+        "operator": "<=",
+        "passed": false
+      },
+      "loso_macro_false_positive_rate": {
+        "actual": 0.1157076655887087,
+        "limit": 0.05,
+        "operator": "<=",
+        "passed": false
+      },
+      "loso_macro_recall": {
+        "actual": 0.7107110858214802,
+        "limit": 0.9,
+        "operator": ">=",
+        "passed": false
+      },
+      "loso_worst_brier": {
+        "actual": 0.4284693280436674,
+        "limit": 0.15,
+        "operator": "<=",
+        "passed": false
+      },
+      "loso_worst_source_error": {
+        "actual": 0.6695924764890282,
+        "limit": 0.1,
+        "operator": "<=",
+        "passed": false
+      },
+      "representative_external_holdout": {
+        "actual": false,
+        "limit": true,
+        "operator": "is",
+        "passed": false
+      },
+      "source_sample_support": {
+        "actual": 834,
+        "limit": 100,
+        "operator": ">=",
+        "passed": true
+      },
+      "transfer_max_fpr": {
+        "actual": 0.017151644192098414,
+        "limit": 0.05,
+        "operator": "<=",
+        "passed": true
+      },
+      "transfer_min_f1": {
+        "actual": 0.4303059737736765,
+        "limit": 0.9,
+        "operator": ">=",
+        "passed": false
+      },
+      "transfer_min_recall": {
+        "actual": 0.27774294670846394,
+        "limit": 0.9,
+        "operator": ">=",
+        "passed": false
+      },
+      "validation_band_targets": {
+        "actual": true,
+        "limit": true,
+        "operator": "is",
+        "passed": true
+      },
+      "validation_brier": {
+        "actual": 0.00390578959298124,
+        "limit": 0.1,
+        "operator": "<=",
+        "passed": true
+      },
+      "validation_ece": {
+        "actual": 0.003840148150485691,
+        "limit": 0.05,
+        "operator": "<=",
+        "passed": true
+      },
+      "validation_f1": {
+        "actual": 0.9941341494516704,
+        "limit": 0.9,
+        "operator": ">=",
+        "passed": true
+      },
+      "validation_fpr": {
+        "actual": 0.005177514792899409,
+        "limit": 0.05,
+        "operator": "<=",
+        "passed": true
+      },
+      "validation_precision": {
+        "actual": 0.9928680590932246,
+        "limit": 0.9,
+        "operator": ">=",
+        "passed": true
+      },
+      "validation_recall": {
+        "actual": 0.9954034729315628,
+        "limit": 0.95,
+        "operator": ">=",
+        "passed": true
+      },
+      "validation_worst_source": {
+        "actual": 0.02127659574468085,
+        "limit": 0.1,
+        "operator": "<=",
+        "passed": true
+      }
+    },
+    "passed_all": false
+  },
+  "feature_settings": {
+    "max_df": 0.98,
+    "max_features": 50000,
+    "min_df": 2,
+    "ngram_range": [
+      1,
+      2
+    ],
+    "strip_accents": "unicode",
+    "sublinear_tf": true
+  },
+  "final_confirmation_gates": {
+    "failed": [
+      "loso_worst_source_error",
+      "loso_macro_recall",
+      "loso_macro_false_positive_rate",
+      "loso_macro_brier_score",
+      "loso_macro_ece_10_equal_width",
+      "loso_worst_brier",
+      "transfer_min_recall",
+      "transfer_min_f1",
+      "independent_real_both_class_sources",
+      "representative_external_holdout"
+    ],
+    "gates": {
+      "all_source_folds_evaluated": {
+        "actual": true,
+        "limit": true,
+        "operator": "is",
+        "passed": true
+      },
+      "independent_real_both_class_sources": {
+        "actual": 0,
+        "limit": 2,
+        "operator": ">=",
+        "passed": false
+      },
+      "inference_p95_ms": {
+        "actual": 2.0136267499310634,
+        "limit": 25,
+        "operator": "<=",
+        "passed": true
+      },
+      "loso_macro_brier_score": {
+        "actual": 0.11708547654770177,
+        "limit": 0.1,
+        "operator": "<=",
+        "passed": false
+      },
+      "loso_macro_ece_10_equal_width": {
+        "actual": 0.16677472698974813,
+        "limit": 0.1,
+        "operator": "<=",
+        "passed": false
+      },
+      "loso_macro_false_positive_rate": {
+        "actual": 0.1157076655887087,
+        "limit": 0.05,
+        "operator": "<=",
+        "passed": false
+      },
+      "loso_macro_recall": {
+        "actual": 0.7107110858214802,
+        "limit": 0.9,
+        "operator": ">=",
+        "passed": false
+      },
+      "loso_worst_brier": {
+        "actual": 0.4284693280436674,
+        "limit": 0.15,
+        "operator": "<=",
+        "passed": false
+      },
+      "loso_worst_source_error": {
+        "actual": 0.6695924764890282,
+        "limit": 0.1,
+        "operator": "<=",
+        "passed": false
+      },
+      "representative_external_holdout": {
+        "actual": false,
+        "limit": true,
+        "operator": "is",
+        "passed": false
+      },
+      "source_sample_support": {
+        "actual": 834,
+        "limit": 100,
+        "operator": ">=",
+        "passed": true
+      },
+      "transfer_max_fpr": {
+        "actual": 0.017151644192098414,
+        "limit": 0.05,
+        "operator": "<=",
+        "passed": true
+      },
+      "transfer_min_f1": {
+        "actual": 0.4303059737736765,
+        "limit": 0.9,
+        "operator": ">=",
+        "passed": false
+      },
+      "transfer_min_recall": {
+        "actual": 0.27774294670846394,
+        "limit": 0.9,
+        "operator": ">=",
+        "passed": false
+      },
+      "validation_band_targets": {
+        "actual": true,
+        "limit": true,
+        "operator": "is",
+        "passed": true
+      },
+      "validation_brier": {
+        "actual": 0.002676144174781257,
+        "limit": 0.1,
+        "operator": "<=",
+        "passed": true
+      },
+      "validation_ece": {
+        "actual": 0.005711998983283322,
+        "limit": 0.05,
+        "operator": "<=",
+        "passed": true
+      },
+      "validation_f1": {
+        "actual": 0.9977146588312112,
+        "limit": 0.9,
+        "operator": ">=",
+        "passed": true
+      },
+      "validation_fpr": {
+        "actual": 0.0034263338228095936,
+        "limit": 0.05,
+        "operator": "<=",
+        "passed": true
+      },
+      "validation_precision": {
+        "actual": 0.9954397394136808,
+        "limit": 0.9,
+        "operator": ">=",
+        "passed": true
+      },
+      "validation_recall": {
+        "actual": 1.0,
+        "limit": 0.95,
+        "operator": ">=",
+        "passed": true
+      },
+      "validation_worst_source": {
+        "actual": 0.003863134657836645,
+        "limit": 0.1,
+        "operator": "<=",
+        "passed": true
+      }
+    },
+    "passed_all": false
+  },
+  "legacy_artifacts_overwritten": false,
+  "model_type": "linear_svm_sigmoid",
+  "model_version": "candidate_v2/linear_svm_sigmoid",
+  "normalization_version": "readable_source_masked_v2",
+  "random_seed": 20260904,
+  "status": "UNVALIDATED",
+  "thresholds": {
+    "high": 0.8,
+    "suspicious": 0.7
+  },
+  "trained_at": "2026-09-04T05:15:19.855797+00:00",
+  "training_sources": [
+    "adjei_bec",
+    "kuladeep_synthetic",
+    "ling",
+    "nazario",
+    "nigerian_fraud",
+    "spamassassin",
+    "trec06_ham"
+  ],
+  "validated": false,
+  "validation_status": "UNVALIDATED",
+  "versions": {
+    "joblib": "1.6.0",
+    "numpy": "2.5.2",
+    "python": "3.14.4",
+    "scikit_learn": "1.9.0"
+  }
+}

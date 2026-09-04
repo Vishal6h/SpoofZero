@@ -1,0 +1,838 @@
+{
+  "artifact_audit": {
+    "largest_repeated_lines": [
+      {
+        "count": 272,
+        "line_sha256": "a44ddf722f5af80a24b1c17937faa2512af758075c30227dc6444e805bb642a2",
+        "source_counts": {
+          "kuladeep_synthetic": 272
+        }
+      },
+      {
+        "count": 260,
+        "line_sha256": "2b4fa88b56eea6db7ebf881052718621b7ef65a60e21d3039cb163d94a7bf342",
+        "source_counts": {
+          "trec06_ham": 260
+        }
+      },
+      {
+        "count": 243,
+        "line_sha256": "f68d9922d98650a8d200f1a77a3a4161c7b0fdfb28b547448d9c625d679102af",
+        "source_counts": {
+          "trec06_ham": 243
+        }
+      },
+      {
+        "count": 232,
+        "line_sha256": "7a7580ba45c94a09aa3fab5446a67b3916ab5fa0d0e774b729d8967a65436d56",
+        "source_counts": {
+          "kuladeep_synthetic": 232
+        }
+      },
+      {
+        "count": 163,
+        "line_sha256": "09e4a07f0cec63a0281ec051ed0beaa351393fbcb1a5b5e749da7d80a1c050dc",
+        "source_counts": {
+          "trec06_ham": 163
+        }
+      },
+      {
+        "count": 152,
+        "line_sha256": "4ec55a5deccf56c75a7a7c7ef9b512fb1d3a5c587a16489411def77f81a3cde3",
+        "source_counts": {
+          "kuladeep_synthetic": 152
+        }
+      },
+      {
+        "count": 136,
+        "line_sha256": "cd90ab72d601f149798d6bbb302e153e9967d4acba3d3d06a712d74bd85418b5",
+        "source_counts": {
+          "kuladeep_synthetic": 136
+        }
+      },
+      {
+        "count": 135,
+        "line_sha256": "510d26f8a78cc92c5cb572e5f96310464e7cd9a83ec120b15c92a85d0c6f3b5a",
+        "source_counts": {
+          "kuladeep_synthetic": 135
+        }
+      },
+      {
+        "count": 109,
+        "line_sha256": "accb40b5d967f9b22559dd84cd866d8bd88a02a5fcc808cc0eae9abfec26e8d2",
+        "source_counts": {
+          "trec06_ham": 109
+        }
+      },
+      {
+        "count": 104,
+        "line_sha256": "24655afd91ee14c150d88d5ac48cf2f527c333032596eacf4ec10528af6787ce",
+        "source_counts": {
+          "kuladeep_synthetic": 104
+        }
+      },
+      {
+        "count": 99,
+        "line_sha256": "34ffcf119c18830e45c474ad864a7f8992aec8fca8e67b108885364d0f7f3725",
+        "source_counts": {
+          "spamassassin": 99
+        }
+      },
+      {
+        "count": 99,
+        "line_sha256": "da31936f12265c20396867f65eed53a1e6a1ab433f969a00f09dddac1d372985",
+        "source_counts": {
+          "kuladeep_synthetic": 99
+        }
+      },
+      {
+        "count": 85,
+        "line_sha256": "1de6a0cf82975db3fc8075f12560bb3809a188ff95aa9980ea3f4990dc30f511",
+        "source_counts": {
+          "kuladeep_synthetic": 85
+        }
+      },
+      {
+        "count": 81,
+        "line_sha256": "a6c943a42e3959ac58b0492e0028cf7355d1b26de1eccfa16bdc624b3ffc91a0",
+        "source_counts": {
+          "kuladeep_synthetic": 81
+        }
+      },
+      {
+        "count": 78,
+        "line_sha256": "47f3502947fdfde9c8c604bf147f53dbe32de8c1f78a302cc0cbd66974ac98d4",
+        "source_counts": {
+          "kuladeep_synthetic": 78
+        }
+      },
+      {
+        "count": 74,
+        "line_sha256": "33a145be03f6fc2034f5a8657375e1aa5871872e24e22e87a2cec245805cd179",
+        "source_counts": {
+          "kuladeep_synthetic": 74
+        }
+      },
+      {
+        "count": 72,
+        "line_sha256": "33521d0b679403f132e5cde4083774892275a4362f15d132996cf5b38dddad46",
+        "source_counts": {
+          "trec06_ham": 72
+        }
+      },
+      {
+        "count": 71,
+        "line_sha256": "53ce66418dfa0d509da2566884d29254eebab40ca08edd8b267991f8777656fe",
+        "source_counts": {
+          "kuladeep_synthetic": 71
+        }
+      },
+      {
+        "count": 69,
+        "line_sha256": "481f587b4189c75ad3d51f6a068974e513eaf179dede92d7e51b59faa871daec",
+        "source_counts": {
+          "kuladeep_synthetic": 69
+        }
+      },
+      {
+        "count": 68,
+        "line_sha256": "7a2544b6af47c36c192c5d4980003906f9e32cf3cf8af5cae0d67ff4f80bfe65",
+        "source_counts": {
+          "spamassassin": 68
+        }
+      },
+      {
+        "count": 68,
+        "line_sha256": "955f952210a91797f2bea2c7718414cdeaa075f9aeaba14111f9e90a32dbf436",
+        "source_counts": {
+          "kuladeep_synthetic": 68
+        }
+      },
+      {
+        "count": 68,
+        "line_sha256": "9adcc9e6ccbbebc6781b89dbf44e9857ff2c077ab5267c3810cca91b404a66a1",
+        "source_counts": {
+          "spamassassin": 68
+        }
+      },
+      {
+        "count": 67,
+        "line_sha256": "cfe4d1f4ec732af2e38ac66729ad9aedf8988d427e3c1a9f61d5b5f33da1b30a",
+        "source_counts": {
+          "kuladeep_synthetic": 67
+        }
+      },
+      {
+        "count": 65,
+        "line_sha256": "45c55cba89df7032c626ad9c382e1df8abb99fbda86ce8eabd2d6b6018ead6d7",
+        "source_counts": {
+          "kuladeep_synthetic": 65
+        }
+      },
+      {
+        "count": 64,
+        "line_sha256": "45c13f2d75b6771fe2b2fdfcc79f4ba92aa62342a90b1160346d87063b0323eb",
+        "source_counts": {
+          "kuladeep_synthetic": 64
+        }
+      },
+      {
+        "count": 64,
+        "line_sha256": "daded847f97fca0295b86b04cb65ac91493b822f0ace9d1706e8006e21cfbd1a",
+        "source_counts": {
+          "kuladeep_synthetic": 64
+        }
+      },
+      {
+        "count": 63,
+        "line_sha256": "6deb9ba29bae4ea2f8c240a129227bf49707c268b8581f6990d6977409c526b6",
+        "source_counts": {
+          "trec06_ham": 63
+        }
+      },
+      {
+        "count": 63,
+        "line_sha256": "7895b8e6f2c924cdda8956de30cef2e3767c7c5bfebab3a15641e6ba1928fd1e",
+        "source_counts": {
+          "trec06_ham": 63
+        }
+      },
+      {
+        "count": 63,
+        "line_sha256": "9278752ebe5557e3f684dfe4d0f8d0b2df8065b757c4f92397cc4be131f196e3",
+        "source_counts": {
+          "kuladeep_synthetic": 63
+        }
+      },
+      {
+        "count": 63,
+        "line_sha256": "92a6bf9ceab6bf788bbdc50ac1f81857806abd003e11bd1c75fe2d7c4389db8f",
+        "source_counts": {
+          "trec06_ham": 63
+        }
+      }
+    ],
+    "marker_counts": {
+      "collector_markers_rows_after": 0,
+      "collector_markers_rows_before": 0,
+      "embedded_metadata_rows_after": 0,
+      "embedded_metadata_rows_before": 52,
+      "filenames_rows_after": 0,
+      "filenames_rows_before": 96
+    },
+    "notes": "Counts/hash IDs only. Repeated legitimate prose is not automatically erased. Topic, spelling, template and residual boilerplate can still identify sources.",
+    "partition": "train_only",
+    "repeated_line_groups": 138
+  },
+  "dataset_id": "d9e57517dac7859483c07517b2fbd4620624f79b19e66163b59ee035c10aca4e",
+  "deduplication": {
+    "conflicting_rows_quarantined": 12,
+    "duplicates_removed": 3482,
+    "exact_component_merges": 129,
+    "exposed_v1_groups_quarantined": 3112,
+    "exposed_v1_rows_quarantined": 3427,
+    "input": 37978,
+    "near_edges": 5891,
+    "retained": 31057,
+    "template_component_merges": 367
+  },
+  "near_duplicate_limitations": "Reuse v1 cosine>=0.90/Jaccard>=0.85 on exact/template/body representatives; fewer than eight shingles use exact/template only. No guarantee against paraphrases or distinct variants of a collapsed component.",
+  "normalization_version": "readable_source_masked_v2",
+  "protected_v1_evaluation_hash_count": 3112,
+  "protected_v1_manifest_sha256": "6dc1477dbde2742f54d3502789d5b07ed0d022c845c68c88fe594b4e16bafb15",
+  "quarantine_group_counts": {
+    "conflicting_labels": 1,
+    "exposed_v1_validation_or_test_family": 3112
+  },
+  "recipe": {
+    "additional_considered": [
+      {
+        "decision": "REJECTED_UNAVAILABLE",
+        "license": "Paper CC-BY-4.0; downloadable corpus license not verified",
+        "name": "DataPhish / Constructing and Benchmarking (2025)",
+        "period": "2025 publication",
+        "publisher": "Rebeka Toth, Tamas Bisztray, Richard A. Dubniczky",
+        "reason": "Published GitHub DataPhish/PhishingSpamDataSet and API returned 404 on 2026-09-04. No data downloaded; paper license does not establish permission for unavailable corpus.",
+        "reported_count": "Paper describes originals and rephrases; no verified accessible raw count",
+        "source": "https://arxiv.org/abs/2511.21448"
+      },
+      {
+        "decision": "REJECTED",
+        "license": "CC-BY-4.0",
+        "name": "MeAJOR v2",
+        "period": "Historical TREC 2005-2007, Nazario and Nigerian Fraud; 2026 release",
+        "publisher": "Cardoso, Vitorino, Mendes, Maia, Praca",
+        "reason": "Repackages overlapping corpora; merged positive label includes spam sources. Not new independent phishing ground truth; anonymization also changes text. No raw download.",
+        "reported_count": 108685,
+        "source": "https://zenodo.org/records/18471483"
+      },
+      {
+        "decision": "REJECTED",
+        "license": "CC-BY-4.0",
+        "name": "Phishing-Email-Detection-Dataset (2025)",
+        "period": "2025 release, older merged corpora",
+        "publisher": "Alhuzali, Alloqmani, Aljabri, Alharbi",
+        "reason": "Merged/downsampled public corpora; no verified new independent collection or spam/phishing separation. No raw download.",
+        "reported_count": null,
+        "source": "https://zenodo.org/records/17314806"
+      },
+      {
+        "decision": "PARTIAL",
+        "license": "CC-BY-4.0",
+        "name": "Seven Phishing Email Datasets: other files",
+        "period": "Historical through 2008; released 2024",
+        "publisher": "Champa and Rabbi",
+        "reason": "TREC-06 ham admitted. Assassin/Ling copies duplicate existing bytes; TREC-05/-07 and CEAS generic spam positives not admitted as phishing; Enron and pre-vectorized files not used. TREC-06 suffices as one extra historical legitimate source in this fixed run.",
+        "reported_count": null,
+        "source": "https://figshare.com/articles/dataset/25432108"
+      },
+      {
+        "decision": "REJECTED",
+        "license": "CC-BY-NC-SA-4.0",
+        "name": "Human-LLM generated phishing-legitimate emails",
+        "period": "2024 release; mixed historical and generated",
+        "publisher": "Francesco Greco et al.",
+        "reason": "Label column denotes human versus LLM, not phishing; human source description ambiguously attributes legitimate mail to Nazario/Nigerian Fraud. Do not guess a class mapping. No raw download.",
+        "reported_count": 4000,
+        "source": "https://www.kaggle.com/datasets/francescogreco97/human-llm-generated-phishing-legitimate-emails"
+      },
+      {
+        "decision": "REJECTED",
+        "license": "MIT synthetic content plus mixed third-party/academic permissions; not a blanket MIT corpus license",
+        "name": "PhishNChips v5.2",
+        "period": "2026 synthetic release; historical real phishing",
+        "publisher": "PhishNChips / AreLit",
+        "reason": "Additional synthetic source with mixed source-specific permissions, not fresh independent real email ground truth. Core URL-derived labels have source/label confounding. Prefer clearly licensed CSVs for this run.",
+        "reported_count": "2000 core synthetic emails plus overlapping Nazario subsets",
+        "source": "https://huggingface.co/datasets/AreLit/PhishNChips"
+      },
+      {
+        "decision": "REJECTED_RESTRICTED",
+        "license": "Restricted academic request, institutional identity and NDA",
+        "name": "IWSPA-AP v2",
+        "period": "2018/2019",
+        "publisher": "Rakesh M. Verma / University of Houston",
+        "reason": "Not openly downloadable under current authorization; no request, NDA, identity transfer or third-party mirror use.",
+        "reported_count": null,
+        "source": "https://www2.cs.uh.edu/~rmverma/book.html"
+      },
+      {
+        "decision": "REJECTED",
+        "license": "CC-BY-4.0",
+        "name": "AVN Phishing Email Classification Dataset",
+        "period": "2025 release; original message period unknown",
+        "publisher": "AVN BlueFox",
+        "reason": "Adds deliberate noise/garbage labels; independent original collection and inherited class provenance not sufficiently documented. No raw download.",
+        "reported_count": "60000 Basic rows advertised; clean corpus count not verified",
+        "source": "https://www.kaggle.com/datasets/avnbluefox/avn-phishing-email-classification-dataset"
+      },
+      {
+        "decision": "REJECTED",
+        "license": "Card text CC-BY-4.0 conflicts with platform CC-BY-NC-SA-4.0",
+        "name": "Turkish Phishing Email Dataset",
+        "period": "2025 release; message dates unknown",
+        "publisher": "Osman Can Cetlenbik",
+        "reason": "Conflicting usage declarations and unclear generation/collection provenance; language transfer is outside this fixed English-centric research comparison. No raw download.",
+        "reported_count": "7500+ advertised",
+        "source": "https://www.kaggle.com/datasets/osmancancet/turkish-phishing-email-dataset"
+      },
+      {
+        "decision": "REJECTED_UNVERIFIED",
+        "license": "Open paper; separately licensed downloadable email-text corpus not verified",
+        "name": "Phishing Codebook",
+        "period": "2015-2021 emails; 2024 paper",
+        "publisher": "Saka, Jain, Vaniea, Kokciyan",
+        "reason": "Useful independent phishing study, but no verified licensed text asset located in this review. No data downloaded.",
+        "reported_count": 503,
+        "source": "https://arxiv.org/abs/2408.08967"
+      },
+      {
+        "decision": "REJECTED",
+        "license": "CC-BY-4.0",
+        "name": "Impact of email category on phishing detection",
+        "period": "2025 study",
+        "publisher": "Arifa Islam Champa",
+        "reason": "Small user-study package with questionnaire, response spreadsheet and 20 stimuli; insufficient source-generalization support. No participant data downloaded.",
+        "reported_count": 20,
+        "source": "https://figshare.com/articles/dataset/28953446"
+      },
+      {
+        "decision": "REJECTED",
+        "license": "CC-BY-4.0",
+        "name": "Spam E-mail and Phishing Detection",
+        "period": "2025 release",
+        "publisher": "Ahmed Sedik and Moustafa M. Nasralla",
+        "reason": "RAR notebook bundle with unclear phishing/ham text label provenance; no reviewed standalone email CSV. No archive downloaded.",
+        "reported_count": null,
+        "source": "https://data.mendeley.com/datasets/shj94nrczy/1"
+      },
+      {
+        "decision": "REJECTED",
+        "license": "CC-BY-4.0",
+        "name": "Balanced Dataset for Spam and Smishing Detection",
+        "period": "2025 generated release",
+        "publisher": "Miriam Munoz and Muhammad Islam",
+        "reason": "Synthetic SMS/smishing, not email text; no download.",
+        "reported_count": 10191,
+        "source": "https://data.mendeley.com/datasets/vmg875v4xs/1"
+      },
+      {
+        "decision": "SCOPE",
+        "license": null,
+        "name": "AVN/other search results policy",
+        "period": null,
+        "publisher": null,
+        "reason": "Search-engine suggestions alone were not treated as reviewed/admitted datasets. This catalog records datasets whose provenance, format or suitability was actually assessed.",
+        "reported_count": null,
+        "source": null
+      }
+    ],
+    "additional_sources": [
+      {
+        "body_field": "body",
+        "dataset": "Seven Phishing Email Datasets: TREC-06",
+        "file": "TREC-06.csv",
+        "label_map": {
+          "0": 0
+        },
+        "license": "CC-BY-4.0",
+        "license_source": "https://api.figshare.com/v2/articles/25432108",
+        "name": "trec06_ham",
+        "period": "TREC 2006 collection; row Date headers are unverified and not reliable chronology",
+        "publisher": "Arifa Islam Champa and Md Fazle Rabbi; original TREC 2006 spam track",
+        "raw_rows_observed": 16463,
+        "sha256": "8ca6b1249f30f0a74790b8a34d4dbe248d526cfb0b13227b41970a1ebd638be5",
+        "source": "https://figshare.com/articles/dataset/25432108",
+        "subject_field": "subject",
+        "synthetic": false,
+        "url": "https://ndownloader.figshare.com/files/45117808",
+        "usage_notes": "Retain explicitly labeled ham only; exclude label 1 generic spam and null/invalid labels. New corpus source, not independent evidence for both classes."
+      },
+      {
+        "body_field": "body",
+        "dataset": "Adversarial BEC Email Dataset, version 2, clean original text",
+        "file": "synthetic_emails.csv",
+        "label_map": {
+          "1": 1
+        },
+        "license": "CC-BY-SA-4.0",
+        "license_source": "https://www.kaggle.com/api/v1/datasets/view/yoadjei/adversarial-bec-email-dataset",
+        "name": "adjei_bec",
+        "period": "Published November 2025; generated examples, no real sent timestamps",
+        "publisher": "Yaw Osei Adjei",
+        "raw_rows_observed": 4211,
+        "sha256": "c6151b4fca463a48f5141303a911f7fb177af2c7b6314344fd52498603dd932e",
+        "source": "https://www.kaggle.com/datasets/yoadjei/adversarial-bec-email-dataset",
+        "subject_field": "subject",
+        "synthetic": true,
+        "url": "https://www.kaggle.com/api/v1/datasets/download/yoadjei/adversarial-bec-email-dataset/synthetic_emails.csv?datasetVersionNumber=2",
+        "usage_notes": "Gemini 2.5 Flash synthetic BEC/fraud. Only clean CSV; the paired obfuscated version is excluded to avoid splitting paraphrase families and is not downloaded. Actual filename differs from the card. Blank labels excluded rather than inferred."
+      },
+      {
+        "body_field": "text",
+        "dataset": "Phishing and Legitimate Emails Dataset for ML 2026, version 1",
+        "file": "phishing_legit_dataset_KD_10000.csv",
+        "label_map": {
+          "0": 0,
+          "1": 1
+        },
+        "license": "CC-BY-SA-4.0",
+        "license_source": "https://www.kaggle.com/api/v1/datasets/view/kuladeep19/phishing-and-legitimate-emails-dataset",
+        "name": "kuladeep_synthetic",
+        "period": "Version 1 released September 2025 despite 2026 title; synthetic, no real sent timestamps",
+        "publisher": "Kuladeep P",
+        "raw_rows_observed": 10000,
+        "sha256": "fb65d38e33e9fe070cc842abf3a6f7ed679da5ae0fd823cec31db46ede5f1aa7",
+        "source": "https://www.kaggle.com/datasets/kuladeep19/phishing-and-legitimate-emails-dataset",
+        "subject_field": null,
+        "synthetic": true,
+        "url": "https://www.kaggle.com/api/v1/datasets/download/kuladeep19/phishing-and-legitimate-emails-dataset/phishing_legit_dataset_KD_10000.csv?datasetVersionNumber=1",
+        "usage_notes": "Both classes within one collection. Explicit separate prompts make legitimate text deliberately non-suspicious; template/topic bias is expected. Ignore phishing_type, severity and confidence entirely."
+      }
+    ],
+    "evidence": {
+      "independent_real_both_class_sources": 0,
+      "reason": "Only the synthetic Kuladeep source supplies both labels. No independently labeled modern real-email collection with both classes and reliable chronology was verified. Synthetic or historical results cannot satisfy that deployment evidence requirement.",
+      "reliable_temporal_evaluation": false,
+      "representative_external_holdout": false
+    },
+    "legacy_partitions": "ml/data/processed/public_email_v1",
+    "legacy_recipe": "ml/data/sources.json",
+    "protected_commit": "a56e87675657cbfbde3f70be7c440db203bed76a",
+    "protocol": {
+      "final": "One post-lock diagnostic final evaluation with fixed artifacts/bands. No model switch or threshold revision after test. No automatic activation, even if eligible.",
+      "mixed_split": "Source+label strata: fresh new sources 70/15/15; old-source development-only representatives 85/15/0. Strata under 8 rows are training-only and explicitly counted. No source gets fake test support.",
+      "pre_exposed_policy": "All v1 validation/test representatives and their detected exact/template/near families are quarantined globally. Any representative with old-source provenance is development-only. Final v2 test contains only new-source representatives, sealed before fitting.",
+      "selection": "Prefer any candidate passing all development gates, then maximize 0.50*(1-worst source error)+0.25*transfer macro recall+0.15*validation F1+0.10*(1-source macro Brier). Ties favor simpler/faster model. No final-test input.",
+      "temporal": "No reliable message chronology, so no fabricated temporal split. New synthetic release dates are not sent dates. Source transfer is reported, not called temporal validation.",
+      "thresholds": "Use preserved v1 select_thresholds on mixed validation only for each of four fixed candidates. LOSO/source-transfer models choose their own bands using only fitting-source internal validation; held-out source labels never tune a threshold.",
+      "training_balance": "After splitting, deterministic training cap of 1500 unique representatives per source/class stratum. No validation/test rebalancing or oversampling."
+    },
+    "seed": 20260904,
+    "transfer_pairs": [
+      [
+        "ling",
+        "nazario"
+      ],
+      [
+        "spamassassin",
+        "nigerian_fraud"
+      ],
+      [
+        "trec06_ham",
+        "adjei_bec"
+      ]
+    ],
+    "usage_notes": "Local defensive research using publicly released CSV text. Attribute publishers. CC-BY-SA material and all learned artifacts stay local/ignored; no dataset or model redistribution is part of this milestone. Only subject/body enter features. Generic spam, malformed labels, and empty text are excluded. Publication date is not an email timestamp.",
+    "version": "public_email_generalization_v2"
+  },
+  "retained": {
+    "class_counts": {
+      "0": 18017,
+      "1": 13040
+    },
+    "count": 31057,
+    "source_class_counts": {
+      "adjei_bec": {
+        "1": 4181
+      },
+      "kuladeep_synthetic": {
+        "0": 1538,
+        "1": 6000
+      },
+      "ling": {
+        "0": 1618
+      },
+      "nazario": {
+        "1": 982
+      },
+      "nigerian_fraud": {
+        "1": 1877
+      },
+      "spamassassin": {
+        "0": 2783
+      },
+      "trec06_ham": {
+        "0": 12078
+      }
+    },
+    "source_counts": {
+      "adjei_bec": 4181,
+      "kuladeep_synthetic": 7538,
+      "ling": 1618,
+      "nazario": 982,
+      "nigerian_fraud": 1877,
+      "spamassassin": 2783,
+      "trec06_ham": 12078
+    },
+    "synthetic_count": 11719
+  },
+  "small_strata_train_only": [],
+  "sources": [
+    {
+      "checksum": "md5:eac6399dc0c7ae455aebb64423dadc8b",
+      "counts": {
+        "excluded_other_labels": 458,
+        "label_eligible": 2401,
+        "raw": 2859,
+        "usable_before_deduplication": 2401
+      },
+      "file": "Ling.csv",
+      "label": 0,
+      "license": "CC-BY-4.0",
+      "name": "ling",
+      "retain_original_label": 0,
+      "sha256": "9407c9e022accc6c831e54c5226b99b30ac4ae07682e63f5d483ed0ec17ff23c",
+      "url": "https://zenodo.org/api/records/8339691/files/Ling.csv/content",
+      "usage_notes": "Retain legitimate/ham rows only; exclude generic spam."
+    },
+    {
+      "checksum": "md5:d921e0b2333bfaa058bd38193e6b3fbd",
+      "counts": {
+        "excluded_other_labels": 1718,
+        "label_eligible": 4091,
+        "raw": 5809,
+        "usable_before_deduplication": 4091
+      },
+      "file": "SpamAssasin.csv",
+      "label": 0,
+      "license": "CC-BY-4.0",
+      "name": "spamassassin",
+      "retain_original_label": 0,
+      "sha256": "3bfe8f8abff89f69a98456be50413c2fcb20a476141116dd84ee1507b980c00e",
+      "url": "https://zenodo.org/api/records/8339691/files/SpamAssasin.csv/content",
+      "usage_notes": "Retain legitimate/ham rows only; exclude generic spam."
+    },
+    {
+      "checksum": "md5:4022d055bb7cf8602f30f768f652e91e",
+      "counts": {
+        "label_eligible": 1565,
+        "raw": 1565,
+        "usable_before_deduplication": 1565
+      },
+      "file": "Nazario.csv",
+      "label": 1,
+      "license": "CC-BY-4.0",
+      "name": "nazario",
+      "retain_original_label": 1,
+      "sha256": "b8fbc4158fbdfaff1ed98584c43d72e283c6352d7ade4d457d34c1d79488d184",
+      "url": "https://zenodo.org/api/records/8339691/files/Nazario.csv/content",
+      "usage_notes": "Retain publisher-labeled phishing/fraud text only."
+    },
+    {
+      "checksum": "md5:65fd47ae7cb4ae762e4be42b11905d63",
+      "counts": {
+        "empty_excluded": 1,
+        "label_eligible": 3332,
+        "raw": 3332,
+        "usable_before_deduplication": 3331
+      },
+      "file": "Nigerian_Fraud.csv",
+      "label": 1,
+      "license": "CC-BY-4.0",
+      "name": "nigerian_fraud",
+      "retain_original_label": 1,
+      "sha256": "f5d6930763cae6feeae6484131c79655a7440abbb97d6f51eab757aea4e6ab4b",
+      "url": "https://zenodo.org/api/records/8339691/files/Nigerian_Fraud.csv/content",
+      "usage_notes": "Retain publisher-labeled phishing/fraud text only."
+    },
+    {
+      "body_field": "body",
+      "counts": {
+        "empty_excluded": 2,
+        "excluded_other_labels": 3989,
+        "invalid_label_excluded": 63,
+        "label_eligible": 12411,
+        "raw": 16463,
+        "usable_before_deduplication": 12409
+      },
+      "dataset": "Seven Phishing Email Datasets: TREC-06",
+      "file": "TREC-06.csv",
+      "label_map": {
+        "0": 0
+      },
+      "license": "CC-BY-4.0",
+      "license_source": "https://api.figshare.com/v2/articles/25432108",
+      "name": "trec06_ham",
+      "period": "TREC 2006 collection; row Date headers are unverified and not reliable chronology",
+      "publisher": "Arifa Islam Champa and Md Fazle Rabbi; original TREC 2006 spam track",
+      "raw_rows_observed": 16463,
+      "sha256": "8ca6b1249f30f0a74790b8a34d4dbe248d526cfb0b13227b41970a1ebd638be5",
+      "source": "https://figshare.com/articles/dataset/25432108",
+      "subject_field": "subject",
+      "synthetic": false,
+      "url": "https://ndownloader.figshare.com/files/45117808",
+      "usage_notes": "Retain explicitly labeled ham only; exclude label 1 generic spam and null/invalid labels. New corpus source, not independent evidence for both classes."
+    },
+    {
+      "body_field": "body",
+      "counts": {
+        "invalid_label_excluded": 30,
+        "label_eligible": 4181,
+        "raw": 4211,
+        "usable_before_deduplication": 4181
+      },
+      "dataset": "Adversarial BEC Email Dataset, version 2, clean original text",
+      "file": "synthetic_emails.csv",
+      "label_map": {
+        "1": 1
+      },
+      "license": "CC-BY-SA-4.0",
+      "license_source": "https://www.kaggle.com/api/v1/datasets/view/yoadjei/adversarial-bec-email-dataset",
+      "name": "adjei_bec",
+      "period": "Published November 2025; generated examples, no real sent timestamps",
+      "publisher": "Yaw Osei Adjei",
+      "raw_rows_observed": 4211,
+      "sha256": "c6151b4fca463a48f5141303a911f7fb177af2c7b6314344fd52498603dd932e",
+      "source": "https://www.kaggle.com/datasets/yoadjei/adversarial-bec-email-dataset",
+      "subject_field": "subject",
+      "synthetic": true,
+      "url": "https://www.kaggle.com/api/v1/datasets/download/yoadjei/adversarial-bec-email-dataset/synthetic_emails.csv?datasetVersionNumber=2",
+      "usage_notes": "Gemini 2.5 Flash synthetic BEC/fraud. Only clean CSV; the paired obfuscated version is excluded to avoid splitting paraphrase families and is not downloaded. Actual filename differs from the card. Blank labels excluded rather than inferred."
+    },
+    {
+      "body_field": "text",
+      "counts": {
+        "label_eligible": 10000,
+        "raw": 10000,
+        "usable_before_deduplication": 10000
+      },
+      "dataset": "Phishing and Legitimate Emails Dataset for ML 2026, version 1",
+      "file": "phishing_legit_dataset_KD_10000.csv",
+      "label_map": {
+        "0": 0,
+        "1": 1
+      },
+      "license": "CC-BY-SA-4.0",
+      "license_source": "https://www.kaggle.com/api/v1/datasets/view/kuladeep19/phishing-and-legitimate-emails-dataset",
+      "name": "kuladeep_synthetic",
+      "period": "Version 1 released September 2025 despite 2026 title; synthetic, no real sent timestamps",
+      "publisher": "Kuladeep P",
+      "raw_rows_observed": 10000,
+      "sha256": "fb65d38e33e9fe070cc842abf3a6f7ed679da5ae0fd823cec31db46ede5f1aa7",
+      "source": "https://www.kaggle.com/datasets/kuladeep19/phishing-and-legitimate-emails-dataset",
+      "subject_field": null,
+      "synthetic": true,
+      "url": "https://www.kaggle.com/api/v1/datasets/download/kuladeep19/phishing-and-legitimate-emails-dataset/phishing_legit_dataset_KD_10000.csv?datasetVersionNumber=1",
+      "usage_notes": "Both classes within one collection. Explicit separate prompts make legitimate text deliberately non-suspicious; template/topic bias is expected. Ignore phishing_type, severity and confidence entirely."
+    }
+  ],
+  "splits": {
+    "test": {
+      "class_counts": {
+        "0": 2043,
+        "1": 1528
+      },
+      "count": 3571,
+      "sha256": "cf622e091cc9fc85e8bb992053b3eefa7108be3c43b2c9a03cdcce5c7aca48e5",
+      "source_class_counts": {
+        "adjei_bec": {
+          "1": 628
+        },
+        "kuladeep_synthetic": {
+          "0": 231,
+          "1": 900
+        },
+        "trec06_ham": {
+          "0": 1812
+        }
+      },
+      "source_counts": {
+        "adjei_bec": 628,
+        "kuladeep_synthetic": 1131,
+        "trec06_ham": 1812
+      },
+      "synthetic_count": 1759
+    },
+    "train": {
+      "class_counts": {
+        "0": 13270,
+        "1": 9554
+      },
+      "count": 22824,
+      "sha256": "31c8348a5aa9b702c1579159829344a7d7eca7df064cb0532cb7aceb2a9a3d40",
+      "source_class_counts": {
+        "adjei_bec": {
+          "1": 2925
+        },
+        "kuladeep_synthetic": {
+          "0": 1076,
+          "1": 4200
+        },
+        "ling": {
+          "0": 1375
+        },
+        "nazario": {
+          "1": 834
+        },
+        "nigerian_fraud": {
+          "1": 1595
+        },
+        "spamassassin": {
+          "0": 2365
+        },
+        "trec06_ham": {
+          "0": 8454
+        }
+      },
+      "source_counts": {
+        "adjei_bec": 2925,
+        "kuladeep_synthetic": 5276,
+        "ling": 1375,
+        "nazario": 834,
+        "nigerian_fraud": 1595,
+        "spamassassin": 2365,
+        "trec06_ham": 8454
+      },
+      "synthetic_count": 8201
+    },
+    "validation": {
+      "class_counts": {
+        "0": 2704,
+        "1": 1958
+      },
+      "count": 4662,
+      "sha256": "373a8867c029be1d72a25164ab21d8dd989765ec1dcc6d0016c10d8f21e7f854",
+      "source_class_counts": {
+        "adjei_bec": {
+          "1": 628
+        },
+        "kuladeep_synthetic": {
+          "0": 231,
+          "1": 900
+        },
+        "ling": {
+          "0": 243
+        },
+        "nazario": {
+          "1": 148
+        },
+        "nigerian_fraud": {
+          "1": 282
+        },
+        "spamassassin": {
+          "0": 418
+        },
+        "trec06_ham": {
+          "0": 1812
+        }
+      },
+      "source_counts": {
+        "adjei_bec": 628,
+        "kuladeep_synthetic": 1131,
+        "ling": 243,
+        "nazario": 148,
+        "nigerian_fraud": 282,
+        "spamassassin": 418,
+        "trec06_ham": 1812
+      },
+      "synthetic_count": 1759
+    }
+  },
+  "temporal_evaluation": {
+    "available": false,
+    "reason": "No reliable message chronology, so no fabricated temporal split. New synthetic release dates are not sent dates. Source transfer is reported, not called temporal validation."
+  },
+  "training_after_cap": {
+    "class_counts": {
+      "0": 5451,
+      "1": 5334
+    },
+    "count": 10785,
+    "source_class_counts": {
+      "adjei_bec": {
+        "1": 1500
+      },
+      "kuladeep_synthetic": {
+        "0": 1076,
+        "1": 1500
+      },
+      "ling": {
+        "0": 1375
+      },
+      "nazario": {
+        "1": 834
+      },
+      "nigerian_fraud": {
+        "1": 1500
+      },
+      "spamassassin": {
+        "0": 1500
+      },
+      "trec06_ham": {
+        "0": 1500
+      }
+    },
+    "source_counts": {
+      "adjei_bec": 1500,
+      "kuladeep_synthetic": 2576,
+      "ling": 1375,
+      "nazario": 834,
+      "nigerian_fraud": 1500,
+      "spamassassin": 1500,
+      "trec06_ham": 1500
+    },
+    "synthetic_count": 4076
+  },
+  "training_cap_per_source_class": 1500
+}

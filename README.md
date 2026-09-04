@@ -179,3 +179,12 @@ counts, leakage controls, per-model metrics, calibration, thresholds and the
 reason promotion was blocked. [Reproduction and methodology](docs/ai-model-readiness.md)
 describes commands, artifact locations and the single-use final-test lock. The
 public benchmark's metrics must not be presented as real-inbox accuracy.
+
+## AI Dataset Generalization v2
+
+The isolated v2 research pipeline adds source-aware evaluation, cross-source
+duplicate quarantine, source-balanced training caps, per-source calibration and
+mandatory generalization gates. New synthetic evidence is labeled explicitly.
+The protected legacy model remains active; research candidates are not activated.
+See [v2 methodology](docs/ai-dataset-generalization-v2.md) and
+[measured results](ml/reports/AI_DATASET_GENERALIZATION_V2.md).
