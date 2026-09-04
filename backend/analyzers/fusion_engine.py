@@ -1,4 +1,10 @@
-from ml.model_policy import describe_ai_output, FUSION_NOTE
+from collections.abc import Mapping
+
+from ml.model_policy import FUSION_NOTE
+from backend.fusion_policy import (
+    CURRENT_FUSION_POLICY, LEGACY_FUSION_V1, V2_NOTE,
+    bounded_signal, calculate_base, valid_number,
+)
 
 
 def calculate_reputation_score(reputation):
@@ -59,8 +65,14 @@ def calculate_final_risk(
     relay_trace,
     ai_analysis,
     reputation=None,
-    attachment_reputation=None
+    attachment_reputation=None,
+    *,
+    policy_version=CURRENT_FUSION_POLICY,
+    ai_model_metadata=None,
+    ai_authorization=None,
 ):
+    if policy_version == CURRENT_FUSION_POLICY:
+        ai_analysis = ai_analysis if isinstance(ai_analysis, Mapping) else {}
     reputation = reputation or {}
     attachment_reputation = attachment_reputation or []
 
@@ -87,12 +99,20 @@ def calculate_final_risk(
         attachment_reputation
     )
 
-    # Base SpoofZero score
-    final_score = (
-        sender_score * 0.30
-        + auth_score * 0.35
-        + ai_score * 0.35
+    if policy_version == CURRENT_FUSION_POLICY:
+        sender_score = bounded_signal(sender_score, "Sender identity")
+        auth_score = bounded_signal(auth_score, "Authentication")
+        # Malformed AI output cannot affect numeric scoring or qualitative flags.
+        ai_score = bounded_signal(ai_score, "AI") if valid_number(ai_score) else 0.0
+
+    base = calculate_base(
+        sender_score, auth_score, ai_score, ai_analysis,
+        policy_version=policy_version, model_metadata=ai_model_metadata,
+        authorization=ai_authorization,
     )
+    decision = base["ai_policy"]
+    ai_points = base["base_contributions"]["ai_phishing"]
+    final_score = base["base_score"]
 
     reasons = []
 
@@ -109,6 +129,8 @@ def calculate_final_risk(
     if ai_score >= 50:
         reasons.append(
             "AI model signal suggests phishing-like language"
+            + (" (supporting evidence only; excluded from numeric score)."
+               if not decision["included"] else "")
         )
 
     # Domain/IP reputation bonus
@@ -169,7 +191,7 @@ def calculate_final_risk(
         )
 
     # Authentication is a domain-authentication signal, never a safety credit.
-    # Keep the existing score weights and expose contradictory behavioral evidence.
+    # Preserve qualitative BEC findings even when AI has zero numeric weight.
     passed_methods = [method for method in ("spf", "dkim", "dmarc")
                       if authentication.get(method) == "pass"]
     behavioral_signals = []
@@ -208,6 +230,9 @@ def calculate_final_risk(
         100
     )
 
+    if policy_version == CURRENT_FUSION_POLICY:
+        final_score = max(0, final_score)
+
     if final_score >= 80:
         verdict = "CRITICAL"
     elif final_score >= 60:
@@ -226,6 +251,18 @@ def calculate_final_risk(
     return {
         "risk_score": final_score,
         "verdict": verdict,
+        "fusion_policy_version": policy_version,
+        "ai_numeric_contribution": ai_points,
+        "ai_weight_applied": decision["weight"],
+        "ai_validation_status": decision["validation_status"],
+        "ai_included_in_numeric_score": decision["included"],
+        "ai_model_eligible": decision["model_eligible"],
+        "ai_scoring_reason": decision["reason"],
+        "ai_scoring_authorization": decision["authorization"],
+        "score_explanation": base["score_explanation"],
+        "base_weights": base["base_weights"],
+        "base_contributions": base["base_contributions"],
+        "base_score_before_bonuses": base["base_score"],
 
         "evidence_scores": {
             "sender_identity": round(sender_score, 2),
@@ -241,13 +278,13 @@ def calculate_final_risk(
 
         "reasons": reasons,
         "ai_context": {
-            "calculation_version": "legacy_fusion_v1",
-            "base_weight": 0.35,
-            "maximum_base_points": 35,
-            "weighted_points_before_rounding": ai_score * 0.35,
-            "validation_status": describe_ai_output(ai_analysis)["validation_status"],
+            "calculation_version": policy_version,
+            "base_weight": decision["weight"],
+            "maximum_base_points": 100 * decision["weight"],
+            "weighted_points_before_rounding": ai_points,
+            "validation_status": decision["validation_status"],
             "evidence_role": "supporting_evidence_only",
-            "limitation": FUSION_NOTE,
+            "limitation": FUSION_NOTE if policy_version == LEGACY_FUSION_V1 else V2_NOTE,
         },
         "authentication_context": {
             "reported_pass_methods": passed_methods,

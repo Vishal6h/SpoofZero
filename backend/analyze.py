@@ -12,6 +12,7 @@ from .analyzers.threat_intel import analyze_domains
 from .analyzers.reputation_analyzer import analyze_reputation, analyze_attachment_reputation
 from .analyzers.attachment_analyzer import analyze_attachments
 from .analyzers.fusion_engine import calculate_final_risk
+from .fusion_policy import CURRENT_FUSION_POLICY
 
 
 def analyze_email(file_path):
@@ -83,7 +84,8 @@ def analyze_email(file_path):
         relay_trace,
         ai_analysis,
         reputation,
-        attachment_reputation
+        attachment_reputation,
+        policy_version=CURRENT_FUSION_POLICY,
     )
 
     return {

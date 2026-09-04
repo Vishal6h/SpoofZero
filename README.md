@@ -210,3 +210,17 @@ candidates remain inactive, and the protected legacy artifact hashes are checked
 before loading. Fusion weights and historical scores are unchanged; the UI now
 discloses the legacy AI signal's 35% base weight and lack of validation. See
 [AI honesty, compatibility, and future fusion guidance](docs/ai-honesty-and-production-safety.md).
+
+## AI Fusion Safety
+
+Fresh analyses now use `validated_evidence_fusion_v2`. The base score preserves
+the existing 6:7 relative emphasis between sender identity and authentication,
+normalized to 100%; the active experimental AI signal remains visible and adds
+zero numeric points. Reputation, attachment and relay bonuses are unchanged.
+Historical snapshots retain their stored scores and receive explicit legacy
+policy labels without migration or recalculation.
+
+A validated model does not automatically receive weight. Any future contribution
+requires a separate model-bound, hash-bound, evaluated and explicitly approved
+fusion authorization. No current research candidate is active or authorized.
+See [the complete fusion policy and compatibility notes](docs/ai-fusion-safety.md).

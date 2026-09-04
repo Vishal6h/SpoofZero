@@ -5,7 +5,7 @@ import streamlit as st
 
 from backend.analyze import analyze_email
 from frontend.case_ui import render_case_workspace, render_case_report
-from frontend.ai_ui import render_ai_card, render_ai_details
+from frontend.ai_ui import ai_evidence_label, render_ai_card, render_ai_details
 
 
 # ============================================================
@@ -387,6 +387,7 @@ if uploaded_file is not None:
 
             st.session_state["spoofzero_result"] = result
             st.session_state["spoofzero_filename"] = uploaded_file.name
+            st.session_state["spoofzero_result_source"] = "fresh_analysis"
 
         finally:
 
@@ -460,9 +461,9 @@ if result:
 
     with c1:
         card(
-            "Threat Score",
+            "Forensic Risk Score",
             f'{assessment.get("risk_score", 0)}/100',
-            "Composite forensic risk"
+            "Deterministic evidence assessment"
         )
 
     with c2:
@@ -622,7 +623,7 @@ if result:
                     "Evidence": [
                         "Sender Identity",
                         "Authentication",
-                        "AI model signal",
+                        ai_evidence_label(assessment),
                         "Threat Reputation",
                         "Attachment Reputation"
                     ],
@@ -652,7 +653,7 @@ if result:
                 },
 
                 hide_index=True,
-                use_container_width=True
+                width="stretch"
             )
 
 

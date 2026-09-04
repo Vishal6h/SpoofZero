@@ -8,6 +8,7 @@ import streamlit as st
 from backend.analyzers.campaign_correlator import correlate_emails
 from backend.case_analysis import MAX_BATCH_FILES, analyze_batch
 from backend.case_store import CaseStore
+from backend.fusion_policy import snapshot_policy_version
 
 
 STORE_ERRORS = (OSError, sqlite3.Error, ValueError)
@@ -51,8 +52,16 @@ def render_case_workspace():
                 st.caption(f"Current dashboard result: {filename}")
                 if st.button("Add current result to case", key="sz_save_current"):
                     try:
+                        email_id = (current.get("email") or {}).get("sha256") or ""
+                        previous = store.get_analysis(case_id, email_id) if email_id else None
                         if store.add_analysis(case_id, filename, current):
                             st.success("Analysis saved to this case.")
+                        elif previous and previous["analysis"] != current:
+                            st.info(
+                                "This email already has a saved historical snapshot in this case. "
+                                "The current result remains displayed separately and the saved snapshot "
+                                "was not changed. Use a separate case to retain both versions."
+                            )
                         else:
                             st.info("This exact email is already in the case.")
                     except STORE_ERRORS as error:
@@ -79,6 +88,9 @@ def render_case_workspace():
                             if outcome.get("analysis"):
                                 st.session_state["spoofzero_result"] = outcome["analysis"]
                                 st.session_state["spoofzero_filename"] = outcome["filename"]
+                                st.session_state["spoofzero_result_source"] = (
+                                    "fresh_analysis" if outcome["status"] == "saved" else "saved_snapshot"
+                                )
                             progress.progress((index + 1) / len(files))
                     st.dataframe(outcomes, hide_index=True, width="stretch")
                     st.caption("Duplicate raw EML files are counted once per case and skip repeat lookups.")
@@ -95,6 +107,7 @@ def render_case_workspace():
                     record = records_by_id[choice]
                     st.session_state["spoofzero_result"] = record["analysis"]
                     st.session_state["spoofzero_filename"] = record["filename"]
+                    st.session_state["spoofzero_result_source"] = "saved_snapshot"
             return {"case": case, "records": records}
         except STORE_ERRORS as error:
             st.warning(f"Case storage is unavailable: {error}")
@@ -139,10 +152,15 @@ def render_case_report(workspace):
         inventory.append({
             "Email": label(record["email_id"]), "Subject": email.get("subject"),
             "From": email.get("from"), "Email date": email.get("date"),
-            "Threat score": assessment.get("risk_score"), "Verdict": assessment.get("verdict"),
-            "Saved at (UTC)": record["analyzed_at"],
+            "Forensic risk score": assessment.get("risk_score"),
+            "Fusion policy": snapshot_policy_version(assessment),
+            "Verdict": assessment.get("verdict"), "Saved at (UTC)": record["analyzed_at"],
         })
     st.dataframe(inventory, hide_index=True, width="stretch")
+    st.caption(
+        "Saved forensic risk scores may use different fusion policies. Compare the stored "
+        "evidence and policy before comparing scores; snapshots are not recalculated."
+    )
     if len(records) < 2:
         st.info("Add at least one more distinct email to find shared evidence.")
 

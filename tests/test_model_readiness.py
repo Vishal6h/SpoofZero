@@ -420,7 +420,7 @@ class DownloadBoundaryTests(unittest.TestCase):
     def test_ml_alone_cannot_create_a_malicious_fusion_verdict(self):
         from backend.analyzers.fusion_engine import calculate_final_risk
         result = calculate_final_risk({"risk_score": 0}, {"risk_score": 0}, {"hops": []}, {"phishing_probability": 100})
-        self.assertEqual(result["risk_score"], 35)
+        self.assertEqual(result["risk_score"], 0)
         self.assertNotIn(result["verdict"], ("SUSPICIOUS", "HIGH RISK", "CRITICAL"))
 
 if __name__ == "__main__":

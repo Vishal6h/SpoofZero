@@ -215,8 +215,10 @@ class CaseStorageAndBatchTests(unittest.TestCase):
              patch("urllib.request.urlopen", side_effect=AssertionError("No network in regression tests")):
             result = analyze_email("data/samples/test.eml")
             attachment_result = analyze_email("data/samples/attachment_test.eml")
-        self.assertEqual(result["final_assessment"]["risk_score"], 69)
+        self.assertEqual(result["final_assessment"]["risk_score"], 75)
         self.assertEqual(result["ai_analysis"]["phishing_probability"], 58.05)
+        self.assertEqual(result["final_assessment"]["fusion_policy_version"], "validated_evidence_fusion_v2")
+        self.assertFalse(result["final_assessment"]["ai_included_in_numeric_score"])
         self.assertEqual(result["relay_trace"]["hop_count"], 3)
         self.assertEqual(result["email"]["sha256"], sha256(Path("data/samples/test.eml").read_bytes()).hexdigest())
         self.assertEqual(result["email"]["message_id"], "<123456@example.com>")

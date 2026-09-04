@@ -13,6 +13,7 @@ from streamlit.testing.v1 import AppTest
 
 from backend.analyzers.email_parser import parse_email
 from backend.analyzers.fusion_engine import calculate_final_risk
+from backend.fusion_policy import LEGACY_FUSION_V1
 from backend.analyzers.nlp_detector import analyze_text
 from backend.case_store import CaseStore
 from frontend.ai_ui import ai_card_html, score_label
@@ -244,6 +245,8 @@ class UIHonestyTests(unittest.TestCase):
         output = analyze_text({"subject": "hello", "body": "meeting agenda"})
         rendered = ai_card_html(output)
         self.assertIn("AI phishing score", rendered)
+        self.assertIn(score_label(output), rendered)
+        self.assertNotEqual(score_label(output), "Unavailable")
         self.assertIn(f"Signal band: {output['verdict']}", rendered)
         self.assertIn("Model status: EXPERIMENTAL", rendered)
         self.assertIn("Validation: NOT VALIDATED", rendered)
@@ -347,8 +350,12 @@ class FusionTransparencyTests(unittest.TestCase):
             },
             "relay_trace": {"hops": []},
         }
-        bare = calculate_final_risk(ai_analysis=bare_ai, **inputs)
-        labeled = calculate_final_risk(ai_analysis=labeled_ai, **inputs)
+        bare = calculate_final_risk(
+            ai_analysis=bare_ai, policy_version=LEGACY_FUSION_V1, **inputs
+        )
+        labeled = calculate_final_risk(
+            ai_analysis=labeled_ai, policy_version=LEGACY_FUSION_V1, **inputs
+        )
         for key in (
             "risk_score",
             "verdict",
@@ -374,6 +381,7 @@ class FusionTransparencyTests(unittest.TestCase):
             {"risk_score": 0, "findings": []},
             {"hops": []},
             {"phishing_probability": 100, **legacy_output_metadata()},
+            policy_version=LEGACY_FUSION_V1,
         )
         self.assertEqual(assessment["risk_score"], 35)
         self.assertEqual(assessment["verdict"], "LOW RISK")

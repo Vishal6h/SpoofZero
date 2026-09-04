@@ -226,3 +226,23 @@ thresholds. Its additive `ai_context` describes the 35% AI weight, exact weighte
 points, supporting role, and lack of calibration. Details and the future
 weighting recommendation are in
 [AI honesty and production safety](ai-honesty-and-production-safety.md).
+
+## AI Fusion Safety
+
+Protected reference: `edef5030b635085eb89ea7711edd03a730bb7d11`.
+
+`backend/fusion_policy.py` defines immutable policy identifiers, the exact
+historical v1 calculation, the current 6:7 sender/authentication v2 base, and a
+separate model-bound authorization type for any future AI weight. The default
+application path supplies no authorization, so experimental and merely eligible
+models contribute zero points. `fusion_engine.py` retains existing bonus and
+verdict behavior and emits additive policy, weight, contribution and explanation
+metadata.
+
+`frontend/ai_ui.py` distinguishes current v2, explicit v1 and metadata-free
+legacy snapshots without recalculating them. The case inventory shows the stored
+policy, and duplicate raw emails cannot overwrite an earlier case row. Uploading
+an EML through the main analyzer produces a fresh v2 result; storing both versions
+requires separate cases under the unchanged raw-SHA-256 case key. Campaign
+correlation remains based on indicators and infrastructure, independent of the
+risk score. See [AI fusion safety](ai-fusion-safety.md).

@@ -51,6 +51,11 @@ class CaseUITests(unittest.TestCase):
             self.create_case(app)
             next(button for button in app.button if button.label == "Analyze").click().run()
             self.assert_clean(app)
+            visible = "\n".join(item.value for item in list(app.markdown) + list(app.caption))
+            self.assertIn("Forensic Risk Score", visible)
+            self.assertIn("Fusion policy: Validated Evidence v2", visible)
+            self.assertIn("AI numeric contribution: 0 points", visible)
+            self.assertIn("not a statistically calibrated probability", visible)
             labels = [tab.label for tab in app.tabs]
             for label in ("Overview", "Email Forensics", "Threat Intelligence", "Attachments", "Raw Evidence", "Campaign / Cases"):
                 self.assertIn(label, labels)
@@ -70,6 +75,51 @@ class CaseUITests(unittest.TestCase):
             fresh.button(key="sz_open_email").click().run()
             self.assert_clean(fresh)
             self.assertEqual(fresh.session_state["spoofzero_result"], original)
+
+    def test_reanalysis_display_does_not_replace_historical_case_snapshot(self):
+        from copy import deepcopy
+        from backend.analyze import analyze_email
+        from backend.analyzers.fusion_engine import calculate_final_risk
+        from backend.fusion_policy import LEGACY_FUSION_V1, CURRENT_FUSION_POLICY
+        with patch("backend.analyzers.reputation_analyzer.VT_API_KEY", None), \
+             patch("urllib.request.urlopen", side_effect=AssertionError("No network")):
+            fresh = analyze_email("data/samples/test.eml")
+        historical = deepcopy(fresh)
+        historical["final_assessment"] = calculate_final_risk(
+            historical["sender_identity"], historical["authentication"],
+            historical["relay_trace"], historical["ai_analysis"],
+            historical["reputation"], historical["attachment_reputation"],
+            policy_version=LEGACY_FUSION_V1,
+        )
+        store = CaseStore(self.db)
+        case_id = store.create_case("Preserved historical case")
+        store.add_analysis(case_id, "test.eml", historical)
+        with store.connection() as connection:
+            before = connection.execute("SELECT analysis_json FROM case_emails").fetchone()[0]
+        upload = Upload("test.eml", Path("data/samples/test.eml").read_bytes())
+        def uploader(*args, **kwargs):
+            return [] if kwargs.get("key") == "sz_batch_files" else upload
+        with patch("streamlit.file_uploader", side_effect=uploader), \
+             patch("backend.analyze.analyze_email", return_value=fresh) as analyzer:
+            app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "frontend" / "app.py")).run()
+            app.button(key="sz_open_email").click().run()
+            self.assert_clean(app)
+            self.assertEqual(app.session_state["spoofzero_result"]["final_assessment"]["risk_score"], 69)
+            next(button for button in app.button if button.label == "Analyze").click().run()
+            self.assert_clean(app)
+            self.assertEqual(analyzer.call_count, 1)
+            self.assertEqual(app.session_state["spoofzero_result"], fresh)
+            self.assertEqual(fresh["final_assessment"]["fusion_policy_version"], CURRENT_FUSION_POLICY)
+            app.button(key="sz_save_current").click().run()
+            self.assert_clean(app)
+            self.assertTrue(any("saved historical snapshot" in item.value for item in app.info))
+            self.assertEqual(app.session_state["spoofzero_result"]["final_assessment"]["risk_score"], 75)
+            app.button(key="sz_open_email").click().run()
+            self.assert_clean(app)
+            self.assertEqual(app.session_state["spoofzero_result"], historical)
+        with store.connection() as connection:
+            after = connection.execute("SELECT analysis_json FROM case_emails").fetchone()[0]
+        self.assertEqual(before, after)
 
     def test_batch_upload_failure_duplicate_and_report_controls(self):
         uploads = [Upload("one.eml", b"one"), Upload("two.eml", b"two"),

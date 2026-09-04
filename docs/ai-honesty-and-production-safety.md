@@ -81,19 +81,11 @@ changes loader policy code without rewriting old reports, hashes, test-use
 markers, metrics, or candidate metadata. Reproduction that requires an exact
 historical code hash should use the report's protected commit.
 
-## Fusion compatibility and recommendation
+## Fusion compatibility at this checkpoint
 
-The numeric fusion calculation is unchanged. The unvalidated AI signal still
-has a 35% base weight and can contribute up to 35 points. The assessment now
-returns an additive `ai_context` block with the calculation version, weight,
-weighted points, validation label, evidence role, and this limitation. The UI
-shows the limitation beside AI Analysis. The composite threat score is not a
-calibrated probability.
-
-A future production milestone should gate an unvalidated model out of the
-numeric production score and retain it as a visible supporting signal. Keep
-`legacy_fusion_v1` available for historical snapshots and comparison. Before
-changing or redistributing weights, evaluate the full fusion system on an
-independent, representative corpus and set alert thresholds against measured
-false-positive and false-negative costs. Arbitrarily reducing the 35% weight
-would not calibrate either the model signal or the composite score.
+At this protected checkpoint, the numeric fusion calculation was unchanged:
+the unvalidated AI signal still had a 35% base weight and could contribute up
+to 35 points. The assessment added an `ai_context` disclosure without changing
+that score. The subsequent [AI fusion safety milestone](ai-fusion-safety.md)
+implements the recommended versioned policy and excludes unvalidated AI from
+fresh numeric assessments while preserving this historical calculation.
