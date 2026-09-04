@@ -1,0 +1,855 @@
+{
+  "corpus_id": "spoofzero_fusion_calibration_v1",
+  "fusion_policy": "validated_evidence_fusion_v2",
+  "label_semantics": {
+    "CRITICAL": "Multiple severe corroborating forensic failures expected.",
+    "HIGH": "Strong multi-source concern expected.",
+    "LOW": "No review-triggering evidence expected.",
+    "REVIEW": "Human review expected; includes inconclusive, low-risk, and suspicious outcomes."
+  },
+  "limitations": "Engineering targets for policy evaluation, not ground-truth phishing labels or statistical probability calibration.",
+  "provenance": {
+    "repository_safe_sample": "Maintained non-weaponized demo EML; only its documented aggregate evidence scores are represented.",
+    "synthetic_controlled_fixture": "Hand-authored non-message fusion inputs derived from documented SpoofZero evidence-score bands; no private email, executable content, network data, or malware."
+  },
+  "randomness": "none",
+  "scenario_count": 33,
+  "scenarios": [
+    {
+      "category": "clearly_legitimate_business",
+      "expected_class": "LOW",
+      "id": "legit-business",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "Aligned identities and reported passes.",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "legitimate_newsletter_service",
+      "expected_class": "LOW",
+      "id": "legit-newsletter",
+      "inputs": {
+        "ai_score": 20,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "Routine safe newsletter fixture.",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "legitimate_third_party_infrastructure",
+      "expected_class": "LOW",
+      "id": "legit-third-party-mailer",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 30
+      },
+      "note": "Expected benign return-path provider difference.",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "sender_reply_to_mismatch",
+      "expected_class": "REVIEW",
+      "id": "reply-to-mismatch",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 40
+      },
+      "note": "Reply-To organizational domain differs.",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "sender_return_path_mismatch",
+      "expected_class": "REVIEW",
+      "id": "return-path-mismatch",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 30
+      },
+      "note": "Unexplained envelope sender difference.",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "spf_failure",
+      "expected_class": "REVIEW",
+      "id": "spf-failure",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "fail"
+        },
+        "authentication_score": 30,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "dkim_failure",
+      "expected_class": "REVIEW",
+      "id": "dkim-failure",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "fail",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 30,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "dmarc_failure",
+      "expected_class": "REVIEW",
+      "id": "dmarc-failure",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "fail",
+          "spf": "pass"
+        },
+        "authentication_score": 40,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "authentication_missing_inconclusive",
+      "expected_class": "REVIEW",
+      "id": "authentication-missing",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "inconclusive",
+        "authentication_results": {
+          "dkim": "unknown",
+          "dmarc": "unknown",
+          "spf": "unknown"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "authentication_malformed_inconclusive",
+      "expected_class": "REVIEW",
+      "id": "authentication-malformed",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "inconclusive",
+        "authentication_results": {
+          "dkim": "unknown",
+          "dmarc": "none",
+          "spf": "softfail"
+        },
+        "authentication_score": 15,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "suspicious_url_domain",
+      "expected_class": "REVIEW",
+      "id": "suspicious-url-no-reputation",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "Content indicator exists but has no reputation detection; current fusion has no raw-IOC numeric input.",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "suspicious_reputation_evidence",
+      "expected_class": "REVIEW",
+      "id": "low-reputation",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [
+          {
+            "kind": "domain",
+            "malicious": 0,
+            "suspicious": 1
+          }
+        ],
+        "sender_score": 0
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "malicious_reputation_evidence",
+      "expected_class": "HIGH",
+      "id": "malicious-reputation",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [
+          {
+            "kind": "domain",
+            "malicious": 4,
+            "suspicious": 0
+          }
+        ],
+        "sender_score": 0
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "duplicate_reputation_evidence",
+      "expected_class": "HIGH",
+      "id": "duplicate-malicious-reputation",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [
+          {
+            "kind": "domain",
+            "malicious": 4,
+            "suspicious": 0
+          },
+          {
+            "kind": "domain",
+            "malicious": 4,
+            "suspicious": 0
+          },
+          {
+            "kind": "domain",
+            "malicious": 4,
+            "suspicious": 0
+          }
+        ],
+        "sender_score": 0
+      },
+      "note": "Duplicates must not stack.",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "suspicious_attachment_hash",
+      "expected_class": "REVIEW",
+      "id": "low-attachment-reputation",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [
+          {
+            "malicious": 0,
+            "suspicious": 1
+          }
+        ],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "malicious_attachment_hash",
+      "expected_class": "HIGH",
+      "id": "malicious-attachment-reputation",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [
+          {
+            "malicious": 4,
+            "suspicious": 0
+          }
+        ],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "duplicate_attachment_evidence",
+      "expected_class": "HIGH",
+      "id": "duplicate-malicious-attachment",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [
+          {
+            "malicious": 4,
+            "suspicious": 0
+          },
+          {
+            "malicious": 4,
+            "suspicious": 0
+          }
+        ],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "Duplicates must not stack.",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "relay_chain_mismatch",
+      "expected_class": "REVIEW",
+      "id": "relay-mismatch",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 1,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "duplicate_relay_evidence",
+      "expected_class": "REVIEW",
+      "id": "repeated-relay-mismatch",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 3,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "Multiple mismatches retain one relay bonus.",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "bec_style_valid_authentication",
+      "expected_class": "REVIEW",
+      "id": "authenticated-bec-language",
+      "inputs": {
+        "ai_score": 90,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "Experimental language signal is qualitative only.",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "obvious_spoofing",
+      "expected_class": "CRITICAL",
+      "id": "obvious-spoof",
+      "inputs": {
+        "ai_score": 58.05,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "fail",
+          "dmarc": "fail",
+          "spf": "fail"
+        },
+        "authentication_score": 100,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 70
+      },
+      "note": "Controlled severe-spoof combination; it is not derived from a stored message.",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "multiple_weak_indicators",
+      "expected_class": "REVIEW",
+      "id": "multiple-weak-indicators",
+      "inputs": {
+        "ai_score": 65,
+        "attachment_items": [
+          {
+            "malicious": 0,
+            "suspicious": 1
+          }
+        ],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "softfail"
+        },
+        "authentication_score": 15,
+        "relay_mismatches": 1,
+        "reputation_items": [
+          {
+            "kind": "domain",
+            "malicious": 0,
+            "suspicious": 1
+          }
+        ],
+        "sender_score": 30
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "one_strong_indicator",
+      "expected_class": "HIGH",
+      "id": "one-strong-auth-indicator",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "fail",
+          "dmarc": "fail",
+          "spf": "fail"
+        },
+        "authentication_score": 100,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 0
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "one_strong_indicator",
+      "expected_class": "HIGH",
+      "id": "one-strong-sender-indicator",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "none",
+          "dmarc": "none",
+          "spf": "none"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 100
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "multiple_strong_forensic_failures",
+      "expected_class": "CRITICAL",
+      "id": "strong-evidence-stack",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [
+          {
+            "malicious": 4,
+            "suspicious": 0
+          }
+        ],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "none",
+          "dmarc": "fail",
+          "spf": "fail"
+        },
+        "authentication_score": 70,
+        "relay_mismatches": 1,
+        "reputation_items": [
+          {
+            "kind": "domain",
+            "malicious": 4,
+            "suspicious": 0
+          }
+        ],
+        "sender_score": 70
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "multiple_strong_forensic_failures",
+      "expected_class": "HIGH",
+      "id": "mixed-high-evidence",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [
+          {
+            "malicious": 1,
+            "suspicious": 0
+          }
+        ],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "fail",
+          "spf": "pass"
+        },
+        "authentication_score": 40,
+        "relay_mismatches": 1,
+        "reputation_items": [
+          {
+            "kind": "ip",
+            "malicious": 2,
+            "suspicious": 1
+          }
+        ],
+        "sender_score": 40
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "threshold_near_20",
+      "expected_class": "REVIEW",
+      "id": "near-low-threshold",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "none",
+          "dmarc": "none",
+          "spf": "none"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 40
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "threshold_near_40",
+      "expected_class": "REVIEW",
+      "id": "near-suspicious-threshold",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 0,
+        "reputation_items": [
+          {
+            "kind": "domain",
+            "malicious": 0,
+            "suspicious": 1
+          }
+        ],
+        "sender_score": 70
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "threshold_at_60",
+      "expected_class": "HIGH",
+      "id": "high-boundary",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "none",
+          "dmarc": "pass",
+          "spf": "softfail"
+        },
+        "authentication_score": 25,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 100
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "threshold_above_80",
+      "expected_class": "CRITICAL",
+      "id": "critical-boundary",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "fail",
+          "spf": "fail"
+        },
+        "authentication_score": 70,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 100
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "bonus_saturation_and_cap",
+      "expected_class": "CRITICAL",
+      "id": "all-bonuses-cap",
+      "inputs": {
+        "ai_score": 5,
+        "attachment_items": [
+          {
+            "malicious": 4,
+            "suspicious": 0
+          }
+        ],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 100,
+        "relay_mismatches": 3,
+        "reputation_items": [
+          {
+            "kind": "domain",
+            "malicious": 4,
+            "suspicious": 0
+          }
+        ],
+        "sender_score": 100
+      },
+      "note": "",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    },
+    {
+      "category": "repository_demo_email",
+      "expected_class": "HIGH",
+      "id": "repository-demo-test-eml",
+      "inputs": {
+        "ai_score": 58.05,
+        "attachment_items": [],
+        "authentication_evidence_source": "untrusted",
+        "authentication_evidence_state": "inconclusive",
+        "authentication_results": {
+          "dkim": "none",
+          "dmarc": "fail",
+          "spf": "fail"
+        },
+        "authentication_score": 80,
+        "relay_mismatches": 0,
+        "reputation_items": [],
+        "sender_score": 70
+      },
+      "note": "Aggregate analyzer outputs from the maintained, non-weaponized test EML; live enrichment is excluded.",
+      "source": "repository_safe_sample",
+      "source_path": "data/samples/test.eml"
+    },
+    {
+      "category": "cross_family_bonus_stacking",
+      "expected_class": "REVIEW",
+      "id": "bonuses-only-stack",
+      "inputs": {
+        "ai_score": 100,
+        "attachment_items": [
+          {
+            "malicious": 4,
+            "suspicious": 0
+          }
+        ],
+        "authentication_evidence_state": "reported_results",
+        "authentication_results": {
+          "dkim": "pass",
+          "dmarc": "pass",
+          "spf": "pass"
+        },
+        "authentication_score": 0,
+        "relay_mismatches": 2,
+        "reputation_items": [
+          {
+            "kind": "domain",
+            "malicious": 4,
+            "suspicious": 0
+          }
+        ],
+        "sender_score": 0
+      },
+      "note": "Maximum bonuses in all three families, with zero base evidence; unvalidated AI is held at 0 numeric points.",
+      "source": "synthetic_controlled_fixture",
+      "source_path": null
+    }
+  ],
+  "schema_version": 1
+}

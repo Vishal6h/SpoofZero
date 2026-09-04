@@ -1,0 +1,1406 @@
+{
+  "actual_class_distribution": {
+    "CRITICAL": 4,
+    "HIGH": 3,
+    "LOW": 6,
+    "REVIEW": 20
+  },
+  "bonus_effect_statistics": {
+    "maximum": 50,
+    "mean": 7.5758,
+    "median": 0,
+    "minimum": 0,
+    "population_stddev": 12.3166
+  },
+  "calibration_claim": "Engineering scenario evaluation only; not statistical probability calibration.",
+  "classification_distribution": {
+    "false_high": 1,
+    "false_low": 10,
+    "match": 22
+  },
+  "confusion_matrix": {
+    "CRITICAL": {
+      "CRITICAL": 4,
+      "HIGH": 0,
+      "LOW": 0,
+      "REVIEW": 0
+    },
+    "HIGH": {
+      "CRITICAL": 0,
+      "HIGH": 3,
+      "LOW": 0,
+      "REVIEW": 6
+    },
+    "LOW": {
+      "CRITICAL": 0,
+      "HIGH": 0,
+      "LOW": 2,
+      "REVIEW": 1
+    },
+    "REVIEW": {
+      "CRITICAL": 0,
+      "HIGH": 0,
+      "LOW": 4,
+      "REVIEW": 13
+    }
+  },
+  "corpus_id": "spoofzero_fusion_calibration_v1",
+  "decision": {
+    "bonuses": "KEEP",
+    "reason": "The corpus is controlled engineering evidence, not an independent labeled inbox sample. V2 is monotonic, prevents any one base component from reaching HIGH, caps each bonus family, and does not double count repeats. Observed misses identify evidence-model gaps and ambiguous single-source targets; changing numeric policy on this corpus would overfit those assumptions.",
+    "thresholds": "KEEP",
+    "weights": "KEEP"
+  },
+  "dominant_evidence": {
+    "attachment": 3,
+    "authentication": 10,
+    "none": 5,
+    "relay": 2,
+    "reputation": 4,
+    "sender_identity": 9
+  },
+  "duplicate_bonus_checks": {
+    "attachment_repeated": 20,
+    "attachment_single": 20,
+    "relay_repeated": 10,
+    "relay_single": 10,
+    "reputation_repeated": 20,
+    "reputation_single": 20
+  },
+  "false_high": [
+    "legit-third-party-mailer"
+  ],
+  "false_low": [
+    "spf-failure",
+    "dkim-failure",
+    "suspicious-url-no-reputation",
+    "malicious-reputation",
+    "duplicate-malicious-reputation",
+    "malicious-attachment-reputation",
+    "duplicate-malicious-attachment",
+    "one-strong-auth-indicator",
+    "one-strong-sender-indicator",
+    "near-low-threshold"
+  ],
+  "limitations": [
+    "Scenario targets are engineering judgments rather than real-world ground truth.",
+    "Raw URL suspiciousness has no direct numeric input unless reputation evidence is available.",
+    "A single SPF or DKIM failure can remain below the first numeric threshold.",
+    "Strong reputation or attachment evidence is capped at 20 points and cannot alone produce HIGH.",
+    "Authentication is parsed reported evidence, not independent cryptographic verification.",
+    "Score distributions are corpus-composition dependent and are not performance probabilities."
+  ],
+  "near_threshold": [
+    "reply-to-mismatch",
+    "dmarc-failure",
+    "malicious-reputation",
+    "duplicate-malicious-reputation",
+    "malicious-attachment-reputation",
+    "duplicate-malicious-attachment",
+    "multiple-weak-indicators",
+    "near-low-threshold",
+    "near-suspicious-threshold",
+    "high-boundary"
+  ],
+  "outcomes": [
+    {
+      "actual_class": "LOW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "clearly_legitimate_business",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 0,
+        "total_before_rounding_and_cap": 0.0
+      },
+      "dominant_contribution": "none",
+      "expected_class": "LOW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "legit-business",
+      "nearest_threshold_distance": 20,
+      "reasons": [],
+      "score": 0,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "LIKELY SAFE"
+    },
+    {
+      "actual_class": "LOW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "legitimate_newsletter_service",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 0,
+        "total_before_rounding_and_cap": 0.0
+      },
+      "dominant_contribution": "none",
+      "expected_class": "LOW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "legit-newsletter",
+      "nearest_threshold_distance": 20,
+      "reasons": [],
+      "score": 0,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "LIKELY SAFE"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "legitimate_third_party_infrastructure",
+      "classification": "false_high",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.1538461538461533,
+        "sender_identity": 13.846153846153847,
+        "total": 14,
+        "total_before_rounding_and_cap": 13.846153846153847
+      },
+      "dominant_contribution": "sender_identity",
+      "expected_class": "LOW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "legit-third-party-mailer",
+      "nearest_threshold_distance": 6,
+      "reasons": [
+        "Sender identity checks produced a nonzero risk signal",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 14,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "REVIEW REQUIRED"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "sender_reply_to_mismatch",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": -0.4615384615384599,
+        "sender_identity": 18.461538461538463,
+        "total": 18,
+        "total_before_rounding_and_cap": 18.46153846153846
+      },
+      "dominant_contribution": "sender_identity",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "reply-to-mismatch",
+      "nearest_threshold_distance": 2,
+      "reasons": [
+        "Sender identity checks produced a nonzero risk signal",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 18,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "REVIEW REQUIRED"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "sender_return_path_mismatch",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.1538461538461533,
+        "sender_identity": 13.846153846153847,
+        "total": 14,
+        "total_before_rounding_and_cap": 13.846153846153847
+      },
+      "dominant_contribution": "sender_identity",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "return-path-mismatch",
+      "nearest_threshold_distance": 6,
+      "reasons": [
+        "Sender identity checks produced a nonzero risk signal",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 14,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "REVIEW REQUIRED"
+    },
+    {
+      "actual_class": "LOW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "spf_failure",
+      "classification": "false_low",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 16.153846153846153,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": -0.1538461538461533,
+        "sender_identity": 0.0,
+        "total": 16,
+        "total_before_rounding_and_cap": 16.153846153846153
+      },
+      "dominant_contribution": "authentication",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "spf-failure",
+      "nearest_threshold_distance": 4,
+      "reasons": [
+        "Reported authentication checks produced a nonzero risk signal"
+      ],
+      "score": 16,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "LIKELY SAFE"
+    },
+    {
+      "actual_class": "LOW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "dkim_failure",
+      "classification": "false_low",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 16.153846153846153,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": -0.1538461538461533,
+        "sender_identity": 0.0,
+        "total": 16,
+        "total_before_rounding_and_cap": 16.153846153846153
+      },
+      "dominant_contribution": "authentication",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "dkim-failure",
+      "nearest_threshold_distance": 4,
+      "reasons": [
+        "Reported authentication checks produced a nonzero risk signal"
+      ],
+      "score": 16,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "LIKELY SAFE"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "dmarc_failure",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 21.538461538461537,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.4615384615384599,
+        "sender_identity": 0.0,
+        "total": 22,
+        "total_before_rounding_and_cap": 21.53846153846154
+      },
+      "dominant_contribution": "authentication",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "dmarc-failure",
+      "nearest_threshold_distance": 2,
+      "reasons": [
+        "Reported authentication checks produced a nonzero risk signal"
+      ],
+      "score": 22,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "LOW RISK"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "authentication_missing_inconclusive",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 0,
+        "total_before_rounding_and_cap": 0.0
+      },
+      "dominant_contribution": "none",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "authentication-missing",
+      "nearest_threshold_distance": 20,
+      "reasons": [
+        "Authentication evidence is incomplete or inconclusive; missing or unknown results do not establish safety."
+      ],
+      "score": 0,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "INCONCLUSIVE"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "authentication_malformed_inconclusive",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 8.076923076923077,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": -0.07692307692307665,
+        "sender_identity": 0.0,
+        "total": 8,
+        "total_before_rounding_and_cap": 8.076923076923077
+      },
+      "dominant_contribution": "authentication",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "authentication-malformed",
+      "nearest_threshold_distance": 12,
+      "reasons": [
+        "Reported authentication checks produced a nonzero risk signal",
+        "Authentication evidence is incomplete or inconclusive; missing or unknown results do not establish safety."
+      ],
+      "score": 8,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "INCONCLUSIVE"
+    },
+    {
+      "actual_class": "LOW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "suspicious_url_domain",
+      "classification": "false_low",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 0,
+        "total_before_rounding_and_cap": 0.0
+      },
+      "dominant_contribution": "none",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "suspicious-url-no-reputation",
+      "nearest_threshold_distance": 20,
+      "reasons": [],
+      "score": 0,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "LIKELY SAFE"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 5,
+      "category": "suspicious_reputation_evidence",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 5,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 5,
+        "total_before_rounding_and_cap": 5.0
+      },
+      "dominant_contribution": "reputation",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "low-reputation",
+      "nearest_threshold_distance": 15,
+      "reasons": [
+        "Threat intelligence detected suspicious domain or IP reputation",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 5,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "REVIEW REQUIRED"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 20,
+      "category": "malicious_reputation_evidence",
+      "classification": "false_low",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 20,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 20,
+        "total_before_rounding_and_cap": 20.0
+      },
+      "dominant_contribution": "reputation",
+      "expected_class": "HIGH",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "malicious-reputation",
+      "nearest_threshold_distance": 0,
+      "reasons": [
+        "Threat intelligence detected suspicious domain or IP reputation",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 20,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "LOW RISK"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 20,
+      "category": "duplicate_reputation_evidence",
+      "classification": "false_low",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 20,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 20,
+        "total_before_rounding_and_cap": 20.0
+      },
+      "dominant_contribution": "reputation",
+      "expected_class": "HIGH",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "duplicate-malicious-reputation",
+      "nearest_threshold_distance": 0,
+      "reasons": [
+        "Threat intelligence detected suspicious domain or IP reputation",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 20,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "LOW RISK"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 5,
+      "category": "suspicious_attachment_hash",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 5,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 5,
+        "total_before_rounding_and_cap": 5.0
+      },
+      "dominant_contribution": "attachment",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "low-attachment-reputation",
+      "nearest_threshold_distance": 15,
+      "reasons": [
+        "Attachment hash has suspicious threat-intelligence detections",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 5,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "REVIEW REQUIRED"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 20,
+      "category": "malicious_attachment_hash",
+      "classification": "false_low",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 20,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 20,
+        "total_before_rounding_and_cap": 20.0
+      },
+      "dominant_contribution": "attachment",
+      "expected_class": "HIGH",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "malicious-attachment-reputation",
+      "nearest_threshold_distance": 0,
+      "reasons": [
+        "Attachment hash has suspicious threat-intelligence detections",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 20,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "LOW RISK"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 20,
+      "category": "duplicate_attachment_evidence",
+      "classification": "false_low",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 20,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 20,
+        "total_before_rounding_and_cap": 20.0
+      },
+      "dominant_contribution": "attachment",
+      "expected_class": "HIGH",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "duplicate-malicious-attachment",
+      "nearest_threshold_distance": 0,
+      "reasons": [
+        "Attachment hash has suspicious threat-intelligence detections",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 20,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "LOW RISK"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 10,
+      "category": "relay_chain_mismatch",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 10,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 10,
+        "total_before_rounding_and_cap": 10.0
+      },
+      "dominant_contribution": "relay",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "relay-mismatch",
+      "nearest_threshold_distance": 10,
+      "reasons": [
+        "Suspicious relay-chain mismatch detected",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 10,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "REVIEW REQUIRED"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 10,
+      "category": "duplicate_relay_evidence",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 10,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 10,
+        "total_before_rounding_and_cap": 10.0
+      },
+      "dominant_contribution": "relay",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "repeated-relay-mismatch",
+      "nearest_threshold_distance": 10,
+      "reasons": [
+        "Suspicious relay-chain mismatch detected",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 10,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "REVIEW REQUIRED"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "bec_style_valid_authentication",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 0,
+        "total_before_rounding_and_cap": 0.0
+      },
+      "dominant_contribution": "none",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "authenticated-bec-language",
+      "nearest_threshold_distance": 20,
+      "reasons": [
+        "AI model signal suggests phishing-like language (supporting evidence only; excluded from numeric score).",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 0,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "REVIEW REQUIRED"
+    },
+    {
+      "actual_class": "CRITICAL",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "obvious_spoofing",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 53.84615384615385,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": -0.1538461538461604,
+        "sender_identity": 32.30769230769231,
+        "total": 86,
+        "total_before_rounding_and_cap": 86.15384615384616
+      },
+      "dominant_contribution": "authentication",
+      "expected_class": "CRITICAL",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "obvious-spoof",
+      "nearest_threshold_distance": 6,
+      "reasons": [
+        "Suspicious sender identity mismatch detected",
+        "Email authentication problems detected",
+        "AI model signal suggests phishing-like language (supporting evidence only; excluded from numeric score)."
+      ],
+      "score": 86,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "CRITICAL"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 20,
+      "category": "multiple_weak_indicators",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 5,
+        "authentication": 8.076923076923077,
+        "cap_applied": false,
+        "relay": 10,
+        "reputation": 5,
+        "rounding_and_cap_adjustment": 0.0769230769230802,
+        "sender_identity": 13.846153846153847,
+        "total": 42,
+        "total_before_rounding_and_cap": 41.92307692307692
+      },
+      "dominant_contribution": "sender_identity",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "multiple-weak-indicators",
+      "nearest_threshold_distance": 2,
+      "reasons": [
+        "Sender identity checks produced a nonzero risk signal",
+        "Reported authentication checks produced a nonzero risk signal",
+        "AI model signal suggests phishing-like language (supporting evidence only; excluded from numeric score).",
+        "Threat intelligence detected suspicious domain or IP reputation",
+        "Attachment hash has suspicious threat-intelligence detections",
+        "Suspicious relay-chain mismatch detected",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 42,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "SUSPICIOUS"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "one_strong_indicator",
+      "classification": "false_low",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 53.84615384615385,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.1538461538461533,
+        "sender_identity": 0.0,
+        "total": 54,
+        "total_before_rounding_and_cap": 53.84615384615385
+      },
+      "dominant_contribution": "authentication",
+      "expected_class": "HIGH",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "one-strong-auth-indicator",
+      "nearest_threshold_distance": 6,
+      "reasons": [
+        "Email authentication problems detected"
+      ],
+      "score": 54,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "SUSPICIOUS"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "one_strong_indicator",
+      "classification": "false_low",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": -0.1538461538461533,
+        "sender_identity": 46.15384615384615,
+        "total": 46,
+        "total_before_rounding_and_cap": 46.15384615384615
+      },
+      "dominant_contribution": "sender_identity",
+      "expected_class": "HIGH",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "one-strong-sender-indicator",
+      "nearest_threshold_distance": 6,
+      "reasons": [
+        "Suspicious sender identity mismatch detected"
+      ],
+      "score": 46,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "SUSPICIOUS"
+    },
+    {
+      "actual_class": "CRITICAL",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 30,
+      "category": "multiple_strong_forensic_failures",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 20,
+        "authentication": 37.69230769230769,
+        "cap_applied": true,
+        "relay": 10,
+        "reputation": 20,
+        "rounding_and_cap_adjustment": -20.0,
+        "sender_identity": 32.30769230769231,
+        "total": 100,
+        "total_before_rounding_and_cap": 120.0
+      },
+      "dominant_contribution": "authentication",
+      "expected_class": "CRITICAL",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "strong-evidence-stack",
+      "nearest_threshold_distance": 20,
+      "reasons": [
+        "Suspicious sender identity mismatch detected",
+        "Email authentication problems detected",
+        "Threat intelligence detected suspicious domain or IP reputation",
+        "Attachment hash has suspicious threat-intelligence detections",
+        "Suspicious relay-chain mismatch detected"
+      ],
+      "score": 100,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "CRITICAL"
+    },
+    {
+      "actual_class": "HIGH",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 35,
+      "category": "multiple_strong_forensic_failures",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 10,
+        "authentication": 21.538461538461537,
+        "cap_applied": false,
+        "relay": 10,
+        "reputation": 15,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 18.461538461538463,
+        "total": 75,
+        "total_before_rounding_and_cap": 75.0
+      },
+      "dominant_contribution": "authentication",
+      "expected_class": "HIGH",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "mixed-high-evidence",
+      "nearest_threshold_distance": 5,
+      "reasons": [
+        "Sender identity checks produced a nonzero risk signal",
+        "Reported authentication checks produced a nonzero risk signal",
+        "Threat intelligence detected suspicious domain or IP reputation",
+        "Attachment hash has suspicious threat-intelligence detections",
+        "Suspicious relay-chain mismatch detected",
+        "Some authentication checks passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 75,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "HIGH RISK"
+    },
+    {
+      "actual_class": "LOW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "threshold_near_20",
+      "classification": "false_low",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": -0.4615384615384599,
+        "sender_identity": 18.461538461538463,
+        "total": 18,
+        "total_before_rounding_and_cap": 18.46153846153846
+      },
+      "dominant_contribution": "sender_identity",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "near-low-threshold",
+      "nearest_threshold_distance": 2,
+      "reasons": [
+        "Sender identity checks produced a nonzero risk signal"
+      ],
+      "score": 18,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "LIKELY SAFE"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 5,
+      "category": "threshold_near_40",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 5,
+        "rounding_and_cap_adjustment": -0.3076923076923066,
+        "sender_identity": 32.30769230769231,
+        "total": 37,
+        "total_before_rounding_and_cap": 37.30769230769231
+      },
+      "dominant_contribution": "sender_identity",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "near-suspicious-threshold",
+      "nearest_threshold_distance": 3,
+      "reasons": [
+        "Suspicious sender identity mismatch detected",
+        "Threat intelligence detected suspicious domain or IP reputation",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 37,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "LOW RISK"
+    },
+    {
+      "actual_class": "HIGH",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "threshold_at_60",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 13.461538461538462,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.3846153846153868,
+        "sender_identity": 46.15384615384615,
+        "total": 60,
+        "total_before_rounding_and_cap": 59.61538461538461
+      },
+      "dominant_contribution": "sender_identity",
+      "expected_class": "HIGH",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "high-boundary",
+      "nearest_threshold_distance": 0,
+      "reasons": [
+        "Suspicious sender identity mismatch detected",
+        "Reported authentication checks produced a nonzero risk signal",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 60,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "HIGH RISK"
+    },
+    {
+      "actual_class": "CRITICAL",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "threshold_above_80",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 37.69230769230769,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": 0.1538461538461604,
+        "sender_identity": 46.15384615384615,
+        "total": 84,
+        "total_before_rounding_and_cap": 83.84615384615384
+      },
+      "dominant_contribution": "sender_identity",
+      "expected_class": "CRITICAL",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "critical-boundary",
+      "nearest_threshold_distance": 4,
+      "reasons": [
+        "Suspicious sender identity mismatch detected",
+        "Email authentication problems detected",
+        "Some authentication checks passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 84,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "CRITICAL"
+    },
+    {
+      "actual_class": "CRITICAL",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "bonus_saturation_and_cap",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 20,
+        "authentication": 53.84615384615385,
+        "cap_applied": true,
+        "relay": 10,
+        "reputation": 20,
+        "rounding_and_cap_adjustment": -50.0,
+        "sender_identity": 46.15384615384615,
+        "total": 100,
+        "total_before_rounding_and_cap": 150.0
+      },
+      "dominant_contribution": "authentication",
+      "expected_class": "CRITICAL",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "all-bonuses-cap",
+      "nearest_threshold_distance": 20,
+      "reasons": [
+        "Suspicious sender identity mismatch detected",
+        "Email authentication problems detected",
+        "Threat intelligence detected suspicious domain or IP reputation",
+        "Attachment hash has suspicious threat-intelligence detections",
+        "Suspicious relay-chain mismatch detected",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 100,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "CRITICAL"
+    },
+    {
+      "actual_class": "HIGH",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 0,
+      "category": "repository_demo_email",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 0,
+        "authentication": 43.07692307692307,
+        "cap_applied": false,
+        "relay": 0,
+        "reputation": 0,
+        "rounding_and_cap_adjustment": -0.3846153846153868,
+        "sender_identity": 32.30769230769231,
+        "total": 75,
+        "total_before_rounding_and_cap": 75.38461538461539
+      },
+      "dominant_contribution": "authentication",
+      "expected_class": "HIGH",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "repository-demo-test-eml",
+      "nearest_threshold_distance": 5,
+      "reasons": [
+        "Suspicious sender identity mismatch detected",
+        "Email authentication problems detected",
+        "AI model signal suggests phishing-like language (supporting evidence only; excluded from numeric score).",
+        "Authentication evidence is incomplete or inconclusive; missing or unknown results do not establish safety.",
+        "Authentication claims come from a reporter whose receiving-infrastructure association is unverified."
+      ],
+      "score": 75,
+      "source": "repository_safe_sample",
+      "verdict": "HIGH RISK"
+    },
+    {
+      "actual_class": "REVIEW",
+      "ai_numeric_contribution": 0.0,
+      "bonus_score_effect": 50,
+      "category": "cross_family_bonus_stacking",
+      "classification": "match",
+      "contributions": {
+        "ai": 0.0,
+        "attachment": 20,
+        "authentication": 0.0,
+        "cap_applied": false,
+        "relay": 10,
+        "reputation": 20,
+        "rounding_and_cap_adjustment": 0.0,
+        "sender_identity": 0.0,
+        "total": 50,
+        "total_before_rounding_and_cap": 50.0
+      },
+      "dominant_contribution": "reputation",
+      "expected_class": "REVIEW",
+      "fusion_policy_version": "validated_evidence_fusion_v2",
+      "id": "bonuses-only-stack",
+      "nearest_threshold_distance": 10,
+      "reasons": [
+        "AI model signal suggests phishing-like language (supporting evidence only; excluded from numeric score).",
+        "Threat intelligence detected suspicious domain or IP reputation",
+        "Attachment hash has suspicious threat-intelligence detections",
+        "Suspicious relay-chain mismatch detected",
+        "Authentication passed, but behavioral evidence remains suspicious. These are reported results; this does not prove account compromise."
+      ],
+      "score": 50,
+      "source": "synthetic_controlled_fixture",
+      "verdict": "SUSPICIOUS"
+    }
+  ],
+  "policy_evaluated": "validated_evidence_fusion_v2",
+  "report_schema_version": 1,
+  "scenario_count": 33,
+  "score_distribution": {
+    "0-19": 16,
+    "20-39": 6,
+    "40-59": 4,
+    "60-79": 3,
+    "80-100": 4
+  },
+  "score_statistics": {
+    "maximum": 100,
+    "mean": 31.6667,
+    "median": 20,
+    "minimum": 0,
+    "population_stddev": 30.5631
+  },
+  "sensitivity": {
+    "attachment": [
+      {
+        "bonus": 0,
+        "final_score": 0,
+        "malicious": 0,
+        "raw_detection_score": 0,
+        "suspicious": 0
+      },
+      {
+        "bonus": 5,
+        "final_score": 5,
+        "malicious": 0,
+        "raw_detection_score": 10,
+        "suspicious": 1
+      },
+      {
+        "bonus": 10,
+        "final_score": 10,
+        "malicious": 1,
+        "raw_detection_score": 20,
+        "suspicious": 0
+      },
+      {
+        "bonus": 15,
+        "final_score": 15,
+        "malicious": 2,
+        "raw_detection_score": 50,
+        "suspicious": 1
+      },
+      {
+        "bonus": 20,
+        "final_score": 20,
+        "malicious": 4,
+        "raw_detection_score": 80,
+        "suspicious": 0
+      },
+      {
+        "bonus": 20,
+        "final_score": 20,
+        "malicious": 5,
+        "raw_detection_score": 100,
+        "suspicious": 0
+      }
+    ],
+    "authentication": [
+      {
+        "input": 0,
+        "score": 0,
+        "verdict": "LIKELY SAFE"
+      },
+      {
+        "input": 10,
+        "score": 5,
+        "verdict": "LIKELY SAFE"
+      },
+      {
+        "input": 20,
+        "score": 11,
+        "verdict": "LIKELY SAFE"
+      },
+      {
+        "input": 30,
+        "score": 16,
+        "verdict": "LIKELY SAFE"
+      },
+      {
+        "input": 40,
+        "score": 22,
+        "verdict": "LOW RISK"
+      },
+      {
+        "input": 50,
+        "score": 27,
+        "verdict": "LOW RISK"
+      },
+      {
+        "input": 60,
+        "score": 32,
+        "verdict": "LOW RISK"
+      },
+      {
+        "input": 70,
+        "score": 38,
+        "verdict": "LOW RISK"
+      },
+      {
+        "input": 80,
+        "score": 43,
+        "verdict": "SUSPICIOUS"
+      },
+      {
+        "input": 90,
+        "score": 48,
+        "verdict": "SUSPICIOUS"
+      },
+      {
+        "input": 100,
+        "score": 54,
+        "verdict": "SUSPICIOUS"
+      }
+    ],
+    "relay": [
+      {
+        "bonus": 0,
+        "mismatches": 0
+      },
+      {
+        "bonus": 10,
+        "mismatches": 1
+      },
+      {
+        "bonus": 10,
+        "mismatches": 2
+      },
+      {
+        "bonus": 10,
+        "mismatches": 5
+      }
+    ],
+    "reputation": [
+      {
+        "bonus": 0,
+        "final_score": 0,
+        "malicious": 0,
+        "raw_detection_score": 0,
+        "suspicious": 0
+      },
+      {
+        "bonus": 5,
+        "final_score": 5,
+        "malicious": 0,
+        "raw_detection_score": 10,
+        "suspicious": 1
+      },
+      {
+        "bonus": 10,
+        "final_score": 10,
+        "malicious": 1,
+        "raw_detection_score": 20,
+        "suspicious": 0
+      },
+      {
+        "bonus": 15,
+        "final_score": 15,
+        "malicious": 2,
+        "raw_detection_score": 50,
+        "suspicious": 1
+      },
+      {
+        "bonus": 20,
+        "final_score": 20,
+        "malicious": 4,
+        "raw_detection_score": 80,
+        "suspicious": 0
+      },
+      {
+        "bonus": 20,
+        "final_score": 20,
+        "malicious": 5,
+        "raw_detection_score": 100,
+        "suspicious": 0
+      }
+    ],
+    "sender_identity": [
+      {
+        "input": 0,
+        "score": 0,
+        "verdict": "LIKELY SAFE"
+      },
+      {
+        "input": 10,
+        "score": 5,
+        "verdict": "LIKELY SAFE"
+      },
+      {
+        "input": 20,
+        "score": 9,
+        "verdict": "LIKELY SAFE"
+      },
+      {
+        "input": 30,
+        "score": 14,
+        "verdict": "LIKELY SAFE"
+      },
+      {
+        "input": 40,
+        "score": 18,
+        "verdict": "LIKELY SAFE"
+      },
+      {
+        "input": 50,
+        "score": 23,
+        "verdict": "LOW RISK"
+      },
+      {
+        "input": 60,
+        "score": 28,
+        "verdict": "LOW RISK"
+      },
+      {
+        "input": 70,
+        "score": 32,
+        "verdict": "LOW RISK"
+      },
+      {
+        "input": 80,
+        "score": 37,
+        "verdict": "LOW RISK"
+      },
+      {
+        "input": 90,
+        "score": 42,
+        "verdict": "SUSPICIOUS"
+      },
+      {
+        "input": 100,
+        "score": 46,
+        "verdict": "SUSPICIOUS"
+      }
+    ]
+  },
+  "target_distribution": {
+    "CRITICAL": 4,
+    "HIGH": 9,
+    "LOW": 3,
+    "REVIEW": 17
+  },
+  "verdict_distribution": {
+    "CRITICAL": 4,
+    "HIGH RISK": 3,
+    "INCONCLUSIVE": 2,
+    "LIKELY SAFE": 6,
+    "LOW RISK": 6,
+    "REVIEW REQUIRED": 8,
+    "SUSPICIOUS": 4
+  },
+  "verdict_thresholds": {
+    "critical": 80,
+    "high_risk": 60,
+    "low_risk": 20,
+    "suspicious": 40
+  },
+  "weights": {
+    "authentication": 0.5384615384615384,
+    "sender_identity": 0.46153846153846156,
+    "sum": 1,
+    "unvalidated_ai": 0
+  }
+}

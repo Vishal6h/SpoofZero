@@ -56,6 +56,8 @@ class CaseUITests(unittest.TestCase):
             self.assertIn("Fusion policy: Validated Evidence v2", visible)
             self.assertIn("AI numeric contribution: 0 points", visible)
             self.assertIn("not a statistically calibrated probability", visible)
+            self.assertIn("Forensic Score Breakdown", visible)
+            self.assertIn("Evidence contributions plus the explicit rounding / score-cap", visible)
             labels = [tab.label for tab in app.tabs]
             for label in ("Overview", "Email Forensics", "Threat Intelligence", "Attachments", "Raw Evidence", "Campaign / Cases"):
                 self.assertIn(label, labels)

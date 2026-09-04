@@ -5,7 +5,9 @@ import streamlit as st
 
 from backend.analyze import analyze_email
 from frontend.case_ui import render_case_workspace, render_case_report
-from frontend.ai_ui import ai_evidence_label, render_ai_card, render_ai_details
+from frontend.ai_ui import (
+    ai_evidence_label, render_ai_card, render_ai_details, score_breakdown_rows,
+)
 
 
 # ============================================================
@@ -654,6 +656,24 @@ if result:
 
                 hide_index=True,
                 width="stretch"
+            )
+
+        score_breakdown = score_breakdown_rows(assessment)
+        if score_breakdown:
+            st.markdown(
+                '<div class="section-title">Forensic Score Breakdown</div>',
+                unsafe_allow_html=True
+            )
+            st.dataframe(
+                score_breakdown, hide_index=True, width="stretch",
+                column_config={
+                    "Contribution": st.column_config.NumberColumn(format="%.4f")
+                },
+            )
+            st.caption(
+                "Evidence contributions plus the explicit rounding / score-cap "
+                "adjustment equal the stored final score. AI remains visible here "
+                "and contributes 0 points under the current policy."
             )
 
 

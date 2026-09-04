@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from ml.model_policy import FUSION_NOTE
 from backend.fusion_policy import (
     CURRENT_FUSION_POLICY, LEGACY_FUSION_V1, V2_NOTE,
-    bounded_signal, calculate_base, valid_number,
+    VERDICT_THRESHOLDS, bounded_signal, calculate_base, valid_number,
 )
 
 
@@ -120,10 +120,18 @@ def calculate_final_risk(
         reasons.append(
             "Suspicious sender identity mismatch detected"
         )
+    elif sender_score > 0:
+        reasons.append(
+            "Sender identity checks produced a nonzero risk signal"
+        )
 
     if auth_score >= 50:
         reasons.append(
             "Email authentication problems detected"
+        )
+    elif auth_score > 0:
+        reasons.append(
+            "Reported authentication checks produced a nonzero risk signal"
         )
 
     if ai_score >= 50:
@@ -225,6 +233,7 @@ def calculate_final_risk(
            for f in authentication.get("findings", [])):
         reasons.append("Reported authentication identities contain alignment differences; inspect the per-identity evidence.")
 
+    total_before_rounding_and_cap = final_score
     final_score = min(
         round(final_score),
         100
@@ -233,13 +242,13 @@ def calculate_final_risk(
     if policy_version == CURRENT_FUSION_POLICY:
         final_score = max(0, final_score)
 
-    if final_score >= 80:
+    if final_score >= VERDICT_THRESHOLDS["critical"]:
         verdict = "CRITICAL"
-    elif final_score >= 60:
+    elif final_score >= VERDICT_THRESHOLDS["high_risk"]:
         verdict = "HIGH RISK"
-    elif final_score >= 40:
+    elif final_score >= VERDICT_THRESHOLDS["suspicious"]:
         verdict = "SUSPICIOUS"
-    elif final_score >= 20:
+    elif final_score >= VERDICT_THRESHOLDS["low_risk"]:
         verdict = "LOW RISK"
     elif behavioral_finding:
         verdict = "REVIEW REQUIRED"
@@ -263,6 +272,20 @@ def calculate_final_risk(
         "base_weights": base["base_weights"],
         "base_contributions": base["base_contributions"],
         "base_score_before_bonuses": base["base_score"],
+        "verdict_thresholds": dict(VERDICT_THRESHOLDS),
+        "contributions": {
+            "sender_identity": base["base_contributions"]["sender_identity"],
+            "authentication": base["base_contributions"]["authentication"],
+            "reputation": reputation_bonus,
+            "attachment": attachment_bonus,
+            "relay": relay_bonus,
+            "ai": ai_points,
+            "total_before_rounding_and_cap": total_before_rounding_and_cap,
+            "rounding_and_cap_adjustment": final_score - total_before_rounding_and_cap,
+            "total": final_score,
+            "cap_applied": round(total_before_rounding_and_cap) > 100
+                           or round(total_before_rounding_and_cap) < 0,
+        },
 
         "evidence_scores": {
             "sender_identity": round(sender_score, 2),

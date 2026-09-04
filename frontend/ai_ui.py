@@ -99,6 +99,66 @@ def ai_evidence_label(assessment):
     return "AI model signal" if included or not disclosure["current"] else "AI model signal (0 numeric points)"
 
 
+def score_breakdown_rows(assessment):
+    """Build display values which reconcile without changing a stored score."""
+    assessment = assessment if isinstance(assessment, Mapping) else {}
+    contributions = assessment.get("contributions")
+    final = assessment.get("risk_score")
+    if (
+        not isinstance(contributions, Mapping)
+        or isinstance(final, bool)
+        or not isinstance(final, Real)
+    ):
+        return []
+    keys = (
+        ("sender_identity", "Sender identity"),
+        ("authentication", "Authentication"),
+        ("reputation", "Domain/IP reputation bonus"),
+        ("attachment", "Attachment reputation bonus"),
+        ("relay", "Relay-chain bonus"),
+        ("ai", "AI model signal"),
+    )
+    values = []
+    try:
+        for key, label in keys:
+            value = contributions.get(key)
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, Real)
+                or not math.isfinite(value)
+            ):
+                return []
+            values.append((label, round(float(value), 4)))
+        final = float(final)
+        raw = contributions.get("total_before_rounding_and_cap")
+        adjustment = contributions.get("rounding_and_cap_adjustment")
+        stored_total = contributions.get("total")
+        ledger = (raw, adjustment, stored_total)
+        if not math.isfinite(final) or any(
+            isinstance(value, bool) or not isinstance(value, Real) or not math.isfinite(value)
+            for value in ledger
+        ):
+            return []
+        exact_parts = sum(contributions[key] for key, _ in keys)
+        if (
+            abs(exact_parts - raw) > 1e-9
+            or abs(raw + adjustment - final) > 1e-9
+            or stored_total != final
+        ):
+            return []
+    except (OverflowError, TypeError, ValueError):
+        return []
+    # This includes ordinary score rounding, the 0-100 cap, and display rounding.
+    adjustment = round(final - sum(value for _, value in values), 4)
+    rows = [{"Evidence": label, "Contribution": value} for label, value in values]
+    rows.append({
+        "Evidence": "Rounding / score-cap adjustment",
+        "Contribution": adjustment,
+    })
+    rows.append({"Evidence": "Final forensic risk score", "Contribution": final})
+    return rows
+
+
 def render_ai_details(ai, assessment):
     metadata = describe_ai_output(ai)
     disclosure = fusion_disclosure(assessment)

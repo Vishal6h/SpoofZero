@@ -246,3 +246,21 @@ an EML through the main analyzer produces a fresh v2 result; storing both versio
 requires separate cases under the unchanged raw-SHA-256 case key. Campaign
 correlation remains based on indicators and infrastructure, independent of the
 risk score. See [AI fusion safety](ai-fusion-safety.md).
+
+
+## Risk Score Calibration & Evidence Weighting
+
+Protected reference: `7a239173cf28f16551a8571ab6abbd16cae21e57`.
+
+`backend/risk_calibration.py` validates and evaluates the versioned, structured
+offline corpus in `data/calibration/fusion_v2_scenarios.json`. Its deterministic
+output is frozen in `data/calibration/fusion_v2_results.json` and checked for
+exact reproducibility. This evaluation layer calls the production fusion engine
+but has no production runtime or network dependency.
+
+`backend/fusion_policy.py` centralizes the unchanged 20/40/60/80 thresholds.
+`fusion_engine.py` adds a structured contribution ledger and preserves the
+existing v2 arithmetic. `frontend/ai_ui.py` prepares display-safe rows whose
+components plus explicit rounding/cap adjustment equal the stored final score;
+snapshots without contribution metadata are not recalculated. The existing raw
+evidence table remains available. See [risk score calibration](risk-score-calibration.md).

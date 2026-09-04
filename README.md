@@ -224,3 +224,17 @@ A validated model does not automatically receive weight. Any future contribution
 requires a separate model-bound, hash-bound, evaluated and explicitly approved
 fusion authorization. No current research candidate is active or authorized.
 See [the complete fusion policy and compatibility notes](docs/ai-fusion-safety.md).
+
+
+## Risk Score Calibration & Evidence Weighting
+
+A reproducible 33-scenario offline engineering corpus now exercises the current
+`validated_evidence_fusion_v2` formula, thresholds, bonus caps, duplicate
+handling, sensitivity, and historical compatibility. The evaluation kept all
+numeric policy settings unchanged. Fresh results add an exact contribution
+breakdown in the dashboard; historical case scores remain stored and displayed
+without recalculation. Experimental AI continues contributing 0 points.
+
+See [the complete calibration report](docs/risk-score-calibration.md). The
+reported scenario matches and misses describe controlled engineering targets,
+not statistical accuracy or phishing probability.

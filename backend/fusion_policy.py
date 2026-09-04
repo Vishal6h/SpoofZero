@@ -11,6 +11,7 @@ import json
 import math
 from numbers import Real
 import re
+from types import MappingProxyType
 
 from ml.model_policy import activation_eligibility, describe_ai_output
 
@@ -19,6 +20,9 @@ LEGACY_FUSION_V1 = "legacy_fusion_v1"
 CURRENT_FUSION_POLICY = "validated_evidence_fusion_v2"
 SENDER_SHARE = 6 / 13
 AUTHENTICATION_SHARE = 7 / 13
+VERDICT_THRESHOLDS = MappingProxyType({
+    "low_risk": 20, "suspicious": 40, "high_risk": 60, "critical": 80,
+})
 V2_NOTE = (
     "Engineering risk weights, not statistically calibrated probabilities. "
     "Unvalidated AI is displayed as supporting evidence and contributes no numeric points."
