@@ -10,11 +10,13 @@ import math
 import re
 import unicodedata
 
-from backend.fusion_policy import snapshot_policy_version
+from backend.fusion_policy import (
+    snapshot_policy_version, has_unified_assessment, claims_unified_assessment,
+)
 from ml.model_policy import describe_ai_output
 
 REPORT_SCHEMA = "spoofzero.forensic-report"
-REPORT_VERSION = 2
+REPORT_VERSION = 3
 GEOLOCATION_LIMITATION = (
     "IP geolocation represents approximate infrastructure location and does not "
     "identify a person's physical location."
@@ -148,6 +150,10 @@ def compare_analyses(left_record, right_record):
         _change("Forensic risk score", la.get("risk_score"), ra.get("risk_score")),
         _change("Verdict", la.get("verdict"), ra.get("verdict")),
         _change("Fusion policy", snapshot_policy_version(la), snapshot_policy_version(ra)),
+        _change("Risk level", la.get("risk_level"), ra.get("risk_level")),
+        _change("Evidence confidence", _safe_copy(la.get("evidence_confidence")), _safe_copy(ra.get("evidence_confidence"))),
+        _change("Evidence coverage", _safe_copy(la.get("evidence_coverage")), _safe_copy(ra.get("evidence_coverage"))),
+        _change("Review required", la.get("review_required"), ra.get("review_required")),
         _change("Visible sender", (left.get("email") or {}).get("from"),
                 (right.get("email") or {}).get("from")),
     ]
@@ -215,12 +221,22 @@ def _record_for_report(record, include_sensitive, sensitive_bodies):
     version = int(record.get("version") or 1)
     reasons = assessment.get("reasons") or []
     verdict = str(assessment.get("verdict") or "UNKNOWN")
-    score = assessment.get("risk_score")
+    unified = has_unified_assessment(assessment)
+    invalid = claims_unified_assessment(assessment) and not unified
+    score = None if invalid else assessment.get("risk_score")
     summary = (
         f"Analysis #{version} recorded forensic risk score {score}/100 with verdict "
         f"{verdict} under {snapshot_policy_version(assessment)}. "
         f"{len(reasons)} documented reason(s) require investigator interpretation."
     )
+    if unified:
+        summary = (
+            f"Analysis #{version} recorded SpoofZero Threat Score {score}/100, "
+            f"risk level {assessment['risk_level']}, under {assessment['scoring_version']}. "
+            "Evidence confidence and coverage describe reliability and availability, not certainty of safety."
+        )
+    elif invalid:
+        summary = "This snapshot has inconsistent unified assessment metadata; no canonical score is presented."
     result = {
         "analysis_id": analysis_id,
         "analysis_version": version,
@@ -238,6 +254,20 @@ def _record_for_report(record, include_sensitive, sensitive_bodies):
             "fusion_policy_version": snapshot_policy_version(assessment),
             "contribution_ledger": _safe_copy(assessment.get("contributions") or {}),
             "reasons": _safe_copy(reasons),
+            "assessment_contract_status": "RECORDED" if unified else "INVALID" if invalid else "NOT_RECORDED",
+            "threat_score": assessment.get("threat_score") if unified else None,
+            "risk_level": assessment.get("risk_level") if unified else None,
+            "scoring_version": assessment.get("scoring_version") if unified else None,
+            "evidence_confidence": _safe_copy(assessment.get("evidence_confidence")) if unified else None,
+            "evidence_coverage": _safe_copy(assessment.get("evidence_coverage")) if unified else None,
+            "score_breakdown": _safe_copy(assessment.get("score_breakdown")) if unified else None,
+            "review_required": assessment.get("review_required") if unified else None,
+            "review_reasons": _safe_copy(assessment.get("review_reasons")) if unified else None,
+            "normalized_findings": _safe_copy(assessment.get("normalized_findings")) if unified else None,
+            "strongest_findings": _safe_copy([
+                finding for finding in assessment.get("normalized_findings") or []
+                if isinstance(finding, Mapping) and finding.get("finding_id") in (assessment.get("strongest_findings") or [])
+            ]) if unified else None,
         },
         "sender_identity": _safe_copy(analysis.get("sender_identity") or {}),
         "authentication": _safe_copy(analysis.get("authentication") or {}),
@@ -314,6 +344,8 @@ def build_forensic_report(case, records, correlation=None, *, generated_at=None,
             "Authentication results are parsed reported evidence and are not independent cryptographic verification.",
             "Threat-intelligence and geolocation entries describe the stored lookup snapshot and may change over time.",
             "This report is an investigative aid and requires human interpretation.",
+            "A LOW score is not a safety guarantee. Evidence confidence is separate from threat severity.",
+            "Unified fields are absent for historical snapshots; historical scores and bands are not recalculated.",
         ],
     }
     report["integrity"] = _integrity(report)
@@ -379,13 +411,43 @@ def report_html(report):
                                ("to", "To"), ("date", "Reported email date"))
         )
         ai = item["ai_signal"]
+        unified_html = ""
+        risk_label = risk["verdict"]
+        score_label = "SpoofZero Threat Score" if risk.get("assessment_contract_status") == "RECORDED" else "Forensic Risk Score"
+        score_text = "Unavailable" if risk.get("assessment_contract_status") == "INVALID" else f"{risk['score']}/100"
+        if risk.get("assessment_contract_status") == "RECORDED":
+            risk_label = risk["risk_level"]
+            confidence = risk.get("evidence_confidence") or {}
+            coverage = risk.get("evidence_coverage") or {}
+            unified_html = (
+                "<h3>Unified assessment</h3>"
+                f"<p>Scoring version: {escape(str(risk.get('scoring_version')))} | "
+                f"Evidence Confidence: {escape(str(confidence.get('level') or 'UNCLASSIFIED'))} | "
+                f"Evidence Coverage: {escape(str(coverage.get('status') or 'NOT RECORDED'))} | "
+                f"Review: {'REQUIRED' if risk.get('review_required') else 'NOT FLAGGED'}</p>"
+                "<p>A LOW score is not a safety guarantee. Confidence describes assertion reliability, not threat severity.</p>"
+                "<details open><summary>Strongest Findings</summary><pre>"
+                + _json_block(risk.get("strongest_findings") or []) + "</pre></details>"
+                "<details><summary>Score Breakdown / Evidence Coverage</summary><pre>"
+                + _json_block({"breakdown": risk.get("score_breakdown"), "coverage": coverage})
+                + "</pre></details>"
+                "<details><summary>Normalized findings and confidence</summary><pre>"
+                + _json_block(risk.get("normalized_findings") or []) + "</pre></details>"
+            )
+        else:
+            unified_html = (
+                "<p>Unified risk level, confidence and coverage: "
+                + ("invalid metadata" if risk.get("assessment_contract_status") == "INVALID" else "not recorded in this historical snapshot")
+                + ". No historical score was recalculated.</p>"
+            )
         analyses.append(f"""<section class="analysis">
           <h2>Analysis #{item['analysis_version']} {"(latest)" if item['latest'] else "(historical)"}</h2>
           <p class="meta">ID {escape(item['analysis_id'])} |
           Evidence file {escape(item['filename'])} | Recorded {escape(item['analyzed_at'])}
           | Raw EML SHA-256 {escape(item['raw_email_sha256'])}</p>
-          <div class="risk"><strong>{escape(str(risk['score']))}/100</strong>
-          <span>{escape(risk['verdict'])}</span></div>
+          <div class="risk"><span>{score_label}</span><strong>{escape(score_text)}</strong>
+          <span>{escape(risk_label)}</span></div>
+          {unified_html}
           <h3>Executive summary</h3><p>{escape(item['executive_summary'])}</p>
           <table>{email_rows}</table>
           <p class="ai-note">AI signal: {escape(str(ai['phishing_score']))} |

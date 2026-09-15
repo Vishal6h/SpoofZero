@@ -17,7 +17,20 @@ from ml.model_policy import activation_eligibility, describe_ai_output
 
 
 LEGACY_FUSION_V1 = "legacy_fusion_v1"
-CURRENT_FUSION_POLICY = "validated_evidence_fusion_v2"
+VALIDATED_FUSION_V2 = "validated_evidence_fusion_v2"
+CURRENT_FUSION_POLICY = "validated_evidence_fusion_v3"
+DETERMINISTIC_POLICIES = (VALIDATED_FUSION_V2, CURRENT_FUSION_POLICY)
+ASSESSMENT_SCHEMA_VERSION = 1
+RISK_LEVEL_BANDS = ((20, "LOW"), (40, "GUARDED"), (60, "MEDIUM"),
+                   (80, "HIGH"), (100, "CRITICAL"))
+CONTRIBUTION_CATEGORIES = (
+    ("sender_identity", "IDENTITY", "Identity Risk"),
+    ("authentication", "AUTHENTICATION", "Authentication Risk"),
+    ("reputation", "REPUTATION", "Domain/IP Reputation Risk"),
+    ("attachment", "ATTACHMENT", "Attachment Reputation Risk"),
+    ("relay", "RELAY", "Relay/Infrastructure Anomaly Risk"),
+    ("ai", "ML", "ML Supporting Evidence"),
+)
 SENDER_SHARE = 6 / 13
 AUTHENTICATION_SHARE = 7 / 13
 VERDICT_THRESHOLDS = MappingProxyType({
@@ -66,8 +79,8 @@ class AIWeightAuthorization:
     fusion_policy_version: str = CURRENT_FUSION_POLICY
 
     def __post_init__(self):
-        if self.fusion_policy_version != CURRENT_FUSION_POLICY:
-            raise ValueError("AI weight authorization must target the current fusion policy")
+        if self.fusion_policy_version not in DETERMINISTIC_POLICIES:
+            raise ValueError("AI weight authorization must target a recognized deterministic fusion policy")
         for value in (self.model_version, self.approval_reference, self.evaluation_reference):
             if not isinstance(value, str) or not value.strip():
                 raise ValueError("Model version, approval and evaluation references are required")
@@ -81,7 +94,8 @@ class AIWeightAuthorization:
             raise ValueError("An explicit supporting AI weight must be greater than 0 and below 0.40")
 
 
-def ai_numeric_policy(ai_analysis, *, model_metadata=None, authorization=None):
+def ai_numeric_policy(ai_analysis, *, model_metadata=None, authorization=None,
+                      policy_version=CURRENT_FUSION_POLICY):
     """Fail closed unless validation AND a separate exact weight approval agree."""
     ai = ai_analysis if isinstance(ai_analysis, Mapping) else {}
     result = {
@@ -112,7 +126,8 @@ def ai_numeric_policy(ai_analysis, *, model_metadata=None, authorization=None):
         result["reason"] = "AI scoring authorization or model metadata is malformed."
         return result
     if (
-        authorization.model_version != model_metadata.get("model_version")
+        authorization.fusion_policy_version != policy_version
+        or authorization.model_version != model_metadata.get("model_version")
         or authorization.model_metadata_sha256 != fingerprint
     ):
         result["reason"] = "AI scoring authorization does not match the reviewed model/version."
@@ -152,9 +167,10 @@ def calculate_base(sender_score, auth_score, ai_score, ai_analysis, *,
             "add reputation, attachment and relay bonuses, round, then cap at 100. "
             "This historical score may include unvalidated AI."
         )
-    elif policy_version == CURRENT_FUSION_POLICY:
+    elif policy_version in DETERMINISTIC_POLICIES:
         decision = ai_numeric_policy(
-            ai_analysis, model_metadata=model_metadata, authorization=authorization
+            ai_analysis, model_metadata=model_metadata, authorization=authorization,
+            policy_version=policy_version,
         )
         weight = decision["weight"]
         weights = {
@@ -187,7 +203,7 @@ def snapshot_policy_version(assessment):
     """Identify a saved policy without inferring or recomputing its score."""
     assessment = assessment if isinstance(assessment, Mapping) else {}
     version = assessment.get("fusion_policy_version")
-    if version in (CURRENT_FUSION_POLICY, LEGACY_FUSION_V1):
+    if version in (*DETERMINISTIC_POLICIES, LEGACY_FUSION_V1):
         return version
     if version is not None:
         return "UNKNOWN SNAPSHOT"
@@ -195,3 +211,45 @@ def snapshot_policy_version(assessment):
     if isinstance(context, Mapping) and context.get("calculation_version") == LEGACY_FUSION_V1:
         return LEGACY_FUSION_V1
     return "LEGACY SNAPSHOT"
+
+
+def risk_level_for_score(score):
+    """Classify an already rounded canonical score; never round or coerce here."""
+    if not valid_number(score) or not 0 <= score <= 100 or int(score) != score:
+        raise ValueError("Threat score must be a finite integer from 0 to 100")
+    return next(label for upper, label in RISK_LEVEL_BANDS if score <= upper)
+
+
+def claims_unified_assessment(assessment):
+    """Either v3 marker requires validation; a conflicting marker cannot downgrade it."""
+    return isinstance(assessment, Mapping) and any(
+        assessment.get(key) == CURRENT_FUSION_POLICY
+        for key in ("fusion_policy_version", "scoring_version")
+    )
+
+
+def has_unified_assessment(assessment):
+    """Validate stored v3 score aliases/bands without changing historical results."""
+    if not isinstance(assessment, Mapping):
+        return False
+    if (assessment.get("fusion_policy_version") != CURRENT_FUSION_POLICY
+            or assessment.get("scoring_version") != CURRENT_FUSION_POLICY
+            or type(assessment.get("assessment_schema_version")) is not int
+            or assessment["assessment_schema_version"] != ASSESSMENT_SCHEMA_VERSION):
+        return False
+    if (not isinstance(assessment.get("normalized_findings"), list)
+            or not all(isinstance(f, Mapping) for f in assessment["normalized_findings"])
+            or not isinstance(assessment.get("score_breakdown"), Mapping)
+            or not isinstance(assessment.get("evidence_confidence"), Mapping)
+            or not isinstance(assessment.get("evidence_coverage"), Mapping)
+            or type(assessment.get("review_required")) is not bool):
+        return False
+    score = assessment.get("threat_score")
+    alias = assessment.get("risk_score")
+    try:
+        return (valid_number(alias) and alias == score
+                and valid_number(assessment["score_breakdown"].get("total"))
+                and assessment["score_breakdown"]["total"] == score
+                and assessment.get("risk_level") == risk_level_for_score(score))
+    except (ValueError, TypeError, OverflowError):
+        return False

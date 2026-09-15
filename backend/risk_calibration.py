@@ -7,7 +7,7 @@ import re
 from statistics import mean, median, pstdev
 
 from .analyzers.fusion_engine import calculate_final_risk
-from .fusion_policy import CURRENT_FUSION_POLICY, VERDICT_THRESHOLDS
+from .fusion_policy import VALIDATED_FUSION_V2, VERDICT_THRESHOLDS
 from ml.model_policy import legacy_output_metadata
 
 
@@ -20,7 +20,7 @@ ALLOWED_SOURCES = {"synthetic_controlled_fixture", "repository_safe_sample"}
 
 def load_corpus(path=DEFAULT_CORPUS):
     data = json.loads(Path(path).read_text(encoding="utf-8"))
-    if data.get("schema_version") != 1 or data.get("fusion_policy") != CURRENT_FUSION_POLICY:
+    if data.get("schema_version") != 1 or data.get("fusion_policy") != VALIDATED_FUSION_V2:
         raise ValueError("Unsupported calibration corpus schema or fusion policy")
     scenarios = data.get("scenarios")
     if not isinstance(scenarios, list) or data.get("scenario_count") != len(scenarios):
@@ -126,8 +126,8 @@ def outcome_class(assessment):
 
 
 def evaluate_scenario(item):
-    result = calculate_final_risk(**scenario_arguments(item))
-    without_bonuses = calculate_final_risk(**scenario_arguments(item, include_bonuses=False))
+    result = calculate_final_risk(**scenario_arguments(item), policy_version=VALIDATED_FUSION_V2)
+    without_bonuses = calculate_final_risk(**scenario_arguments(item, include_bonuses=False), policy_version=VALIDATED_FUSION_V2)
     contributions = result["contributions"]
     displayed = sum(contributions[key] for key in (
         "sender_identity", "authentication", "reputation", "attachment", "relay", "ai"
@@ -196,6 +196,7 @@ def _signal_sensitivity(name):
             {"risk_score": authentication, "findings": []},
             {"hops": []},
             {"phishing_probability": 100, **legacy_output_metadata()},
+            policy_version=VALIDATED_FUSION_V2,
         )
         rows.append({"input": value, "score": result["risk_score"],
                      "verdict": result["verdict"]})
@@ -215,7 +216,7 @@ def _bonus_sensitivity(kind):
             "reputation": _reputation([item]) if kind == "reputation" else {},
             "attachment_reputation": _attachments([item]) if kind == "attachment" else [],
         }
-        result = calculate_final_risk(**kwargs)
+        result = calculate_final_risk(**kwargs, policy_version=VALIDATED_FUSION_V2)
         rows.append({
             "malicious": malicious, "suspicious": suspicious,
             "raw_detection_score": min(100, malicious * 20 + suspicious * 10),
@@ -242,7 +243,7 @@ def build_report(corpus=None):
         "report_schema_version": 1,
         "corpus_id": corpus["corpus_id"],
         "scenario_count": len(outcomes),
-        "policy_evaluated": CURRENT_FUSION_POLICY,
+        "policy_evaluated": VALIDATED_FUSION_V2,
         "calibration_claim": "Engineering scenario evaluation only; not statistical probability calibration.",
         "weights": {
             "sender_identity": 6 / 13,
@@ -273,6 +274,7 @@ def build_report(corpus=None):
                     {"risk_score": 0}, {"risk_score": 0, "findings": []},
                     {"hops": [{"chain_status": "MISMATCH"}] * count},
                     {"phishing_probability": 100, **legacy_output_metadata()},
+                    policy_version=VALIDATED_FUSION_V2,
                 )["relay_bonus"]}
                 for count in (0, 1, 2, 5)
             ],

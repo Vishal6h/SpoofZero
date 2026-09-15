@@ -15,19 +15,19 @@ from backend.case_reporting import (
 )
 from backend.case_store import CaseStore, DB_SCHEMA_VERSION
 from backend.analyzers.campaign_correlator import correlate_emails
-from backend.fusion_policy import CURRENT_FUSION_POLICY, LEGACY_FUSION_V1
+from backend.fusion_policy import VALIDATED_FUSION_V2, LEGACY_FUSION_V1
 from ml.model_policy import legacy_output_metadata
 
 
 def snapshot(email_id, *, score=42, verdict="SUSPICIOUS",
-             policy=CURRENT_FUSION_POLICY, sender="one@alpha.test",
+             policy=VALIDATED_FUSION_V2, sender="one@alpha.test",
              urls=(), domains=(), ips=(), attachment_hashes=(), subject="Example"):
     ai = {
         "phishing_probability": 58.05,
         "verdict": "SUSPICIOUS",
         **legacy_output_metadata(),
     }
-    ai_points = 0 if policy == CURRENT_FUSION_POLICY else 20.3175
+    ai_points = 0 if policy == VALIDATED_FUSION_V2 else 20.3175
     return {
         "email": {
             "from": sender, "to": "analyst@example.test", "subject": subject,

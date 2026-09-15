@@ -15,6 +15,7 @@ import sqlite3
 
 from .input_safety import safe_display_text, safe_evidence_filename
 from .storage_privacy import prepare_analysis_for_storage
+from .fusion_policy import RISK_LEVEL_BANDS, has_unified_assessment, claims_unified_assessment
 from uuid import uuid4
 
 DB_SCHEMA_VERSION = 1
@@ -204,8 +205,10 @@ class CaseStore:
             connection.execute("UPDATE cases SET archived=?, updated_at=? WHERE case_id=?",
                                (int(archived), utc_now(), case_id))
 
-    def list_cases(self, *, query="", verdict=None, sender="", date_from=None,
+    def list_cases(self, *, query="", verdict=None, risk_level=None, sender="", date_from=None,
                    date_to=None, campaign=None, sort="newest", include_archived=False):
+        if risk_level is not None and risk_level not in {label for _, label in RISK_LEVEL_BANDS}:
+            raise ValueError("Unsupported risk level")
         if sort not in {"newest", "oldest", "highest_risk", "recently_updated"}:
             raise ValueError("Unsupported case sort")
         start = date.fromisoformat(str(date_from)) if date_from else None
@@ -235,6 +238,12 @@ class CaseStore:
                 continue
             if verdict and not any(
                 r["analysis"].get("final_assessment", {}).get("verdict") == verdict for r in history
+            ):
+                continue
+            if risk_level is not None and not any(
+                has_unified_assessment(r["analysis"].get("final_assessment"))
+                and r["analysis"]["final_assessment"]["risk_level"] == risk_level
+                for r in history
             ):
                 continue
             if sender and not any(
@@ -304,6 +313,9 @@ class CaseStore:
                      analysis_id=None, analyzed_at=None, privacy_safe=False):
         if not isinstance(analysis, dict):
             raise ValueError("Analysis snapshot must be a mapping")
+        assessment = analysis.get("final_assessment") or {}
+        if claims_unified_assessment(assessment) and not has_unified_assessment(assessment):
+            raise ValueError("Unified assessment score aliases, risk band or version are inconsistent")
         analysis = prepare_analysis_for_storage(analysis, privacy_safe=privacy_safe)
         filename = safe_evidence_filename(filename or "email.eml")
         email_id = (analysis.get("email") or {}).get("sha256") or ""

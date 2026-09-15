@@ -217,7 +217,7 @@ class CaseStorageAndBatchTests(unittest.TestCase):
             attachment_result = analyze_email("data/samples/attachment_test.eml")
         self.assertEqual(result["final_assessment"]["risk_score"], 75)
         self.assertEqual(result["ai_analysis"]["phishing_probability"], 58.05)
-        self.assertEqual(result["final_assessment"]["fusion_policy_version"], "validated_evidence_fusion_v2")
+        self.assertEqual(result["final_assessment"]["fusion_policy_version"], "validated_evidence_fusion_v3")
         self.assertFalse(result["final_assessment"]["ai_included_in_numeric_score"])
         self.assertEqual(result["relay_trace"]["hop_count"], 3)
         self.assertEqual(result["email"]["sha256"], sha256(Path("data/samples/test.eml").read_bytes()).hexdigest())

@@ -137,7 +137,7 @@ class DemoAndReadinessTests(unittest.TestCase):
         self.assertEqual(result["final_assessment"]["risk_score"], 75)
         self.assertEqual(
             result["final_assessment"]["fusion_policy_version"],
-            "validated_evidence_fusion_v2",
+            "validated_evidence_fusion_v3",
         )
         self.assertEqual(result["final_assessment"]["ai_numeric_contribution"], 0.0)
         self.assertFalse(result["final_assessment"]["ai_included_in_numeric_score"])

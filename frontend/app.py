@@ -23,6 +23,7 @@ from backend.version import VERSION_LABEL
 from frontend.case_ui import render_case_workspace, render_case_report
 from frontend.ai_ui import (
     ai_evidence_label, render_ai_card, render_ai_details, score_breakdown_rows,
+    assessment_overview, render_assessment_details, risk_level_class,
 )
 
 
@@ -231,6 +232,9 @@ st.markdown("""
         color: #70dda3;
     }
 
+    .verdict-guarded { color: #91c9ef; }
+    .verdict-unknown { color: #a6b2bc; }
+
     /* Reason panel */
     .reason-box {
         border-left: 3px solid #4db8ff;
@@ -321,7 +325,8 @@ def render_html(content):
 
 def card(label, value, note="", value_class=""):
     css = value_class if value_class in {
-        "", "verdict-critical", "verdict-high", "verdict-suspicious", "verdict-safe"
+        "", "verdict-critical", "verdict-high", "verdict-suspicious", "verdict-safe",
+        "verdict-guarded", "verdict-unknown"
     } else ""
     render_html(
         f"""
@@ -346,7 +351,9 @@ def verdict_class(verdict):
     if verdict in ("SUSPICIOUS", "REVIEW REQUIRED", "INCONCLUSIVE"):
         return "verdict-suspicious"
 
-    return "verdict-safe"
+    if verdict in ("LIKELY SAFE", "LOW RISK"):
+        return "verdict-safe"
+    return "verdict-unknown"
 
 
 def auth_badge(value):
@@ -600,12 +607,13 @@ if result:
         unsafe_allow_html=True
     )
 
+    overview = assessment_overview(assessment)
     c1, c2, c3, c4 = st.columns(4)
 
     with c1:
         card(
-            "Forensic Risk Score",
-            f'{assessment.get("risk_score", 0)}/100',
+            "SpoofZero Threat Score" if overview["unified"] else "Forensic Risk Score",
+            overview["score"],
             "Deterministic evidence assessment"
         )
 
@@ -616,10 +624,11 @@ if result:
         )
 
         card(
-            "Verdict",
-            verdict,
-            "SpoofZero final assessment",
-            verdict_class(verdict)
+            "Risk Level" if overview["unified"] else "Historical Verdict",
+            overview["risk_level"] if overview["unified"] else "UNKNOWN" if overview["invalid"] else verdict,
+            "Numeric risk band; review status is separate" if overview["unified"] else "Stored forensic assessment",
+            risk_level_class(overview["risk_level"]) if overview["unified"] else
+            "verdict-unknown" if overview["invalid"] else verdict_class(verdict)
         )
 
     with c3:
@@ -636,9 +645,17 @@ if result:
         )
 
 
+    if overview["unified"] and verdict in ("REVIEW REQUIRED", "INCONCLUSIVE"):
+        render_html(
+            f'<p class="verdict-suspicious"><strong>{verdict}</strong> '
+            '— retained investigative status; interpret alongside the numeric risk band.</p>'
+        )
+
     # --------------------------------------------------------
     # EMAIL IDENTITY BAR
     # --------------------------------------------------------
+
+    render_assessment_details(assessment)
 
     email_info = result.get(
         "email",
@@ -698,7 +715,7 @@ if result:
         else:
 
             st.success(
-                "No major threat indicators were detected."
+                "No positive numeric indicators were recorded. Review evidence availability and confidence."
             )
 
 

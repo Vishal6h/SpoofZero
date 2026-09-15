@@ -1,5 +1,6 @@
 """Offline validation of the fusion calibration corpus and frozen analysis."""
 import copy
+from functools import partial
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -9,10 +10,10 @@ from unittest.mock import patch
 from backend.analyze import analyze_email
 
 from backend.analyzers.campaign_correlator import correlate_emails
-from backend.analyzers.fusion_engine import calculate_final_risk
+from backend.analyzers.fusion_engine import calculate_final_risk as calculate_versioned_risk
 from backend.case_store import CaseStore
 from backend.fusion_policy import (
-    CURRENT_FUSION_POLICY, LEGACY_FUSION_V1, VERDICT_THRESHOLDS,
+    VALIDATED_FUSION_V2, LEGACY_FUSION_V1, VERDICT_THRESHOLDS,
 )
 from backend.risk_calibration import (
     DEFAULT_CORPUS, build_report, evaluate_scenario, load_corpus, outcome_class,
@@ -22,6 +23,9 @@ from ml.model_policy import legacy_output_metadata
 from test_campaign_correlation import analysis, record
 from frontend.ai_ui import score_breakdown_rows
 
+
+# These are frozen v2 policy regressions even after the application's default changes.
+calculate_final_risk = partial(calculate_versioned_risk, policy_version=VALIDATED_FUSION_V2)
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "data/calibration/fusion_v2_results.json"
@@ -123,7 +127,7 @@ class CalibrationBehaviorTests(unittest.TestCase):
                 self.assertEqual(first, second)
                 self.assertGreaterEqual(first["score"], 0)
                 self.assertLessEqual(first["score"], 100)
-                self.assertEqual(first["fusion_policy_version"], CURRENT_FUSION_POLICY)
+                self.assertEqual(first["fusion_policy_version"], VALIDATED_FUSION_V2)
                 self.assertEqual(first["ai_numeric_contribution"], 0)
 
     def test_explanation_contributions_reconcile_every_final_score(self):

@@ -11,7 +11,8 @@ from backend.case_reporting import (
     sanitize_export_filename,
 )
 from backend.case_store import CaseStore, CaseStorageError
-from backend.fusion_policy import snapshot_policy_version
+from backend.fusion_policy import snapshot_policy_version, RISK_LEVEL_BANDS
+from frontend.ai_ui import assessment_overview
 from backend.input_safety import safe_display_text
 from backend.runtime_config import get_runtime_config
 
@@ -65,10 +66,15 @@ def render_case_workspace():
                 sender = st.text_input("Filter by sender or domain", key="sz_case_sender")
                 f1, f2 = st.columns(2)
                 verdict = f1.selectbox(
-                    "Verdict / risk level",
+                    "Historical / forensic verdict",
                     ["Any", "LIKELY SAFE", "INCONCLUSIVE", "REVIEW REQUIRED",
                      "LOW RISK", "SUSPICIOUS", "HIGH RISK", "CRITICAL"],
                     key="sz_case_verdict",
+                )
+                risk_level = st.selectbox(
+                    "Unified risk level", ["Any", *[label for _, label in RISK_LEVEL_BANDS]],
+                    key="sz_case_risk_level",
+                    help="Matches recorded v3 bands only; historical scores are not reclassified.",
                 )
                 relationship = f2.selectbox(
                     "Campaign relationship", ["Any", "Has candidate group", "No candidate group"],
@@ -91,6 +97,7 @@ def render_case_workspace():
             }[relationship]
             cases = store.list_cases(
                 query=query, sender=sender, verdict=None if verdict == "Any" else verdict,
+                risk_level=None if risk_level == "Any" else risk_level,
                 date_from=date_from, date_to=date_to, campaign=campaign_filter,
                 sort={
                     "Recently updated": "recently_updated", "Newest": "newest",
@@ -239,8 +246,11 @@ def render_case_workspace():
                     "Analysis": f'#{item["version"]}',
                     "State": "Latest" if item["is_latest"] else "Historical",
                     "Recorded at (UTC)": item["analyzed_at"],
-                    "Risk": (item["analysis"].get("final_assessment") or {}).get("risk_score"),
+                    "Risk": assessment_overview(item["analysis"].get("final_assessment"))["score"],
                     "Verdict": (item["analysis"].get("final_assessment") or {}).get("verdict"),
+                    "Risk level": assessment_overview(item["analysis"].get("final_assessment"))["risk_level"],
+                    "Confidence": assessment_overview(item["analysis"].get("final_assessment"))["confidence"],
+                    "Coverage": assessment_overview(item["analysis"].get("final_assessment"))["coverage"],
                     "Fusion policy": snapshot_policy_version(
                         (item["analysis"].get("final_assessment") or {})),
                 } for item in reversed(history)]
@@ -305,7 +315,10 @@ def render_case_report(workspace):
         inventory.append({
             "Email": label(record["email_id"]), "Subject": email.get("subject"),
             "From": email.get("from"), "Email date": email.get("date"),
-            "Forensic risk score": assessment.get("risk_score"),
+            "SpoofZero Threat Score": assessment_overview(assessment)["score"],
+            "Risk level": assessment_overview(assessment)["risk_level"],
+            "Confidence": assessment_overview(assessment)["confidence"],
+            "Coverage": assessment_overview(assessment)["coverage"],
             "Fusion policy": snapshot_policy_version(assessment),
             "Verdict": assessment.get("verdict"),
             "Latest analysis (UTC)": record["analyzed_at"],

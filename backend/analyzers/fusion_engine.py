@@ -4,14 +4,24 @@ from ml.model_policy import FUSION_NOTE
 from backend.fusion_policy import (
     CURRENT_FUSION_POLICY, LEGACY_FUSION_V1, V2_NOTE,
     VERDICT_THRESHOLDS, bounded_signal, calculate_base, valid_number,
+    DETERMINISTIC_POLICIES, ASSESSMENT_SCHEMA_VERSION, CONTRIBUTION_CATEGORIES,
+    risk_level_for_score,
 )
 
+from backend.evidence import normalize_findings, reputation_availability
+from backend.evidence_confidence import summarize_confidence, summarize_coverage
 
-def calculate_reputation_score(reputation):
+
+def calculate_reputation_score(reputation, *, strict=False):
     item_scores = []
 
     for category in ("domains", "ips"):
-        for item in reputation.get(category, []):
+        items = reputation.get(category, [])
+        if strict and not isinstance(items, (list, tuple)):
+            continue
+        for item in items:
+            if strict and reputation_availability(item) not in {"AVAILABLE", "PARTIAL"}:
+                continue
             if item.get("status") != "success":
                 continue
 
@@ -29,11 +39,13 @@ def calculate_reputation_score(reputation):
     return max(item_scores) if item_scores else 0
 
 
-def calculate_attachment_score(attachment_reputation):
+def calculate_attachment_score(attachment_reputation, *, strict=False):
     scores = []
 
     for item in attachment_reputation or []:
 
+        if strict and reputation_availability(item) not in {"AVAILABLE", "PARTIAL"}:
+            continue
         if item.get("status") != "success":
             continue
 
@@ -70,9 +82,21 @@ def calculate_final_risk(
     policy_version=CURRENT_FUSION_POLICY,
     ai_model_metadata=None,
     ai_authorization=None,
+    evidence_context=None,
 ):
-    if policy_version == CURRENT_FUSION_POLICY:
+    if policy_version in DETERMINISTIC_POLICIES:
         ai_analysis = ai_analysis if isinstance(ai_analysis, Mapping) else {}
+    if policy_version == CURRENT_FUSION_POLICY:
+        for name, value in (("sender_identity", sender_identity),
+                            ("authentication", authentication), ("relay_trace", relay_trace)):
+            if not isinstance(value, Mapping):
+                raise ValueError(name + " must be an analyzer mapping")
+        if not isinstance(relay_trace.get("hops", []), (list, tuple)) or any(
+            not isinstance(hop, Mapping) for hop in relay_trace.get("hops", [])
+        ):
+            raise ValueError("Relay hops must be analyzer mappings")
+        reputation = reputation if isinstance(reputation, Mapping) else {}
+        attachment_reputation = attachment_reputation if isinstance(attachment_reputation, (list, tuple)) else []
     reputation = reputation or {}
     attachment_reputation = attachment_reputation or []
 
@@ -92,14 +116,14 @@ def calculate_final_risk(
     )
 
     reputation_score = calculate_reputation_score(
-        reputation
+        reputation, strict=policy_version == CURRENT_FUSION_POLICY
     )
 
     attachment_score = calculate_attachment_score(
-        attachment_reputation
+        attachment_reputation, strict=policy_version == CURRENT_FUSION_POLICY
     )
 
-    if policy_version == CURRENT_FUSION_POLICY:
+    if policy_version in DETERMINISTIC_POLICIES:
         sender_score = bounded_signal(sender_score, "Sender identity")
         auth_score = bounded_signal(auth_score, "Authentication")
         # Malformed AI output cannot affect numeric scoring or qualitative flags.
@@ -239,7 +263,7 @@ def calculate_final_risk(
         100
     )
 
-    if policy_version == CURRENT_FUSION_POLICY:
+    if policy_version in DETERMINISTIC_POLICIES:
         final_score = max(0, final_score)
 
     if final_score >= VERDICT_THRESHOLDS["critical"]:
@@ -257,7 +281,7 @@ def calculate_final_risk(
     else:
         verdict = "LIKELY SAFE"
 
-    return {
+    assessment = {
         "risk_score": final_score,
         "verdict": verdict,
         "fusion_policy_version": policy_version,
@@ -316,3 +340,78 @@ def calculate_final_risk(
             "account_compromise_proven": False,
         }
     }
+
+    if policy_version == CURRENT_FUSION_POLICY:
+        context = dict(evidence_context) if isinstance(evidence_context, Mapping) else {}
+        context.update(
+            sender_identity=sender_identity, authentication=authentication,
+            relay_trace=relay_trace, ai_analysis=ai_analysis, reputation=reputation,
+            attachment_reputation=attachment_reputation, final_assessment=assessment,
+        )
+        _extend_assessment(assessment, normalize_findings(context, policy_version=policy_version))
+    return assessment
+
+
+def _extend_assessment(assessment, findings):
+    """Project the existing ledger; this function never calculates another score."""
+    ledger = assessment["contributions"]
+    categories = []
+    for key, category, label in CONTRIBUTION_CATEGORIES:
+        owners = [f for f in findings if f["ledger_key"] == key]
+        # Each family has exactly one aggregate owner; child evidence never adds points.
+        if len(owners) != 1:
+            raise ValueError("A contribution must have exactly one normalized owner")
+        owner = owners[0]
+        points = float(ledger[key])
+        owner.update(raw_contribution=points, applied_contribution=points)
+        if points:
+            owner["evidence_role"] = "CONTRIBUTING"
+            if owner["availability"] not in {"AVAILABLE", "PARTIAL"}:
+                owner["availability"] = "PARTIAL"
+                owner["coverage_scope"] = True
+                owner["confidence"] = None
+                owner["confidence_explanation"] = "The existing aggregate contributed points, but its source provenance is incomplete."
+        elif owner["evidence_role"] != "UNAVAILABLE":
+            owner["suppression_reason"] = (
+                assessment["ai_scoring_reason"] if key == "ai" else
+                "No positive contribution from this family under the existing arithmetic."
+            )
+        categories.append({
+            "category": category, "label": label, "rule_id": key,
+            "raw_contribution": points, "applied_contribution": points,
+            "finding_ids": [owner["finding_id"]],
+            "aggregation_note": owner["suppression_reason"],
+        })
+    confidence = summarize_confidence(findings)
+    coverage = summarize_coverage(findings)
+    review_reasons = []
+    if assessment["verdict"] != "LIKELY SAFE":
+        review_reasons.append("Existing forensic verdict requires investigator interpretation.")
+    if coverage["status"] != "COMPLETE":
+        review_reasons.append("Evidence coverage is partial; unavailable observations do not establish safety.")
+    if any(f["evidence_role"] == "CONTRIBUTING" and f["confidence"] in (None, "LOW") for f in findings):
+        review_reasons.append("Some contributing assertions have low or unclassified reliability.")
+    strongest = sorted(
+        (f for f in findings if f["applied_contribution"] > 0),
+        key=lambda f: (-f["applied_contribution"], f["finding_id"]),
+    )[:3]
+    assessment.update(
+        assessment_schema_version=ASSESSMENT_SCHEMA_VERSION,
+        threat_score=assessment["risk_score"],
+        risk_level=risk_level_for_score(assessment["risk_score"]),
+        scoring_version=assessment["fusion_policy_version"],
+        normalized_findings=findings,
+        evidence_confidence=confidence,
+        evidence_coverage=coverage,
+        review_required=bool(review_reasons),
+        review_reasons=review_reasons,
+        strongest_findings=[f["finding_id"] for f in strongest],
+        score_breakdown={
+            "categories": categories,
+            "total_before_rounding_and_cap": ledger["total_before_rounding_and_cap"],
+            "rounding_and_cap_adjustment": ledger["rounding_and_cap_adjustment"],
+            "total": assessment["risk_score"],
+            "cap_applied": ledger["cap_applied"],
+            "note": "Category contributions are before the global rounding/cap adjustment; confidence does not change points.",
+        },
+    )

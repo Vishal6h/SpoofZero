@@ -382,7 +382,7 @@ class StorageAndReportTests(unittest.TestCase):
 
 class ProtectedStateTests(unittest.TestCase):
     def test_fusion_and_candidate_policy_are_unchanged(self):
-        self.assertEqual(CURRENT_FUSION_POLICY, "validated_evidence_fusion_v2")
+        self.assertEqual(CURRENT_FUSION_POLICY, "validated_evidence_fusion_v3")
         paths = sorted(Path("ml/models").glob("candidate*/**/metadata.json"))
         self.assertEqual(len(paths), 9)
         self.assertTrue(all(

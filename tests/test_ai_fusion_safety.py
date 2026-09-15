@@ -1,5 +1,6 @@
 """Offline regressions for versioned fusion and zero-weight unvalidated AI."""
 import copy
+from functools import partial
 import json
 import os
 from pathlib import Path
@@ -16,6 +17,7 @@ from backend.fusion_policy import (
     AIWeightAuthorization,
     AUTHENTICATION_SHARE,
     CURRENT_FUSION_POLICY,
+    VALIDATED_FUSION_V2,
     LEGACY_FUSION_V1,
     SENDER_SHARE,
     ai_numeric_policy,
@@ -78,15 +80,19 @@ def authorized(metadata, weight=0.10):
     return AIWeightAuthorization(
         model_version=metadata["model_version"],
         model_metadata_sha256=metadata_fingerprint(metadata),
+        fusion_policy_version=VALIDATED_FUSION_V2,
         weight=weight,
         approval_reference="fixture-review-001",
         evaluation_reference="fixture-evaluation-001",
     )
 
 
+calculate_v2_risk = partial(calculate_final_risk, policy_version=VALIDATED_FUSION_V2)
+
+
 class FusionV2Tests(unittest.TestCase):
     def score(self, sender=0, authentication=0, ai=0, **kwargs):
-        return calculate_final_risk(
+        return calculate_v2_risk(
             {"risk_score": sender}, auth(authentication), {"hops": []},
             {"phishing_probability": ai, **legacy_output_metadata()}, **kwargs,
         )
@@ -105,7 +111,7 @@ class FusionV2Tests(unittest.TestCase):
 
     def test_unvalidated_ai_contributes_exactly_zero(self):
         result = self.score(sender=60, authentication=50, ai=100)
-        self.assertEqual(result["fusion_policy_version"], CURRENT_FUSION_POLICY)
+        self.assertEqual(result["fusion_policy_version"], VALIDATED_FUSION_V2)
         self.assertEqual(result["ai_numeric_contribution"], 0)
         self.assertEqual(result["ai_weight_applied"], 0)
         self.assertFalse(result["ai_included_in_numeric_score"])
@@ -122,7 +128,7 @@ class FusionV2Tests(unittest.TestCase):
 
     def test_validated_and_eligible_without_explicit_weight_still_contributes_zero(self):
         metadata = future_metadata()
-        result = calculate_final_risk(
+        result = calculate_v2_risk(
             {"risk_score": 60}, auth(50), {"hops": []}, future_output(),
             ai_model_metadata=metadata,
         )
@@ -135,7 +141,7 @@ class FusionV2Tests(unittest.TestCase):
     def test_explicit_future_weight_is_model_bound_and_auditable(self):
         metadata = future_metadata()
         approval = authorized(metadata)
-        result = calculate_final_risk(
+        result = calculate_v2_risk(
             {"risk_score": 70}, auth(40), {"hops": []}, future_output(),
             ai_model_metadata=metadata, ai_authorization=approval,
         )
@@ -160,7 +166,8 @@ class FusionV2Tests(unittest.TestCase):
         for candidate, approval in cases:
             with self.subTest(candidate=candidate["model_version"], approval=bool(approval)):
                 decision = ai_numeric_policy(
-                    future_output(), model_metadata=candidate, authorization=approval
+                    future_output(), model_metadata=candidate, authorization=approval,
+                    policy_version=VALIDATED_FUSION_V2
                 )
                 self.assertEqual(decision["weight"], 0)
                 self.assertFalse(decision["included"])
@@ -180,7 +187,7 @@ class FusionV2Tests(unittest.TestCase):
             AIWeightAuthorization(weight=0.10, **{**base, "approval_reference": ""})
 
     def test_reputation_attachment_and_relay_bonuses_are_compatible(self):
-        result = calculate_final_risk(
+        result = calculate_v2_risk(
             {"risk_score": 0}, auth(), {"hops": [{"chain_status": "MISMATCH"}]},
             {"phishing_probability": 100, **legacy_output_metadata()},
             {"domains": [{"status": "success", "analysis_stats": {"malicious": 1}}]},
@@ -201,8 +208,8 @@ class FusionV2Tests(unittest.TestCase):
             reputation={"ips": [{"status": "success", "analysis_stats": {"malicious": 9}}]},
             attachment_reputation=[{"status": "success", "analysis_stats": {"malicious": 9}}],
         )
-        first = calculate_final_risk(**kwargs)
-        second = calculate_final_risk(**kwargs)
+        first = calculate_v2_risk(**kwargs)
+        second = calculate_v2_risk(**kwargs)
         self.assertEqual(first, second)
         self.assertEqual(first["risk_score"], 100)
         self.assertGreaterEqual(first["risk_score"], 0)
@@ -250,7 +257,7 @@ class LegacyCompatibilityTests(unittest.TestCase):
             {"fusion_policy_version": "other", "risk_score": 12}
         ), "UNKNOWN SNAPSHOT")
 
-    def test_reanalysis_uses_v2_and_does_not_rewrite_legacy_snapshot(self):
+    def test_reanalysis_uses_current_policy_and_does_not_rewrite_legacy_snapshot(self):
         with patch("backend.analyzers.reputation_analyzer.VT_API_KEY", None), \
              patch("urllib.request.urlopen", side_effect=AssertionError("offline")):
             fresh = analyze_email(ROOT / "data" / "samples" / "test.eml")
@@ -306,7 +313,7 @@ class FusionUITests(unittest.TestCase):
             {"phishing_probability": 58.05, **legacy_output_metadata()},
         )
         disclosure = fusion_disclosure(result)
-        self.assertEqual(disclosure["policy"], "Validated Evidence v2")
+        self.assertEqual(disclosure["policy"], "Validated Evidence v3")
         self.assertIn("AI numeric contribution: 0 points", disclosure["line"])
         self.assertIn("AI signal: Supporting evidence only", disclosure["line"])
         self.assertIn("not a statistically calibrated probability", disclosure["note"])
@@ -331,6 +338,7 @@ class FusionUITests(unittest.TestCase):
             (ROOT / path).read_text(encoding="utf-8")
             for path in ("frontend/app.py", "frontend/ai_ui.py", "frontend/case_ui.py")
         )
+        self.assertIn("SpoofZero Threat Score", sources)
         self.assertIn("Forensic Risk Score", sources)
         self.assertNotIn('"Threat Score"', sources)
         self.assertNotIn("scientifically calibrated", sources)

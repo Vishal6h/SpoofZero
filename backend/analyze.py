@@ -193,9 +193,15 @@ def analyze_email(
     reputation = enrichment["reputation"]
     attachment_reputation = enrichment["attachment_reputation"]
 
+    email_sha256 = sha256_file(file_path)
     final_assessment = calculate_final_risk(
         sender_identity, authentication, relay_trace, ai_analysis,
-        reputation, attachment_reputation, policy_version=CURRENT_FUSION_POLICY)
+        reputation, attachment_reputation, policy_version=CURRENT_FUSION_POLICY,
+        evidence_context={
+            "email": {"sha256": email_sha256, "processing": email_data.get("processing") or {}},
+            "iocs": iocs, "attachments": attachments,
+            "threat_intelligence": threat_intelligence, "geo_analysis": geo_analysis,
+        })
     health = analysis_health({
         "email": {"processing": email_data.get("processing") or {}},
         "attachments": attachments,
@@ -213,7 +219,7 @@ def analyze_email(
             "subject": email_data.get("subject"), "from": email_data.get("from"),
             "to": email_data.get("to"), "date": email_data.get("date"),
             "reply_to": email_data.get("reply_to"), "return_path": email_data.get("return_path"),
-            "message_id": email_data.get("message_id"), "sha256": sha256_file(file_path),
+            "message_id": email_data.get("message_id"), "sha256": email_sha256,
             "processing": email_data.get("processing") or {},
         },
         "final_assessment": final_assessment, "ai_analysis": ai_analysis,

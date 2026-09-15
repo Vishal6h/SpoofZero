@@ -12,12 +12,13 @@ cases, and integrity-verifiable forensic reports.
 - Reported SPF, DKIM, DMARC identity and alignment analysis
 - Sender mismatch, IOC, relay, origin-IP, and attachment-hash evidence
 - Optional DNS, RDAP, geolocation, and VirusTotal enrichment
+- Versioned threat score, five risk bands, evidence confidence and coverage
 - Deterministic fusion with a reconciled contribution ledger
 - Versioned cases, history comparison, campaign correlation, and reports
 
 The bundled legacy text classifier is **EXPERIMENTAL / NOT VALIDATED**. Its score
 is a supporting model signal, not a confirmed phishing probability. Under
-<code>validated_evidence_fusion_v2</code> it contributes exactly zero numeric
+<code>validated_evidence_fusion_v3</code> it contributes exactly zero numeric
 risk points.
 
 ## Quick start
@@ -75,7 +76,8 @@ is optional. Missing, disabled, timed-out, or failed services produce
 - [Release readiness](docs/release-readiness.md)
 - [Architecture](docs/architecture.md)
 - [Security and privacy model](docs/security-privacy-performance-hardening.md)
-- [Forensic scoring and calibration](docs/risk-score-calibration.md)
+- [Unified risk and evidence confidence](docs/unified-risk-and-confidence.md)
+- [Historical v2 scoring and calibration](docs/risk-score-calibration.md)
 
 Run the offline suite with:
 

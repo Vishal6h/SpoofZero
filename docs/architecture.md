@@ -331,3 +331,15 @@ deployment readiness. It runs as an unprivileged user and expects persistent
 case storage at /data. Unrestricted public exposure remains blocked because the
 application does not provide built-in identity, authorization, tenant isolation,
 encrypted storage, or production abuse controls.
+
+
+## Unified Assessment Foundation (Phase 2)
+
+Fresh analyses now use validated_evidence_fusion_v3. The existing fusion engine
+retains its arithmetic and verdict semantics, normalizes analyzer observations,
+and binds the existing ledger to versioned findings, five risk bands, confidence,
+coverage and review metadata. Evidence adapters perform no scoring or network
+requests. UI, report schema 3 and existing JSON storage expose the new contract;
+v1/v2 snapshots and frozen v2 calibration remain historical and unchanged.
+SQLite stays at schema version 1. See [the unified assessment contract](unified-risk-and-confidence.md)
+for exact bands, contribution ownership, privacy and compatibility rules.
